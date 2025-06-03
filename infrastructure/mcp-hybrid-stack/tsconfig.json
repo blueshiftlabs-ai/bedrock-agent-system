@@ -1,0 +1,34 @@
+{
+  "extends": "@repo/typescript-config/base",
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "commonjs",
+    "lib": ["ES2022"],
+    "outDir": "./dist",
+    "rootDir": "./",
+    "strict": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "resolveJsonModule": true,
+    "declaration": true,
+    "declarationMap": true,
+    "inlineSourceMap": true,
+    "inlineSources": true,
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
+    "typeRoots": ["./node_modules/@types"]
+  },
+  "include": [
+    "bin/**/*",
+    "lib/**/*",
+    "stacks/**/*",
+    "constructs/**/*",
+    "cdk.json"
+  ],
+  "exclude": [
+    "node_modules",
+    "cdk.out",
+    "dist"
+  ]
+}

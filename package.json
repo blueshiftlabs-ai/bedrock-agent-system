@@ -1,0 +1,31 @@
+{
+  "name": "bedrock-agent-system",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "packageManager": "pnpm@10.11.0",
+  "scripts": {
+    "build": "turbo build",
+    "dev": "turbo dev",
+    "test": "turbo test",
+    "lint": "turbo lint",
+    "format": "turbo format",
+    "clean": "turbo clean",
+    "infrastructure:synth": "pnpm --filter @infra/mcp-hybrid-stack synth",
+    "infrastructure:deploy": "pnpm --filter @infra/mcp-hybrid-stack deploy",
+    "infrastructure:destroy": "pnpm --filter @infra/mcp-hybrid-stack destroy",
+    "app:dev": "pnpm --filter @apps/mcp-hybrid-server dev",
+    "app:build": "pnpm --filter @apps/mcp-hybrid-server build",
+    "app:test": "pnpm --filter @apps/mcp-hybrid-server test"
+  },
+  "devDependencies": {
+    "@repo/eslint-config": "workspace:*",
+    "@repo/typescript-config": "workspace:*",
+    "@repo/prettier-config": "workspace:*",
+    "turbo": "^2.3.3"
+  },
+  "engines": {
+    "node": ">=20.0.0",
+    "pnpm": ">=10.0.0"
+  }
+}

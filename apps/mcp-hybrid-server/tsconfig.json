@@ -1,0 +1,21 @@
+{
+  "extends": "@repo/typescript-config/nest",
+  "compilerOptions": {
+    "baseUrl": "./",
+    "outDir": "./dist",
+    "rootDir": "./",
+    "paths": {
+      "@/*": ["src/*"],
+      "@config/*": ["src/config/*"],
+      "@aws/*": ["src/aws/*"],
+      "@memory/*": ["src/memory/*"],
+      "@workflows/*": ["src/workflows/*"],
+      "@agents/*": ["src/agents/*"],
+      "@tools/*": ["src/tools/*"],
+      "@integrations/*": ["src/integrations/*"],
+      "@types/*": ["src/types/*"]
+    }
+  },
+  "include": ["src/**/*", "test/**/*"],
+  "exclude": ["node_modules", "dist", "coverage"]
+}
