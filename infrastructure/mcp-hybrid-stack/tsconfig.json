@@ -2,7 +2,7 @@
   "extends": "@repo/typescript-config/base",
   "compilerOptions": {
     "target": "ES2022",
-    "module": "commonjs",
+    "module": "nodenext",
     "lib": ["ES2022"],
     "outDir": "./dist",
     "rootDir": "./",
@@ -12,8 +12,7 @@
     "forceConsistentCasingInFileNames": true,
     "resolveJsonModule": true,
     "declaration": true,
-    "declarationMap": true,
-    "inlineSourceMap": true,
+    "declarationMap": true,    
     "inlineSources": true,
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,

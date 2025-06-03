@@ -42,7 +42,7 @@ export class ServiceDiscoveryService {
       this.logger.debug(`Service discovery: ${serviceName} -> ${endpoint}`);
       return endpoint;
 
-    } catch (error) {
+    } catch (error: any) {
       this.logger.error(`Failed to discover service ${serviceName}:`, error);
       
       // Fallback to environment variables or defaults

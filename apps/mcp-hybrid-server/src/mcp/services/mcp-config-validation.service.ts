@@ -1,6 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { z } from 'zod';
+import { getErrorMessage } from '@/common/utils/error-utils';
 
 export interface MCPConfigValidationResult {
   valid: boolean;
@@ -57,9 +58,9 @@ export class MCPConfigValidationService {
         result.warnings.forEach(warning => this.logger.warn(`⚠️ ${warning}`));
       }
       
-    } catch (error) {
+    } catch (error: any) {
       result.valid = false;
-      result.errors.push(`Configuration validation failed: ${error instanceof Error ? error.message : String(error)}`);
+      result.errors.push(`Configuration validation failed: ${getErrorMessage(error)}`);
     }
 
     return result;
@@ -89,14 +90,14 @@ export class MCPConfigValidationService {
     try {
       const value = schema.parse(serverConfig);
       result.config.server = value;
-    } catch (error) {
+    } catch (error: any) {
       if (error instanceof z.ZodError) {
         error.errors.forEach(zodError => {
           const path = zodError.path.join('.');
           result.errors.push(`Server config: ${zodError.message}${path ? ` at ${path}` : ''}`);
         });
       } else {
-        result.errors.push(`Server config: ${error instanceof Error ? error.message : String(error)}`);
+        result.errors.push(`Server config: ${getErrorMessage(error)}`);
       }
       return;
     }
@@ -135,14 +136,14 @@ export class MCPConfigValidationService {
     try {
       const value = schema.parse(clientConfig);
       result.config.client = value;
-    } catch (error) {
+    } catch (error: any) {
       if (error instanceof z.ZodError) {
         error.errors.forEach(zodError => {
           const path = zodError.path.join('.');
           result.errors.push(`Client config: ${zodError.message}${path ? ` at ${path}` : ''}`);
         });
       } else {
-        result.errors.push(`Client config: ${error instanceof Error ? error.message : String(error)}`);
+        result.errors.push(`Client config: ${getErrorMessage(error)}`);
       }
       return;
     }
@@ -185,14 +186,14 @@ export class MCPConfigValidationService {
     try {
       const value = schema.parse(globalConfig);
       result.config.global = value;
-    } catch (error) {
+    } catch (error: any) {
       if (error instanceof z.ZodError) {
         error.errors.forEach(zodError => {
           const path = zodError.path.join('.');
           result.errors.push(`Global config: ${zodError.message}${path ? ` at ${path}` : ''}`);
         });
       } else {
-        result.errors.push(`Global config: ${error instanceof Error ? error.message : String(error)}`);
+        result.errors.push(`Global config: ${getErrorMessage(error)}`);
       }
       return;
     }

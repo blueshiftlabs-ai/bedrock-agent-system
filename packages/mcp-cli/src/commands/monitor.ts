@@ -214,7 +214,7 @@ export class MonitorCommand {
           }
         }
 
-      } catch (error) {
+      } catch (error: any) {
         const message = error instanceof Error ? error.message : String(error);
         console.log(Formatter.formatError(`Failed to get system status: ${message}`));
       }
@@ -310,7 +310,7 @@ export class MonitorCommand {
           console.log(Formatter.formatSuccess('All health checks are passing'));
         }
 
-      } catch (error) {
+      } catch (error: any) {
         const message = error instanceof Error ? error.message : String(error);
         SpinnerManager.fail(spinnerId, `Health check failed: ${message}`);
       }
@@ -398,7 +398,7 @@ export class MonitorCommand {
           console.log();
         }
 
-      } catch (error) {
+      } catch (error: any) {
         const message = error instanceof Error ? error.message : String(error);
         console.log(Formatter.formatError(`Failed to get metrics: ${message}`));
       }
@@ -474,7 +474,7 @@ export class MonitorCommand {
         console.log();
       });
 
-    } catch (error) {
+    } catch (error: any) {
       const message = error instanceof Error ? error.message : String(error);
       console.log(Formatter.formatError(`Failed to get alerts: ${message}`));
     }
@@ -620,7 +620,7 @@ export class MonitorCommand {
 
           screen.render();
           
-        } catch (error) {
+        } catch (error: any) {
           alertLog.log(`Error updating dashboard: ${error instanceof Error ? error.message : String(error)}`);
           screen.render();
         }
@@ -656,7 +656,7 @@ export class MonitorCommand {
       screen.append(statusLine);
       screen.render();
 
-    } catch (error) {
+    } catch (error: any) {
       const message = error instanceof Error ? error.message : String(error);
       console.log(Formatter.formatError(`Failed to start dashboard: ${message}`));
     }
@@ -696,7 +696,7 @@ export class MonitorCommand {
         });
       }
 
-    } catch (error) {
+    } catch (error: any) {
       const message = error instanceof Error ? error.message : String(error);
       console.log(Formatter.formatError(`Failed to get performance data: ${message}`));
     }
@@ -743,7 +743,7 @@ export class MonitorCommand {
           });
         }
 
-      } catch (error) {
+      } catch (error: any) {
         const message = error instanceof Error ? error.message : String(error);
         console.log(Formatter.formatError(`Failed to get resource usage: ${message}`));
       }
@@ -811,7 +811,7 @@ export class MonitorCommand {
           format: this.config.get('display.format') 
         }));
 
-      } catch (error) {
+      } catch (error: any) {
         const message = error instanceof Error ? error.message : String(error);
         console.log(Formatter.formatError(`Failed to get connections: ${message}`));
       }
@@ -914,7 +914,7 @@ export class MonitorCommand {
         }
       }, 1000);
 
-    } catch (error) {
+    } catch (error: any) {
       const message = error instanceof Error ? error.message : String(error);
       SpinnerManager.fail(spinnerId, `Load test failed: ${message}`);
     }
@@ -957,7 +957,7 @@ export class MonitorCommand {
         });
       }
 
-    } catch (error) {
+    } catch (error: any) {
       const message = error instanceof Error ? error.message : String(error);
       SpinnerManager.fail(spinnerId, `Benchmark failed: ${message}`);
     }
@@ -989,7 +989,7 @@ export class MonitorCommand {
 
       SpinnerManager.succeed(spinnerId, `Metrics exported to ${file}`);
 
-    } catch (error) {
+    } catch (error: any) {
       const message = error instanceof Error ? error.message : String(error);
       SpinnerManager.fail(spinnerId, `Failed to export metrics: ${message}`);
     }

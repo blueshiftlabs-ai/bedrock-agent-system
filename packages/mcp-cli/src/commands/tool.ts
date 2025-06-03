@@ -229,7 +229,7 @@ export class ToolCommand {
         }));
       }
 
-    } catch (error) {
+    } catch (error: any) {
       const message = error instanceof Error ? error.message : String(error);
       console.log(Formatter.formatError(`Failed to list tools: ${message}`));
     }
@@ -290,7 +290,7 @@ export class ToolCommand {
         // Schema might not be available
       }
 
-    } catch (error) {
+    } catch (error: any) {
       const message = error instanceof Error ? error.message : String(error);
       console.log(Formatter.formatError(`Failed to get tool information: ${message}`));
     }
@@ -376,7 +376,7 @@ export class ToolCommand {
         }
       }
 
-    } catch (error) {
+    } catch (error: any) {
       const message = error instanceof Error ? error.message : String(error);
       SpinnerManager.fail(spinnerId, `Tool execution failed: ${message}`);
     }
@@ -415,7 +415,7 @@ export class ToolCommand {
         }
       }
 
-    } catch (error) {
+    } catch (error: any) {
       const message = error instanceof Error ? error.message : String(error);
       console.log(Formatter.formatError(`Failed to get tool schema: ${message}`));
     }
@@ -473,7 +473,7 @@ export class ToolCommand {
         format: this.config.get('display.format') 
       }));
 
-    } catch (error) {
+    } catch (error: any) {
       const message = error instanceof Error ? error.message : String(error);
       console.log(Formatter.formatError(`Failed to get tool usage statistics: ${message}`));
     }
@@ -524,7 +524,7 @@ export class ToolCommand {
         format: this.config.get('display.format') 
       }));
 
-    } catch (error) {
+    } catch (error: any) {
       const message = error instanceof Error ? error.message : String(error);
       console.log(Formatter.formatError(`Failed to search tools: ${message}`));
     }
@@ -578,7 +578,7 @@ export class ToolCommand {
         wait: true 
       });
 
-    } catch (error) {
+    } catch (error: any) {
       const message = error instanceof Error ? error.message : String(error);
       console.log(Formatter.formatError(`Failed to test tool: ${message}`));
     }
@@ -622,7 +622,7 @@ export class ToolCommand {
         format: this.config.get('display.format') 
       }));
 
-    } catch (error) {
+    } catch (error: any) {
       const message = error instanceof Error ? error.message : String(error);
       console.log(Formatter.formatError(`Failed to get tool history: ${message}`));
     }
@@ -698,7 +698,7 @@ export class ToolCommand {
         console.log(Formatter.formatError(`Unknown command: ${command}`));
         console.log(Formatter.formatInfo('Type "help" for available commands'));
 
-      } catch (error) {
+      } catch (error: any) {
         if (error && typeof error === 'object' && 'isTtyError' in error) {
           // User cancelled (Ctrl+C)
           console.log(yellow('\nGoodbye!'));
@@ -756,7 +756,7 @@ export class ToolCommand {
         format: this.config.get('display.format') 
       }));
 
-    } catch (error) {
+    } catch (error: any) {
       const message = error instanceof Error ? error.message : String(error);
       console.log(Formatter.formatError(`Failed to get tool performance: ${message}`));
     }
@@ -786,7 +786,7 @@ export class ToolCommand {
         format: this.config.get('display.format') 
       }));
 
-    } catch (error) {
+    } catch (error: any) {
       const message = error instanceof Error ? error.message : String(error);
       console.log(Formatter.formatError(`Failed to list tool categories: ${message}`));
     }
@@ -813,7 +813,7 @@ export class ToolCommand {
       const installation = response.data;
       SpinnerManager.succeed(spinnerId, `Installed ${installation.toolCount} tools from ${installation.serverName}`);
 
-    } catch (error) {
+    } catch (error: any) {
       const message = error instanceof Error ? error.message : String(error);
       SpinnerManager.fail(spinnerId, `Failed to install external tools: ${message}`);
     }
@@ -834,7 +834,7 @@ export class ToolCommand {
       const uninstallation = response.data;
       SpinnerManager.succeed(spinnerId, `Uninstalled ${uninstallation.toolCount} tools from ${uninstallation.serverName}`);
 
-    } catch (error) {
+    } catch (error: any) {
       const message = error instanceof Error ? error.message : String(error);
       SpinnerManager.fail(spinnerId, `Failed to uninstall external tools: ${message}`);
     }
@@ -898,7 +898,7 @@ export class ToolCommand {
 
       return answers;
 
-    } catch (error) {
+    } catch (error: any) {
       console.log(Formatter.formatWarning('Could not get tool schema, using basic input'));
       
       const answers = await inquirer.prompt([

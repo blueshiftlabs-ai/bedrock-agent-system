@@ -140,7 +140,7 @@ export class ServerCommand {
         SpinnerManager.succeed(spinnerId, 'Server start initiated');
       }
 
-    } catch (error) {
+    } catch (error: any) {
       const message = error instanceof Error ? error.message : String(error);
       SpinnerManager.fail(spinnerId, `Failed to start server: ${message}`);
     }
@@ -188,7 +188,7 @@ export class ServerCommand {
         throw new Error('Server stop timeout');
       }
 
-    } catch (error) {
+    } catch (error: any) {
       const message = error instanceof Error ? error.message : String(error);
       SpinnerManager.fail(spinnerId, `Failed to stop server: ${message}`);
     }
@@ -213,7 +213,7 @@ export class ServerCommand {
 
       SpinnerManager.succeed(spinnerId, 'Server restarted successfully');
 
-    } catch (error) {
+    } catch (error: any) {
       const message = error instanceof Error ? error.message : String(error);
       SpinnerManager.fail(spinnerId, `Failed to restart server: ${message}`);
     }
@@ -276,7 +276,7 @@ export class ServerCommand {
           }
         }
         
-      } catch (error) {
+      } catch (error: any) {
         console.log(Formatter.formatError('Server is not reachable'));
         
         if (this.config.get<boolean>('display.verbose')) {
@@ -370,7 +370,7 @@ export class ServerCommand {
         });
       }
       
-    } catch (error) {
+    } catch (error: any) {
       const message = error instanceof Error ? error.message : String(error);
       console.log(Formatter.formatError(`Failed to get logs: ${message}`));
     }
@@ -397,7 +397,7 @@ export class ServerCommand {
         format: this.config.get('display.format') 
       }));
       
-    } catch (error) {
+    } catch (error: any) {
       const message = error instanceof Error ? error.message : String(error);
       console.log(Formatter.formatError(`Failed to get server info: ${message}`));
     }
@@ -448,7 +448,7 @@ export class ServerCommand {
         }
       }
       
-    } catch (error) {
+    } catch (error: any) {
       const message = error instanceof Error ? error.message : String(error);
       SpinnerManager.fail(spinnerId, `Health check failed: ${message}`);
     }
@@ -507,7 +507,7 @@ export class ServerCommand {
         console.log(Formatter.formatTable(tableData));
       }
       
-    } catch (error) {
+    } catch (error: any) {
       const message = error instanceof Error ? error.message : String(error);
       console.log(Formatter.formatError(`Failed to get configuration: ${message}`));
     }

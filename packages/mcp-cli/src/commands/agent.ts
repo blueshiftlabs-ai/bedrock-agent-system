@@ -178,7 +178,7 @@ export class AgentCommand {
         }));
       }
 
-    } catch (error) {
+    } catch (error: any) {
       const message = error instanceof Error ? error.message : String(error);
       console.log(Formatter.formatError(`Failed to list agents: ${message}`));
     }
@@ -221,7 +221,7 @@ export class AgentCommand {
         console.log(`  • ${capability}`);
       });
 
-    } catch (error) {
+    } catch (error: any) {
       const message = error instanceof Error ? error.message : String(error);
       console.log(Formatter.formatError(`Failed to get agent information: ${message}`));
     }
@@ -310,7 +310,7 @@ export class AgentCommand {
         console.log(Formatter.formatInfo(`Use 'mcp-cli agent status ${agentId}' to check progress`));
       }
 
-    } catch (error) {
+    } catch (error: any) {
       const message = error instanceof Error ? error.message : String(error);
       SpinnerManager.fail(spinnerId, `Agent execution failed: ${message}`);
     }
@@ -374,7 +374,7 @@ export class AgentCommand {
 
       return answers;
 
-    } catch (error) {
+    } catch (error: any) {
       console.log(Formatter.formatWarning('Could not get agent schema, using basic input'));
       
       const answers = await inquirer.prompt([
@@ -436,7 +436,7 @@ export class AgentCommand {
           });
         }
 
-      } catch (error) {
+      } catch (error: any) {
         const message = error instanceof Error ? error.message : String(error);
         console.log(Formatter.formatError(`Failed to get agent status: ${message}`));
       }
@@ -507,7 +507,7 @@ export class AgentCommand {
         format: this.config.get('display.format') 
       }));
 
-    } catch (error) {
+    } catch (error: any) {
       const message = error instanceof Error ? error.message : String(error);
       console.log(Formatter.formatError(`Failed to get agent history: ${message}`));
     }
@@ -561,7 +561,7 @@ export class AgentCommand {
         }
       }
 
-    } catch (error) {
+    } catch (error: any) {
       const message = error instanceof Error ? error.message : String(error);
       console.log(Formatter.formatError(`Failed to get agent capabilities: ${message}`));
     }
@@ -667,7 +667,7 @@ export class AgentCommand {
         console.log(Formatter.formatError(`Unknown command: ${command}`));
         console.log(Formatter.formatInfo('Type "help" for available commands'));
 
-      } catch (error) {
+      } catch (error: any) {
         if (error && typeof error === 'object' && 'isTtyError' in error) {
           // User cancelled (Ctrl+C)
           console.log(yellow('\nGoodbye!'));
@@ -724,7 +724,7 @@ export class AgentCommand {
         format: this.config.get('display.format') 
       }));
 
-    } catch (error) {
+    } catch (error: any) {
       const message = error instanceof Error ? error.message : String(error);
       console.log(Formatter.formatError(`Failed to get agent performance: ${message}`));
     }
@@ -756,7 +756,7 @@ export class AgentCommand {
         wait: true 
       });
 
-    } catch (error) {
+    } catch (error: any) {
       const message = error instanceof Error ? error.message : String(error);
       console.log(Formatter.formatError(`Failed to test agent: ${message}`));
     }

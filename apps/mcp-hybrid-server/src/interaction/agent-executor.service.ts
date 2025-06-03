@@ -131,7 +131,7 @@ class AgentExecutorImpl implements AgentExecutor {
 
       return result;
 
-    } catch (error) {
+    } catch (error: any) {
       this.logger.error(`Agent execution failed for process ${this.processId}: ${error.message}`);
       
       if (!this.isCancelled) {
@@ -264,7 +264,7 @@ class AgentExecutorImpl implements AgentExecutor {
           `Completed step: ${step.name}`,
           'AgentExecutor'
         );
-      } catch (error) {
+      } catch (error: any) {
         this.processManager.addLog(
           this.processId,
           'error',

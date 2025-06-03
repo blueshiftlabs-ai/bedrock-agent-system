@@ -47,7 +47,7 @@ export class AutoConnectionService implements OnModuleInit {
     const connectionPromises = autoConnectServers.map(async (server) => {
       try {
         await this.connectServerWithRetry(server);
-      } catch (error) {
+      } catch (error: any) {
         this.logger.error(`Failed to auto-connect to ${server.name}:`, error);
       }
     });
@@ -77,7 +77,7 @@ export class AutoConnectionService implements OnModuleInit {
       this.clearReconnectTimeout(config.id);
       
       this.logger.log(`Successfully connected to ${config.name}`);
-    } catch (error) {
+    } catch (error: any) {
       this.logger.error(`Connection attempt failed for ${config.name}:`, error);
       
       this.reconnectAttempts.set(config.id, currentAttempts + 1);
@@ -154,7 +154,7 @@ export class AutoConnectionService implements OnModuleInit {
         connection.lastPingAt = new Date();
         
         this.logger.debug(`Health check passed for ${connection.name}`);
-      } catch (error) {
+      } catch (error: any) {
         this.logger.warn(`Health check failed for ${connection.name}:`, error);
         
         // If the connection appears dead, trigger reconnection
@@ -193,7 +193,7 @@ export class AutoConnectionService implements OnModuleInit {
     // Disconnect if currently connected
     try {
       await this.clientService.disconnect(serverId);
-    } catch (error) {
+    } catch (error: any) {
       this.logger.warn(`Error during disconnect before reconnect:`, error);
     }
     

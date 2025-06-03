@@ -133,7 +133,7 @@ export class ApiKeyGuard implements CanActivate {
       
       // Check against stored hashes (implement your storage logic)
       return await this.checkApiKeyInDatabase(hashedKey);
-    } catch (error) {
+    } catch (error: any) {
       return false;
     }
   }
@@ -1054,7 +1054,7 @@ export class SecretsService {
       }
 
       return response.Parameter.Value;
-    } catch (error) {
+    } catch (error: any) {
       this.logger.error(`Failed to retrieve secret: ${name}`, error);
       throw error;
     }
@@ -1083,7 +1083,7 @@ export class SecretsService {
           ],
         })
       );
-    } catch (error) {
+    } catch (error: any) {
       this.logger.error(`Failed to set secret: ${name}`, error);
       throw error;
     }
@@ -1259,7 +1259,7 @@ export class IncidentResponseService {
       // 5. Document the incident
       await this.documentIncident(incidentId, incident, impact);
       
-    } catch (error) {
+    } catch (error: any) {
       this.logger.error('Error handling security incident', { incidentId, error });
     }
   }

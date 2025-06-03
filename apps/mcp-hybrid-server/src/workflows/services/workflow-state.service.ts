@@ -1,6 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { DynamoDBService } from '@aws/dynamodb.service';
 import { BaseState } from '../states/base-state';
+import { getErrorMessage } from '@/common/utils/error-utils';
 
 @Injectable()
 export class WorkflowStateService {
@@ -17,7 +18,7 @@ export class WorkflowStateService {
         ttl: Math.floor(Date.now() / 1000) + (7 * 24 * 60 * 60), // 7 days TTL
       });
     } catch (error) {
-      this.logger.error(`Error saving workflow state: ${error.message}`);
+      this.logger.error(`Error saving workflow state: ${getErrorMessage(error)}`);
       throw error;
     }
   }
@@ -27,7 +28,7 @@ export class WorkflowStateService {
       const item = await this.dynamoService.getItem('WorkflowState', { workflowId });
       return item ? JSON.parse(item.state) : null;
     } catch (error) {
-      this.logger.error(`Error getting workflow state: ${error.message}`);
+      this.logger.error(`Error getting workflow state: ${getErrorMessage(error)}`);
       return null;
     }
   }
@@ -42,7 +43,7 @@ export class WorkflowStateService {
         ttl: Math.floor(Date.now() / 1000) + (7 * 24 * 60 * 60), // 7 days TTL
       });
     } catch (error) {
-      this.logger.error(`Error saving checkpoint: ${error.message}`);
+      this.logger.error(`Error saving checkpoint: ${getErrorMessage(error)}`);
       throw error;
     }
   }
@@ -50,10 +51,13 @@ export class WorkflowStateService {
   async getCheckpoints(workflowId: string): Promise<any[]> {
     try {
       return await this.dynamoService.queryItems('WorkflowCheckpoints', {
-        workflowId,
+        KeyConditionExpression: 'workflowId = :workflowId',
+        ExpressionAttributeValues: {
+          ':workflowId': workflowId,
+        },
       });
     } catch (error) {
-      this.logger.error(`Error getting checkpoints: ${error.message}`);
+      this.logger.error(`Error getting checkpoints: ${getErrorMessage(error)}`);
       return [];
     }
   }

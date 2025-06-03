@@ -56,7 +56,7 @@ export class ServiceProxyService {
       // Send response
       res.status(response.status).send(response.data);
 
-    } catch (error) {
+    } catch (error: any) {
       this.logger.error(`Error proxying request to ${serviceName}:`, error);
       
       if (error.response) {

@@ -89,7 +89,7 @@ const result = await registry.execute('analyze_code', {
 ```typescript
 try {
   const result = await registry.executeValidated('analyze_code', params);
-} catch (error) {
+} catch (error: any) {
   if (error instanceof ValidationError) {
     // Handle validation error
   }

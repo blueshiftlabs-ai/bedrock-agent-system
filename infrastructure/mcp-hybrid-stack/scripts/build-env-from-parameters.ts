@@ -61,7 +61,7 @@ class ParameterStoreEnvBuilder {
         if (response.InvalidParameters && response.InvalidParameters.length > 0) {
           console.warn('Invalid parameters:', response.InvalidParameters);
         }
-      } catch (error) {
+      } catch (error: any) {
         console.error('Error retrieving parameters:', error);
       }
     }
@@ -86,7 +86,7 @@ class ParameterStoreEnvBuilder {
           const secretValue = JSON.parse(response.SecretString);
           secretMap.set(secretName, secretValue);
         }
-      } catch (error) {
+      } catch (error: any) {
         console.error(`Error retrieving secret ${secretName}:`, error);
       }
     }
@@ -268,7 +268,7 @@ program
       }
 
       console.log('Environment files generated successfully!');
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error generating environment files:', error);
       process.exit(1);
     }
@@ -295,7 +295,7 @@ program
       console.log(`\nSuccessfully retrieved ${envVariables.length} environment variables`);
       console.log(`Parameters: ${envVariables.filter(v => v.source === 'parameter').length}`);
       console.log(`Secrets: ${envVariables.filter(v => v.source === 'secret').length}`);
-    } catch (error) {
+    } catch (error: any) {
       console.error('Validation failed:', error);
       process.exit(1);
     }

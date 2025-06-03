@@ -1,5 +1,6 @@
 import { Logger } from '@nestjs/common';
 import { BedrockMcpClient } from '@integrations/bedrock/bedrock-mcp.client';
+import { getErrorMessage } from '@/common/utils/error-utils';
 
 export abstract class BaseAgent {
   protected readonly logger: Logger;
@@ -19,8 +20,8 @@ export abstract class BaseAgent {
       const result = await this.processRequest(prompt, options);
       this.logger.log(`${this.name} agent completed successfully`);
       return result;
-    } catch (error) {
-      this.logger.error(`Error in ${this.name} agent: ${error.message}`);
+    } catch (error: any) {
+      this.logger.error(`Error in ${this.name} agent: ${getErrorMessage(error)}`);
       throw error;
     }
   }

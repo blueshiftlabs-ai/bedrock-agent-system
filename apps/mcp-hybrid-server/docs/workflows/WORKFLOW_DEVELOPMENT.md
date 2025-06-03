@@ -547,7 +547,7 @@ export class ToolNode {
         [`${toolName}Result`]: result,
         lastUpdated: Date.now(),
       };
-    } catch (error) {
+    } catch (error: any) {
       return {
         ...state,
         error: {
@@ -627,7 +627,7 @@ export class DataProcessingNode {
   ): Promise<any> {
     try {
       return await processingFunction(item);
-    } catch (error) {
+    } catch (error: any) {
       // Log error but continue processing
       console.warn('Error processing item:', error);
       return { error: error.message, item };
@@ -958,7 +958,7 @@ export class WorkflowCircuitBreaker {
       circuit.state = 'CLOSED';
       
       return result;
-    } catch (error) {
+    } catch (error: any) {
       circuit.failureCount++;
       circuit.lastFailureTime = Date.now();
       

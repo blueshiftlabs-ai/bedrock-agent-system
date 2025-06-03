@@ -4,6 +4,7 @@ import { CodeAnalyzerAgent } from '@agents/code-analyzer/code-analyzer.agent';
 import { DatabaseAnalyzerAgent } from '@agents/db-analyzer/db-analyzer.agent';
 import { KnowledgeBuilderAgent } from '@agents/knowledge-builder/knowledge-builder.agent';
 import { DocumentationGeneratorAgent } from '@agents/documentation-generator/documentation-generator.agent';
+import { getErrorMessage } from '@/common/utils/error-utils';
 
 @Injectable()
 export class CodeAnalysisNodes {
@@ -45,12 +46,12 @@ export class CodeAnalysisNodes {
           codeAnalysis: result
         }
       };
-    } catch (error) {
+    } catch (error: any) {
       this.logger.error('Error in code analysis:', error);
       return {
         ...state,
         analysisStage: 'error',
-        error: `Code analysis failed: ${error.message}`,
+        error: `Code analysis failed: ${getErrorMessage(error)}`,
         lastUpdated: Date.now(),
       };
     }
@@ -106,7 +107,7 @@ export class CodeAnalysisNodes {
       return {
         ...state,
         analysisStage: 'error',
-        error: `Database analysis failed: ${error.message}`,
+        error: `Database analysis failed: ${getErrorMessage(error)}`,
         lastUpdated: Date.now(),
       };
     }
@@ -149,7 +150,7 @@ export class CodeAnalysisNodes {
       return {
         ...state,
         analysisStage: 'error',
-        error: `Knowledge graph update failed: ${error.message}`,
+        error: `Knowledge graph update failed: ${getErrorMessage(error)}`,
         lastUpdated: Date.now(),
       };
     }
@@ -193,7 +194,7 @@ export class CodeAnalysisNodes {
       return {
         ...state,
         analysisStage: 'error',
-        error: `Documentation generation failed: ${error.message}`,
+        error: `Documentation generation failed: ${getErrorMessage(error)}`,
         lastUpdated: Date.now(),
       };
     }

@@ -66,7 +66,7 @@ export class KnowledgeGraphTool {
           } else {
             result.entitiesUpdated++;
           }
-        } catch (error) {
+        } catch (error: any) {
           const errorMsg = `Failed to process entity ${entity.id}: ${error.message}`;
           this.logger.error(errorMsg);
           result.errors.push(errorMsg);
@@ -82,7 +82,7 @@ export class KnowledgeGraphTool {
           } else {
             result.relationshipsUpdated++;
           }
-        } catch (error) {
+        } catch (error: any) {
           const errorMsg = `Failed to process relationship ${relationship.id}: ${error.message}`;
           this.logger.error(errorMsg);
           result.errors.push(errorMsg);
@@ -108,7 +108,7 @@ export class KnowledgeGraphTool {
         snapshotStoredAt: `s3://${snapshotKey}`,
         updatedAt: new Date().toISOString(),
       };
-    } catch (error) {
+    } catch (error: any) {
       this.logger.error('Error updating knowledge graph:', error);
       throw new Error(`Knowledge graph update failed: ${error.message}`);
     }
@@ -134,7 +134,7 @@ export class KnowledgeGraphTool {
     try {
       const existingData = await this.awsService.getFromS3(entityKey);
       existingEntity = JSON.parse(existingData);
-    } catch (error) {
+    } catch (error: any) {
       // Entity doesn't exist
       existingEntity = null;
     }
@@ -166,7 +166,7 @@ export class KnowledgeGraphTool {
     try {
       await this.awsService.getFromS3(fromEntityKey);
       await this.awsService.getFromS3(toEntityKey);
-    } catch (error) {
+    } catch (error: any) {
       throw new Error(`Referenced entity does not exist: ${error.message}`);
     }
 
@@ -177,7 +177,7 @@ export class KnowledgeGraphTool {
     try {
       const existingData = await this.awsService.getFromS3(relationshipKey);
       existingRelationship = JSON.parse(existingData);
-    } catch (error) {
+    } catch (error: any) {
       // Relationship doesn't exist
       existingRelationship = null;
     }

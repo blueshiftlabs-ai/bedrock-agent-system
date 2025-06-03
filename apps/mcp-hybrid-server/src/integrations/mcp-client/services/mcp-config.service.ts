@@ -41,7 +41,7 @@ export class MCPConfigService {
       }
 
       this.logger.log(`Loaded ${config.servers.length} MCP server configurations`);
-    } catch (error) {
+    } catch (error: any) {
       this.logger.error('Failed to load MCP configurations:', error);
       throw error;
     }
@@ -65,7 +65,7 @@ export class MCPConfigService {
 
       await writeFile(this.configFile, JSON.stringify(config, null, 2));
       this.logger.log('MCP configurations saved successfully');
-    } catch (error) {
+    } catch (error: any) {
       this.logger.error('Failed to save MCP configurations:', error);
       throw error;
     }

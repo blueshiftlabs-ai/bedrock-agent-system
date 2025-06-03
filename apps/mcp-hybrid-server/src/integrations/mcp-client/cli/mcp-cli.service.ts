@@ -4,6 +4,7 @@ import { MCPConfigService } from '../services/mcp-config.service';
 import { MCPClientService } from '../services/mcp-client.service';
 import { ToolDiscoveryService } from '../services/tool-discovery.service';
 import { MCPServerConfig } from '../types/mcp-protocol.types';
+import { getErrorMessage } from '@/common/utils/error-utils';
 
 @Injectable()
 export class MCPCliService {
@@ -210,7 +211,7 @@ export class MCPCliService {
       const serverConfig = await this.configService.addServer(config);
       console.log(`✅ Added MCP server: ${serverConfig.name} (ID: ${serverConfig.id})`);
     } catch (error) {
-      console.error(`❌ Failed to add server: ${error instanceof Error ? error.message : String(error)}`);
+      console.error(`❌ Failed to add server: ${getErrorMessage(error)}`);
       throw error;
     }
   }
@@ -231,7 +232,7 @@ export class MCPCliService {
       await this.configService.removeServer(config.id);
       console.log(`✅ Removed MCP server: ${name}`);
     } catch (error) {
-      console.error(`❌ Failed to remove server: ${error instanceof Error ? error.message : String(error)}`);
+      console.error(`❌ Failed to remove server: ${getErrorMessage(error)}`);
       throw error;
     }
   }
@@ -275,7 +276,7 @@ export class MCPCliService {
         }
       }
     } catch (error) {
-      console.error(`❌ Failed to list servers: ${error instanceof Error ? error.message : String(error)}`);
+      console.error(`❌ Failed to list servers: ${getErrorMessage(error)}`);
       throw error;
     }
   }
@@ -300,7 +301,7 @@ export class MCPCliService {
       const result = await this.discoveryService.discoverToolsFromConnection(connection);
       console.log(`✅ Discovered ${result.tools.length} tools`);
     } catch (error) {
-      console.error(`❌ Failed to connect: ${error instanceof Error ? error.message : String(error)}`);
+      console.error(`❌ Failed to connect: ${getErrorMessage(error)}`);
       throw error;
     }
   }
@@ -315,7 +316,7 @@ export class MCPCliService {
       await this.clientService.disconnect(config.id);
       console.log(`✅ Disconnected from ${name}`);
     } catch (error) {
-      console.error(`❌ Failed to disconnect: ${error instanceof Error ? error.message : String(error)}`);
+      console.error(`❌ Failed to disconnect: ${getErrorMessage(error)}`);
       throw error;
     }
   }
@@ -330,7 +331,7 @@ export class MCPCliService {
       await this.configService.toggleServerEnabled(config.id, enabled);
       console.log(`✅ Server ${name} ${enabled ? 'enabled' : 'disabled'}`);
     } catch (error) {
-      console.error(`❌ Failed to ${enabled ? 'enable' : 'disable'} server: ${error instanceof Error ? error.message : String(error)}`);
+      console.error(`❌ Failed to ${enabled ? 'enable' : 'disable'} server: ${getErrorMessage(error)}`);
       throw error;
     }
   }
@@ -345,7 +346,7 @@ export class MCPCliService {
       await this.configService.setAutoConnect(config.id, autoConnect);
       console.log(`✅ Auto-connect ${autoConnect ? 'enabled' : 'disabled'} for ${name}`);
     } catch (error) {
-      console.error(`❌ Failed to set auto-connect: ${error instanceof Error ? error.message : String(error)}`);
+      console.error(`❌ Failed to set auto-connect: ${getErrorMessage(error)}`);
       throw error;
     }
   }
@@ -373,7 +374,7 @@ export class MCPCliService {
         console.log(`✅ Discovered ${totalTools} tools from ${results.length} servers`);
       }
     } catch (error) {
-      console.error(`❌ Failed to discover tools: ${error instanceof Error ? error.message : String(error)}`);
+      console.error(`❌ Failed to discover tools: ${getErrorMessage(error)}`);
       throw error;
     }
   }
@@ -417,7 +418,7 @@ export class MCPCliService {
         console.log();
       }
     } catch (error) {
-      console.error(`❌ Failed to list tools: ${error instanceof Error ? error.message : String(error)}`);
+      console.error(`❌ Failed to list tools: ${getErrorMessage(error)}`);
       throw error;
     }
   }
@@ -432,7 +433,7 @@ export class MCPCliService {
       // This would need proper tool registry access
       throw new Error('Tool testing not implemented in CLI context');
     } catch (error) {
-      console.error(`❌ Failed to test tool: ${error instanceof Error ? error.message : String(error)}`);
+      console.error(`❌ Failed to test tool: ${getErrorMessage(error)}`);
       throw error;
     }
   }
@@ -446,7 +447,7 @@ export class MCPCliService {
       await this.configService.importConfigurations(config);
       console.log(`✅ Imported configurations from ${file}`);
     } catch (error) {
-      console.error(`❌ Failed to import config: ${error instanceof Error ? error.message : String(error)}`);
+      console.error(`❌ Failed to import config: ${getErrorMessage(error)}`);
       throw error;
     }
   }
@@ -459,7 +460,7 @@ export class MCPCliService {
       await fs.writeFile(file, JSON.stringify(config, null, 2));
       console.log(`✅ Exported configurations to ${file}`);
     } catch (error) {
-      console.error(`❌ Failed to export config: ${error instanceof Error ? error.message : String(error)}`);
+      console.error(`❌ Failed to export config: ${getErrorMessage(error)}`);
       throw error;
     }
   }
@@ -475,7 +476,7 @@ export class MCPCliService {
       console.log(`✅ Created sample ${type} server: ${serverConfig.name}`);
       console.log(`💡 Remember to review and update the configuration as needed`);
     } catch (error) {
-      console.error(`❌ Failed to create sample: ${error instanceof Error ? error.message : String(error)}`);
+      console.error(`❌ Failed to create sample: ${getErrorMessage(error)}`);
       throw error;
     }
   }
@@ -505,7 +506,7 @@ export class MCPCliService {
         console.log(`${statusIcon} ${server.name}: ${status}`);
       }
     } catch (error) {
-      console.error(`❌ Failed to show status: ${error instanceof Error ? error.message : String(error)}`);
+      console.error(`❌ Failed to show status: ${getErrorMessage(error)}`);
       throw error;
     }
   }

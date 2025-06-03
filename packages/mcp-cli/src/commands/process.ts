@@ -162,7 +162,7 @@ export class ProcessCommand {
           }));
         }
 
-      } catch (error) {
+      } catch (error: any) {
         const message = error instanceof Error ? error.message : String(error);
         console.log(Formatter.formatError(`Failed to list processes: ${message}`));
       }
@@ -223,7 +223,7 @@ export class ProcessCommand {
         });
       }
 
-    } catch (error) {
+    } catch (error: any) {
       const message = error instanceof Error ? error.message : String(error);
       console.log(Formatter.formatError(`Failed to get process information: ${message}`));
     }
@@ -280,7 +280,7 @@ export class ProcessCommand {
         SpinnerManager.succeed(spinnerId, `Kill signal sent to process ${pid}`);
       }
 
-    } catch (error) {
+    } catch (error: any) {
       const message = error instanceof Error ? error.message : String(error);
       SpinnerManager.fail(spinnerId, `Failed to kill process: ${message}`);
     }
@@ -329,7 +329,7 @@ export class ProcessCommand {
 
         console.log(Formatter.formatTable(tableData));
 
-      } catch (error) {
+      } catch (error: any) {
         // Silent error handling in monitor mode
       }
     }, parseInt(options.interval) * 1000);
@@ -359,7 +359,7 @@ export class ProcessCommand {
 
       this.renderProcessTree(tree, '', true);
 
-    } catch (error) {
+    } catch (error: any) {
       const message = error instanceof Error ? error.message : String(error);
       console.log(Formatter.formatError(`Failed to get process tree: ${message}`));
     }
@@ -424,7 +424,7 @@ export class ProcessCommand {
         format: this.config.get('display.format') 
       }));
 
-    } catch (error) {
+    } catch (error: any) {
       const message = error instanceof Error ? error.message : String(error);
       console.log(Formatter.formatError(`Failed to search processes: ${message}`));
     }
@@ -480,7 +480,7 @@ export class ProcessCommand {
           try {
             await this.apiClient.killProcess(process.pid, 'SIGTERM');
             console.log(Formatter.formatSuccess('Process terminated'));
-          } catch (error) {
+          } catch (error: any) {
             console.log(Formatter.formatError('Failed to terminate process'));
           }
           
@@ -488,7 +488,7 @@ export class ProcessCommand {
         });
       }
 
-    } catch (error) {
+    } catch (error: any) {
       const message = error instanceof Error ? error.message : String(error);
       SpinnerManager.fail(spinnerId, `Failed to start process: ${message}`);
     }
@@ -544,7 +544,7 @@ export class ProcessCommand {
           console.log(`  Packets Out: ${resources.network.packetsOut.toLocaleString()}`);
         }
 
-      } catch (error) {
+      } catch (error: any) {
         const message = error instanceof Error ? error.message : String(error);
         console.log(Formatter.formatError(`Failed to get system resources: ${message}`));
       }

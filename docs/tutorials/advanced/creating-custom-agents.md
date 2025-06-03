@@ -50,7 +50,7 @@ export class YourCustomAgent extends BaseAgent {
         success: true,
         data: result
       };
-    } catch (error) {
+    } catch (error: any) {
       this.logger.error('Analysis failed', error);
       throw error;
     }
@@ -440,7 +440,7 @@ private parseResponse(response: any): any {
   try {
     const parsed = JSON.parse(response);
     return ResponseSchema.parse(parsed);
-  } catch (error) {
+  } catch (error: any) {
     this.logger.error('Invalid response format', error);
     throw new Error('Failed to parse AI response');
   }
@@ -473,7 +473,7 @@ async execute(input: YourAgentInput): Promise<YourAgentOutput> {
         tokensConsumed: metrics.promptTokens + metrics.completionTokens,
       },
     };
-  } catch (error) {
+  } catch (error: any) {
     this.logger.error('Analysis failed', error);
     throw error;
   }

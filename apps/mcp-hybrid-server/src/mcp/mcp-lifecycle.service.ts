@@ -84,7 +84,7 @@ export class MCPLifecycleService extends HealthIndicator implements OnModuleInit
       
       this.logger.log(`🚀 MCP Lifecycle Service initialized successfully`);
       this.logServiceStatus();
-    } catch (error) {
+    } catch (error: any) {
       this.logger.error('❌ Failed to initialize MCP Lifecycle Service:', error);
       this.status.overall.status = 'unhealthy';
       throw error;
@@ -103,7 +103,7 @@ export class MCPLifecycleService extends HealthIndicator implements OnModuleInit
 
       this.eventEmitter.emit('mcp.lifecycle.destroyed');
       this.logger.log('✅ MCP Lifecycle Service shut down successfully');
-    } catch (error) {
+    } catch (error: any) {
       this.logger.error('❌ Error during MCP Lifecycle Service shutdown:', error);
     }
   }
@@ -125,7 +125,7 @@ export class MCPLifecycleService extends HealthIndicator implements OnModuleInit
           try {
             await this.mcpClientService.connect(serverConfig);
             this.logger.log(`✅ Connected to MCP server: ${serverConfig.name}`);
-          } catch (error) {
+          } catch (error: any) {
             this.logger.error(`❌ Failed to connect to MCP server ${serverConfig.name}:`, error);
           }
         }
@@ -133,7 +133,7 @@ export class MCPLifecycleService extends HealthIndicator implements OnModuleInit
 
       this.updateClientStatus();
       this.logger.log('✅ MCP Client started successfully');
-    } catch (error) {
+    } catch (error: any) {
       this.status.client.lastError = error instanceof Error ? error.message : String(error);
       this.logger.error('❌ Failed to start MCP Client:', error);
       throw error;
@@ -147,7 +147,7 @@ export class MCPLifecycleService extends HealthIndicator implements OnModuleInit
       await this.mcpClientService.disconnectAll();
       this.updateClientStatus();
       this.logger.log('✅ MCP Client stopped successfully');
-    } catch (error) {
+    } catch (error: any) {
       this.logger.error('❌ Error stopping MCP Client:', error);
       throw error;
     }
@@ -179,7 +179,7 @@ export class MCPLifecycleService extends HealthIndicator implements OnModuleInit
       // Emit health check event
       this.eventEmitter.emit('mcp.lifecycle.health_check', { status: this.status });
       
-    } catch (error) {
+    } catch (error: any) {
       this.logger.warn('⚠️ Health check failed:', error);
     }
   }

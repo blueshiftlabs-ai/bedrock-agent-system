@@ -79,7 +79,7 @@ export class ProcessController {
       await this.processManager.startProcess(processId, executor);
 
       return { processId };
-    } catch (error) {
+    } catch (error: any) {
       this.logger.error(`Failed to start process: ${error.message}`);
       throw new BadRequestException(error.message);
     }
@@ -182,7 +182,7 @@ export class ProcessController {
           setTimeout(async () => {
             try {
               await this.processManager.startProcess(processId);
-            } catch (error) {
+            } catch (error: any) {
               this.logger.error(`Failed to restart process ${processId}: ${error.message}`);
             }
           }, 1000);
@@ -195,7 +195,7 @@ export class ProcessController {
         success: true,
         message: `Action ${request.action} executed successfully`,
       };
-    } catch (error) {
+    } catch (error: any) {
       this.logger.error(`Control action failed for process ${processId}: ${error.message}`);
       throw new BadRequestException(error.message);
     }

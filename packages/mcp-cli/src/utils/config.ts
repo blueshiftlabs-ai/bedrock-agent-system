@@ -66,7 +66,7 @@ export class ConfigManager {
         const loaded = yaml.parse(content);
         return { ...this.getDefaultConfig(), ...loaded };
       }
-    } catch (error) {
+    } catch (error: any) {
       console.warn(`Warning: Could not load config from ${this.configPath}, using defaults`);
     }
     
@@ -78,7 +78,7 @@ export class ConfigManager {
       fs.ensureDirSync(path.dirname(this.configPath));
       const content = yaml.stringify(this.config, { indent: 2 });
       fs.writeFileSync(this.configPath, content);
-    } catch (error) {
+    } catch (error: any) {
       throw new Error(`Failed to save config: ${error instanceof Error ? error.message : String(error)}`);
     }
   }

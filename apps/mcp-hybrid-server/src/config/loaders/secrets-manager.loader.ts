@@ -39,7 +39,7 @@ export class SecretsManagerLoader {
 
       this.logger.log(`Loaded ${Object.keys(config).length} secrets from Secrets Manager`);
       return config;
-    } catch (error) {
+    } catch (error: any) {
       this.logger.error('Failed to load secrets from Secrets Manager', error);
       return {};
     }
@@ -75,7 +75,7 @@ export class SecretsManagerLoader {
         this.cache.set(fullName, value);
       }
       return value;
-    } catch (error) {
+    } catch (error: any) {
       if (error.code !== 'ResourceNotFoundException') {
         this.logger.error(`Failed to get secret: ${fullName}`, error);
       }
@@ -110,7 +110,7 @@ export class SecretsManagerLoader {
       } while (nextToken);
 
       return secretNames;
-    } catch (error) {
+    } catch (error: any) {
       this.logger.error('Failed to list secrets', error);
       return [];
     }

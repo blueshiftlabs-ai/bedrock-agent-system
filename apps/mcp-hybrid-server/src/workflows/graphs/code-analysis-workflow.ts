@@ -1,8 +1,9 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { StateGraph, END } from '@langgraph/core';
+import { StateGraph, END } from '@langchain/langgraph';
 import { CodeAnalysisState } from '../states/analysis-state';
 import { CodeAnalysisNodes } from '../nodes/code-analysis-nodes';
 import { WorkflowStateService } from '../services/workflow-state.service';
+import { getErrorMessage } from '@/common/utils/error-utils';
 
 @Injectable()
 export class CodeAnalysisWorkflow {
@@ -129,7 +130,7 @@ export class CodeAnalysisWorkflow {
       
       this.logger.log(`Code analysis workflow completed for: ${filePath}`);
       return result;
-    } catch (error) {
+    } catch (error: any) {
       this.logger.error(`Error in code analysis workflow: ${error.message}`);
       
       const errorState = {
@@ -153,7 +154,7 @@ export class CodeAnalysisWorkflow {
 
       this.logger.log(`Resuming workflow from stage: ${state.analysisStage}`);
       return await this.workflow.invoke(state);
-    } catch (error) {
+    } catch (error: any) {
       this.logger.error(`Error resuming workflow: ${error.message}`);
       throw error;
     }

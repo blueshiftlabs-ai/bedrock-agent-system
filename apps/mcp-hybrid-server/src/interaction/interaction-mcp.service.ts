@@ -55,7 +55,7 @@ export class InteractionMcpService {
       }
 
       response.success = true;
-    } catch (error) {
+    } catch (error: any) {
       this.logger.error(`MCP request failed: ${error.message}`, error.stack);
       response.error = {
         code: 'MCP_REQUEST_ERROR',

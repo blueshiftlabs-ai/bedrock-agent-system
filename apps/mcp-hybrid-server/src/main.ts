@@ -124,7 +124,7 @@ async function bootstrap() {
     // Log MCP service status
     logger.log(`📊 MCP Status: ${mcpStatus.overall.status.toUpperCase()}`);
     
-  } catch (error) {
+  } catch (error: any) {
     logger.error('❌ Failed to start server:', error);
     process.exit(1);
   }
@@ -150,7 +150,7 @@ function setupGracefulShutdown(app: any, logger: Logger): void {
       clearTimeout(shutdownTimeout);
       logger.log('✅ Graceful shutdown completed');
       process.exit(0);
-    } catch (error) {
+    } catch (error: any) {
       logger.error('❌ Error during shutdown:', error);
       process.exit(1);
     }

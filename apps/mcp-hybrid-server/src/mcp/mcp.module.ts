@@ -26,7 +26,7 @@ export class MCPModule {
         ScheduleModule.forRoot(),
         
         // Configure MCP Server (conditionally)
-        ReKogMcpModule.forRootAsync({
+        ReKogMcpModule.forRoot({
           imports: [ConfigModule],
           inject: [ConfigService],
           useFactory: (configService: ConfigService) => {

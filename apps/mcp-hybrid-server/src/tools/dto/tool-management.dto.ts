@@ -205,7 +205,7 @@ export const validateSystemStats = (data: unknown): SystemStatsDto => {
 // Legacy class-based DTOs for Swagger compatibility (if needed)
 // These can be removed once NestJS fully supports Zod schemas in Swagger
 
-export class ToolVersionDto {
+export class ToolVersionDtoClass {
   @ApiProperty({ description: 'Major version number' })
   major: number;
 
@@ -222,7 +222,7 @@ export class ToolVersionDto {
   build?: string;
 }
 
-export class ToolDependencyDto {
+export class ToolDependencyDtoClass {
   @ApiProperty({ description: 'Dependency name' })
   name: string;
 
@@ -236,7 +236,7 @@ export class ToolDependencyDto {
   optional?: boolean;
 }
 
-export class ToolPermissionDto {
+export class ToolPermissionDtoClass {
   @ApiProperty({ description: 'Permission type', enum: ['read', 'write', 'execute', 'admin'] })
   type: 'read' | 'write' | 'execute' | 'admin';
 
@@ -247,7 +247,7 @@ export class ToolPermissionDto {
   description: string;
 }
 
-export class ToolSearchDto {
+export class ToolSearchDtoClass {
   @ApiPropertyOptional({ description: 'Search query' })
   query?: string;
 
@@ -279,7 +279,7 @@ export class ToolSearchDto {
   offset?: number;
 }
 
-export class ToolInstallDto {
+export class ToolInstallDtoClass {
   @ApiProperty({ description: 'Tool source', enum: ['npm', 'git', 'local', 'registry'] })
   source: 'npm' | 'git' | 'local' | 'registry';
 
@@ -302,7 +302,7 @@ export class ToolInstallDto {
   autoEnable?: boolean;
 }
 
-export class ToolConfigurationDto {
+export class ToolConfigurationDtoClass {
   @ApiProperty({ description: 'Configuration object with tool-specific settings' })
   configuration: { [key: string]: any };
 
@@ -314,7 +314,7 @@ export class ToolConfigurationDto {
   };
 }
 
-export class ToolExecutionDto {
+export class ToolExecutionDtoClass {
   @ApiProperty({ description: 'Parameters to pass to the tool' })
   parameters: { [key: string]: any };
 
@@ -327,7 +327,7 @@ export class ToolExecutionDto {
   };
 }
 
-export class ToolValidationDto {
+export class ToolValidationDtoClass {
   @ApiProperty({ description: 'Tool identifier' })
   id: string;
 
@@ -374,7 +374,7 @@ export class ToolValidationDto {
   };
 }
 
-export class WebSocketSubscriptionDto {
+export class WebSocketSubscriptionDtoClass {
   @ApiPropertyOptional({ description: 'Tool IDs to subscribe to' })
   toolIds?: string[];
 
@@ -388,7 +388,7 @@ export class WebSocketSubscriptionDto {
   permissions?: string[];
 }
 
-export class ToolEventDto {
+export class ToolEventDtoClass {
   @ApiProperty({ description: 'Event type' })
   type: 'registered' | 'unregistered' | 'enabled' | 'disabled' | 'updated' | 'executed' | 'health-check' | 'error';
 
@@ -405,7 +405,7 @@ export class ToolEventDto {
   userId?: string;
 }
 
-export class ToolResponseDto {
+export class ToolResponseDtoClass {
   @ApiProperty({ description: 'Operation success status' })
   success: boolean;
 
@@ -423,7 +423,7 @@ export class ToolResponseDto {
   };
 }
 
-export class ToolHealthDto {
+export class ToolHealthDtoClass {
   @ApiProperty({ description: 'Health status', enum: ['healthy', 'unhealthy', 'degraded'] })
   status: 'healthy' | 'unhealthy' | 'degraded';
 
@@ -437,7 +437,7 @@ export class ToolHealthDto {
   metrics?: { [key: string]: any };
 }
 
-export class SystemStatsDto {
+export class SystemStatsDtoClass {
   @ApiProperty({ description: 'Total number of tools' })
   totalTools: number;
 

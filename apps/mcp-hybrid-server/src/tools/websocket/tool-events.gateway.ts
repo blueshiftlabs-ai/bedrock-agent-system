@@ -109,7 +109,7 @@ export class ToolEventsGateway implements OnGatewayInit, OnGatewayConnection, On
       const recentEvents = this.dynamicToolService.getEventHistory(undefined, 10);
       client.emit('events:history', recentEvents);
 
-    } catch (error) {
+    } catch (error: any) {
       this.logger.error(`WebSocket authentication failed for ${client.id}:`, error.message);
       client.emit('error', { message: 'Authentication failed' });
       client.disconnect();
@@ -319,7 +319,7 @@ export class ToolEventsGateway implements OnGatewayInit, OnGatewayConnection, On
           timestamp: new Date().toISOString(),
         });
       }
-    } catch (error) {
+    } catch (error: any) {
       this.logger.error(`Failed to get health status for tool ${toolId}:`, error);
     }
   }

@@ -85,7 +85,7 @@ export class CodeAnalysisTool {
         resultStoredAt: `s3://${resultKey}`,
         analyzedAt: new Date().toISOString(),
       };
-    } catch (error) {
+    } catch (error: any) {
       this.logger.error(`Error analyzing code file ${filePath}:`, error);
       throw new Error(`Code analysis failed: ${error.message}`);
     }

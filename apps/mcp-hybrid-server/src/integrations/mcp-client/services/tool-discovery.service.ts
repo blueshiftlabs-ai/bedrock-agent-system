@@ -79,7 +79,7 @@ export class ToolDiscoveryService {
       await this.registerDiscoveredTools(tools, connection);
 
       this.logger.log(`Discovered ${tools.length} tools from ${connection.name}`);
-    } catch (error) {
+    } catch (error: any) {
       result.error = error instanceof Error ? error.message : String(error);
       this.logger.error(`Failed to discover tools from ${connection.name}:`, error);
     }
@@ -149,7 +149,7 @@ export class ToolDiscoveryService {
     this.logger.log('Running scheduled tool discovery');
     try {
       await this.discoverAllTools();
-    } catch (error) {
+    } catch (error: any) {
       this.logger.error('Scheduled tool discovery failed:', error);
     }
   }
@@ -168,7 +168,7 @@ export class ToolDiscoveryService {
       try {
         this.toolRegistry.registerTool(adaptedTool);
         this.logger.debug(`Registered external tool: ${adaptedTool.name}`);
-      } catch (error) {
+      } catch (error: any) {
         this.logger.error(`Failed to register tool ${adaptedTool.name}:`, error);
       }
     }
@@ -188,7 +188,7 @@ export class ToolDiscoveryService {
         // We need to add an unregister method to the tool registry
         this.unregisterTool(tool.name);
         this.logger.debug(`Unregistered external tool: ${tool.name}`);
-      } catch (error) {
+      } catch (error: any) {
         this.logger.error(`Failed to unregister tool ${tool.name}:`, error);
       }
     }
@@ -208,7 +208,7 @@ export class ToolDiscoveryService {
       if (connection) {
         await this.discoverToolsFromConnection(connection);
       }
-    } catch (error) {
+    } catch (error: any) {
       this.logger.error(`Failed to discover tools after connection established:`, error);
     }
   }
@@ -218,7 +218,7 @@ export class ToolDiscoveryService {
     
     try {
       await this.unregisterServerTools(event.connectionId);
-    } catch (error) {
+    } catch (error: any) {
       this.logger.error(`Failed to unregister tools after connection lost:`, error);
     }
   }

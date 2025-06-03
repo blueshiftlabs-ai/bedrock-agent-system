@@ -157,7 +157,7 @@ export class OptimizedWorkflowService {
         executionTime: Date.now() - startTime,
         optimizations: this.getAppliedOptimizations(),
       };
-    } catch (error) {
+    } catch (error: any) {
       this.logger.error('Workflow execution failed', error);
       throw error;
     }
@@ -600,7 +600,7 @@ export class RedisCacheService {
       }
 
       return data;
-    } catch (error) {
+    } catch (error: any) {
       this.logger.error(`Cache get error for key ${key}:`, error);
       return null;
     }
@@ -627,7 +627,7 @@ export class RedisCacheService {
 
       await this.redis.setex(key, ttl, storeValue);
       return true;
-    } catch (error) {
+    } catch (error: any) {
       this.logger.error(`Cache set error for key ${key}:`, error);
       return false;
     }
@@ -647,12 +647,12 @@ export class RedisCacheService {
           try {
             const parsed = JSON.parse(value);
             results.set(key, parsed);
-          } catch (error) {
+          } catch (error: any) {
             this.logger.warn(`Failed to parse cached value for key ${key}`);
           }
         }
       });
-    } catch (error) {
+    } catch (error: any) {
       this.logger.error('Cache mget error:', error);
     }
 
@@ -987,7 +987,7 @@ export class StreamProcessor {
   ): Promise<void> {
     try {
       await processor(item);
-    } catch (error) {
+    } catch (error: any) {
       this.logger.error('Error processing item', { item, error });
       // Continue processing other items
     }
@@ -1219,7 +1219,7 @@ export class RequestOptimizer {
       queue.forEach((queueItem, index) => {
         queueItem.resolve(results[index]);
       });
-    } catch (error) {
+    } catch (error: any) {
       // Reject all promises in the batch
       queue.forEach(queueItem => {
         queueItem.reject(error);
@@ -1286,7 +1286,7 @@ export class OptimizedBedrockService {
             try {
               const result = await this.client.invokeModel(params);
               resolve(result);
-            } catch (error) {
+            } catch (error: any) {
               reject(error);
             }
           })
@@ -1442,7 +1442,7 @@ export class OptimizedS3Service {
       }).promise();
 
       return Location!;
-    } catch (error) {
+    } catch (error: any) {
       // Abort upload on error
       await this.s3.abortMultipartUpload({
         Bucket: bucket,
@@ -1596,7 +1596,7 @@ export function PerformanceTracked(metricName?: string) {
         this.metricsService?.recordTiming(name, startTime, { status: 'success' });
         
         return result;
-      } catch (error) {
+      } catch (error: any) {
         // Record error metric
         this.metricsService?.recordTiming(name, startTime, { status: 'error' });
         throw error;
@@ -1738,7 +1738,7 @@ export class ApplicationProfiler {
       this.logger.debug(`Operation profile: ${name}`, profile);
       
       return { result, profile };
-    } catch (error) {
+    } catch (error: any) {
       this.logger.error(`Operation failed: ${name}`, error);
       throw error;
     }
@@ -1788,7 +1788,7 @@ export class HorizontalScalingService {
         } else {
           throw new Error('Health check failed');
         }
-      } catch (error) {
+      } catch (error: any) {
         this.logger.warn(`Instance ${instanceId} failed health check:`, error);
         
         // Remove unhealthy instances after grace period
@@ -1830,7 +1830,7 @@ export class HorizontalScalingService {
         timeout: 5000,
       });
       return response.status === 200;
-    } catch (error) {
+    } catch (error: any) {
       return false;
     }
   }
@@ -1905,7 +1905,7 @@ export class AutoScalingService {
         try {
           const response = await axios.get(`${instance.endpoint}/metrics`);
           return response.data;
-        } catch (error) {
+        } catch (error: any) {
           this.logger.warn(`Failed to get metrics from ${instance.id}`);
           return null;
         }
@@ -1961,7 +1961,7 @@ export class AutoScalingService {
           await this.scaleDown(decision.targetCount!);
           break;
       }
-    } catch (error) {
+    } catch (error: any) {
       this.logger.error('Scaling action failed:', error);
     }
   }
@@ -2080,7 +2080,7 @@ export class PerformanceTestingService {
         
         // Add small delay to prevent overwhelming the server
         await new Promise(resolve => setTimeout(resolve, 10));
-      } catch (error) {
+      } catch (error: any) {
         errors.push(error.message);
       }
     }

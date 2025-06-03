@@ -12,6 +12,7 @@ import {
 import { Logger, UseGuards } from '@nestjs/common';
 import { Server, Socket } from 'socket.io';
 import { OnEvent } from '@nestjs/event-emitter';
+import { getErrorMessage } from '@/common/utils/error-utils';
 import { ProcessManagerService } from './process-manager.service';
 import {
   WebSocketMessage,
@@ -316,7 +317,7 @@ export class InteractionWebSocketGateway
   }
 
   private sendToClient(sessionId: string, message: WebSocketMessage) {
-    const client = this.server.sockets.get(sessionId);
+    const client = this.server.sockets.sockets.get(sessionId);
     if (client) {
       client.emit('message', message);
     }

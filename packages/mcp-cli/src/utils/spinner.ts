@@ -89,7 +89,7 @@ export class SpinnerManager {
       const result = await task();
       this.succeed(id, options?.successText || `${text} completed`);
       return result;
-    } catch (error) {
+    } catch (error: any) {
       const errorMessage = error instanceof Error ? error.message : String(error);
       this.fail(id, options?.errorText || `${text} failed: ${errorMessage}`);
       throw error;

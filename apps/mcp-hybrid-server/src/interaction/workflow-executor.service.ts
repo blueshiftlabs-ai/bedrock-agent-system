@@ -101,7 +101,7 @@ class WorkflowExecutorImpl implements WorkflowExecutor {
 
       return result;
 
-    } catch (error) {
+    } catch (error: any) {
       this.logger.error(`Workflow execution failed for process ${this.processId}: ${error.message}`);
       
       if (!this.isCancelled) {
@@ -315,7 +315,7 @@ class WorkflowExecutorImpl implements WorkflowExecutor {
           'WorkflowExecutor'
         );
 
-      } catch (error) {
+      } catch (error: any) {
         // Update node state with error
         const workflowNode = this.workflowState!.nodes[node.id];
         workflowNode.status = 'failed' as any;
@@ -390,7 +390,7 @@ class WorkflowExecutorImpl implements WorkflowExecutor {
     if (node.id === 'analyze_structure' && this.workflowState!.variables.filePath) {
       try {
         return await this.workflowService.executeCodeAnalysis(this.workflowState!.variables.filePath);
-      } catch (error) {
+      } catch (error: any) {
         this.logger.warn(`Failed to use workflow service, falling back to simulation: ${error.message}`);
       }
     }

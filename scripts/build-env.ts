@@ -65,7 +65,7 @@ class BuildEnvManager {
       await this.generateExampleFiles();
 
       console.log('✅ Environment files generated successfully!');
-    } catch (error) {
+    } catch (error: any) {
       console.error('❌ Error building environment files:', error);
       process.exit(1);
     }

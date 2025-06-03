@@ -430,7 +430,7 @@ export class IntegrationExamples {
         }
       }, 2000);
 
-    } catch (error) {
+    } catch (error: any) {
       this.logger.error(`Failed to start error handling demo: ${error.message}`);
       await this.processManager.failProcess(processId, {
         code: 'DEMO_SETUP_ERROR',
@@ -508,7 +508,7 @@ export class IntegrationExamples {
 
       this.logger.log('All examples completed successfully');
       
-    } catch (error) {
+    } catch (error: any) {
       this.logger.error(`Example execution failed: ${error.message}`, error.stack);
     }
   }

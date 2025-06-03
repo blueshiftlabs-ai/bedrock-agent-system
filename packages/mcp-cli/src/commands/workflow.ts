@@ -215,7 +215,7 @@ export class WorkflowCommand {
         }));
       }
 
-    } catch (error) {
+    } catch (error: any) {
       const message = error instanceof Error ? error.message : String(error);
       console.log(Formatter.formatError(`Failed to list workflows: ${message}`));
     }
@@ -270,7 +270,7 @@ export class WorkflowCommand {
         }
       });
 
-    } catch (error) {
+    } catch (error: any) {
       const message = error instanceof Error ? error.message : String(error);
       console.log(Formatter.formatError(`Failed to get workflow information: ${message}`));
     }
@@ -360,7 +360,7 @@ export class WorkflowCommand {
         console.log(Formatter.formatInfo(`Use 'mcp-cli workflow status ${workflowId}' to check progress`));
       }
 
-    } catch (error) {
+    } catch (error: any) {
       const message = error instanceof Error ? error.message : String(error);
       SpinnerManager.fail(spinnerId, `Workflow start failed: ${message}`);
     }
@@ -401,7 +401,7 @@ export class WorkflowCommand {
         SpinnerManager.warn('workflow-stopping', 'Workflow may still be stopping');
       }
 
-    } catch (error) {
+    } catch (error: any) {
       const message = error instanceof Error ? error.message : String(error);
       SpinnerManager.fail(spinnerId, `Failed to stop workflow: ${message}`);
     }
@@ -421,7 +421,7 @@ export class WorkflowCommand {
 
       SpinnerManager.succeed(spinnerId, 'Workflow paused successfully');
 
-    } catch (error) {
+    } catch (error: any) {
       const message = error instanceof Error ? error.message : String(error);
       SpinnerManager.fail(spinnerId, `Failed to pause workflow: ${message}`);
     }
@@ -441,7 +441,7 @@ export class WorkflowCommand {
 
       SpinnerManager.succeed(spinnerId, 'Workflow resumed successfully');
 
-    } catch (error) {
+    } catch (error: any) {
       const message = error instanceof Error ? error.message : String(error);
       SpinnerManager.fail(spinnerId, `Failed to resume workflow: ${message}`);
     }
@@ -496,7 +496,7 @@ export class WorkflowCommand {
           }
         });
 
-      } catch (error) {
+      } catch (error: any) {
         const message = error instanceof Error ? error.message : String(error);
         console.log(Formatter.formatError(`Failed to get workflow status: ${message}`));
       }
@@ -599,7 +599,7 @@ export class WorkflowCommand {
         }));
       }
 
-    } catch (error) {
+    } catch (error: any) {
       const message = error instanceof Error ? error.message : String(error);
       console.log(Formatter.formatError(`Failed to get workflow steps: ${message}`));
     }
@@ -644,7 +644,7 @@ export class WorkflowCommand {
         format: this.config.get('display.format') 
       }));
 
-    } catch (error) {
+    } catch (error: any) {
       const message = error instanceof Error ? error.message : String(error);
       console.log(Formatter.formatError(`Failed to get workflow history: ${message}`));
     }
@@ -681,7 +681,7 @@ export class WorkflowCommand {
         format: this.config.get('display.format') 
       }));
 
-    } catch (error) {
+    } catch (error: any) {
       const message = error instanceof Error ? error.message : String(error);
       console.log(Formatter.formatError(`Failed to list workflow templates: ${message}`));
     }
@@ -712,7 +712,7 @@ export class WorkflowCommand {
       const workflow = response.data;
       SpinnerManager.succeed(spinnerId, `Workflow created: ${workflow.name} (${workflow.id})`);
 
-    } catch (error) {
+    } catch (error: any) {
       const message = error instanceof Error ? error.message : String(error);
       SpinnerManager.fail(spinnerId, `Failed to create workflow: ${message}`);
     }
@@ -777,7 +777,7 @@ export class WorkflowCommand {
         });
       }
       
-    } catch (error) {
+    } catch (error: any) {
       const message = error instanceof Error ? error.message : String(error);
       console.log(Formatter.formatError(`Failed to get workflow logs: ${message}`));
     }
@@ -802,7 +802,7 @@ export class WorkflowCommand {
         console.log(Formatter.formatCode(graph));
       }
 
-    } catch (error) {
+    } catch (error: any) {
       const message = error instanceof Error ? error.message : String(error);
       console.log(Formatter.formatError(`Failed to get workflow graph: ${message}`));
     }
@@ -866,7 +866,7 @@ export class WorkflowCommand {
 
       return answers;
 
-    } catch (error) {
+    } catch (error: any) {
       console.log(Formatter.formatWarning('Could not get workflow schema, using basic input'));
       
       const answers = await inquirer.prompt([

@@ -27,7 +27,7 @@ async function bootstrap() {
     // Close the application context
     await app.close();
     
-  } catch (error) {
+  } catch (error: any) {
     logger.error('CLI execution failed:', error);
     process.exit(1);
   }

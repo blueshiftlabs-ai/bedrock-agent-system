@@ -8,7 +8,7 @@
   },
   "scripts": {
     "build": "tsc",
-    "dev": "ts-node src/bin/mcp-cli.ts",
+    "dev": "echo 'MCP CLI is a command-line tool, not a dev service. Use: pnpm mcp <command>'",
     "start": "node dist/bin/mcp-cli.js",
     "clean": "rm -rf dist",
     "type-check": "tsc --noEmit",

@@ -89,7 +89,7 @@ export class APIClient extends EventEmitter {
         timestamp: new Date(),
         requestId: response.headers['x-request-id']
       };
-    } catch (error) {
+    } catch (error: any) {
       return this.handleError(error);
     }
   }
@@ -103,7 +103,7 @@ export class APIClient extends EventEmitter {
         timestamp: new Date(),
         requestId: response.headers['x-request-id']
       };
-    } catch (error) {
+    } catch (error: any) {
       return this.handleError(error);
     }
   }
@@ -117,7 +117,7 @@ export class APIClient extends EventEmitter {
         timestamp: new Date(),
         requestId: response.headers['x-request-id']
       };
-    } catch (error) {
+    } catch (error: any) {
       return this.handleError(error);
     }
   }
@@ -131,7 +131,7 @@ export class APIClient extends EventEmitter {
         timestamp: new Date(),
         requestId: response.headers['x-request-id']
       };
-    } catch (error) {
+    } catch (error: any) {
       return this.handleError(error);
     }
   }
@@ -156,7 +156,7 @@ export class APIClient extends EventEmitter {
           const message: WebSocketMessage = JSON.parse(data.toString());
           this.emit('ws-message', message);
           this.emit(`ws-${message.type}`, message.data);
-        } catch (error) {
+        } catch (error: any) {
           this.emit('ws-error', { type: 'parse', error });
         }
       });

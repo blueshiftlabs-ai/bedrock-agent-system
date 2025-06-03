@@ -521,7 +521,7 @@ export class CodeAnalysisNodes {
           codeAnalysis: result
         }
       };
-    } catch (error) {
+    } catch (error: any) {
       this.logger.error('Error in code analysis:', error);
       return {
         ...state,
@@ -577,7 +577,7 @@ export class CodeAnalysisNodes {
           databaseAnalysis: result
         }
       };
-    } catch (error) {
+    } catch (error: any) {
       this.logger.error('Error in database analysis:', error);
       return {
         ...state,
@@ -620,7 +620,7 @@ export class CodeAnalysisNodes {
           knowledgeGraphUpdate: result
         }
       };
-    } catch (error) {
+    } catch (error: any) {
       this.logger.error('Error updating knowledge graph:', error);
       return {
         ...state,
@@ -664,7 +664,7 @@ export class CodeAnalysisNodes {
           documentation: result
         }
       };
-    } catch (error) {
+    } catch (error: any) {
       this.logger.error('Error generating documentation:', error);
       return {
         ...state,
@@ -840,7 +840,7 @@ export class CodeAnalysisWorkflow {
       
       this.logger.log(`Code analysis workflow completed for: ${filePath}`);
       return result;
-    } catch (error) {
+    } catch (error: any) {
       this.logger.error(`Error in code analysis workflow: ${error.message}`);
       
       const errorState = {
@@ -864,7 +864,7 @@ export class CodeAnalysisWorkflow {
 
       this.logger.log(`Resuming workflow from stage: ${state.analysisStage}`);
       return await this.workflow.invoke(state);
-    } catch (error) {
+    } catch (error: any) {
       this.logger.error(`Error resuming workflow: ${error.message}`);
       throw error;
     }
@@ -892,7 +892,7 @@ export class WorkflowStateService {
         lastUpdated: Date.now(),
         ttl: Math.floor(Date.now() / 1000) + (7 * 24 * 60 * 60), // 7 days TTL
       });
-    } catch (error) {
+    } catch (error: any) {
       this.logger.error(`Error saving workflow state: ${error.message}`);
       throw error;
     }
@@ -902,7 +902,7 @@ export class WorkflowStateService {
     try {
       const item = await this.dynamoService.getItem('WorkflowState', { workflowId });
       return item ? JSON.parse(item.state) : null;
-    } catch (error) {
+    } catch (error: any) {
       this.logger.error(`Error getting workflow state: ${error.message}`);
       return null;
     }
@@ -917,7 +917,7 @@ export class WorkflowStateService {
         timestamp: Date.now(),
         ttl: Math.floor(Date.now() / 1000) + (7 * 24 * 60 * 60), // 7 days TTL
       });
-    } catch (error) {
+    } catch (error: any) {
       this.logger.error(`Error saving checkpoint: ${error.message}`);
       throw error;
     }
@@ -928,7 +928,7 @@ export class WorkflowStateService {
       return await this.dynamoService.queryItems('WorkflowCheckpoints', {
         workflowId,
       });
-    } catch (error) {
+    } catch (error: any) {
       this.logger.error(`Error getting checkpoints: ${error.message}`);
       return [];
     }
@@ -1044,7 +1044,7 @@ export abstract class BaseAgent {
       const result = await this.processRequest(prompt, options);
       this.logger.log(`${this.name} agent completed successfully`);
       return result;
-    } catch (error) {
+    } catch (error: any) {
       this.logger.error(`Error in ${this.name} agent: ${error.message}`);
       throw error;
     }
@@ -1531,7 +1531,7 @@ export class MCPToolRegistry {
       this.eventEmitter.emit('tool.execution.completed', { toolName, executionTime, success: true });
       
       return result;
-    } catch (error) {
+    } catch (error: any) {
       const executionTime = Date.now() - startTime;
       this.updateExecutionMetrics(toolName, false, executionTime);
       
@@ -2880,7 +2880,7 @@ export class CodeAnalysisTool {
         resultStoredAt: `s3://${resultKey}`,
         analyzedAt: new Date().toISOString(),
       };
-    } catch (error) {
+    } catch (error: any) {
       this.logger.error(`Error analyzing code file ${filePath}:`, error);
       throw new Error(`Code analysis failed: ${error.message}`);
     }
@@ -3272,7 +3272,7 @@ export class DocumentRetrievalTool {
       
       try {
         content = await this.awsService.getFromS3(docKey);
-      } catch (error) {
+      } catch (error: any) {
         // Generate new documentation if not found
         content = this.generateDocumentationTemplate(entityId, format);
         
@@ -3296,7 +3296,7 @@ export class DocumentRetrievalTool {
       };
 
       return result;
-    } catch (error) {
+    } catch (error: any) {
       this.logger.error(`Error retrieving documentation for ${entityId}:`, error);
       throw new Error(`Documentation retrieval failed: ${error.message}`);
     }
@@ -3538,7 +3538,7 @@ export class KnowledgeGraphTool {
           } else {
             result.entitiesUpdated++;
           }
-        } catch (error) {
+        } catch (error: any) {
           const errorMsg = `Failed to process entity ${entity.id}: ${error.message}`;
           this.logger.error(errorMsg);
           result.errors.push(errorMsg);
@@ -3554,7 +3554,7 @@ export class KnowledgeGraphTool {
           } else {
             result.relationshipsUpdated++;
           }
-        } catch (error) {
+        } catch (error: any) {
           const errorMsg = `Failed to process relationship ${relationship.id}: ${error.message}`;
           this.logger.error(errorMsg);
           result.errors.push(errorMsg);
@@ -3580,7 +3580,7 @@ export class KnowledgeGraphTool {
         snapshotStoredAt: `s3://${snapshotKey}`,
         updatedAt: new Date().toISOString(),
       };
-    } catch (error) {
+    } catch (error: any) {
       this.logger.error('Error updating knowledge graph:', error);
       throw new Error(`Knowledge graph update failed: ${error.message}`);
     }
@@ -3606,7 +3606,7 @@ export class KnowledgeGraphTool {
     try {
       const existingData = await this.awsService.getFromS3(entityKey);
       existingEntity = JSON.parse(existingData);
-    } catch (error) {
+    } catch (error: any) {
       // Entity doesn't exist
       existingEntity = null;
     }
@@ -3638,7 +3638,7 @@ export class KnowledgeGraphTool {
     try {
       await this.awsService.getFromS3(fromEntityKey);
       await this.awsService.getFromS3(toEntityKey);
-    } catch (error) {
+    } catch (error: any) {
       throw new Error(`Referenced entity does not exist: ${error.message}`);
     }
 
@@ -3649,7 +3649,7 @@ export class KnowledgeGraphTool {
     try {
       const existingData = await this.awsService.getFromS3(relationshipKey);
       existingRelationship = JSON.parse(existingData);
-    } catch (error) {
+    } catch (error: any) {
       // Relationship doesn't exist
       existingRelationship = null;
     }

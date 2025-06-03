@@ -194,7 +194,7 @@ export class LogCommand {
         this.displayLogEntry(log, options);
       });
 
-    } catch (error) {
+    } catch (error: any) {
       const message = error instanceof Error ? error.message : String(error);
       console.log(Formatter.formatError(`Failed to view logs: ${message}`));
     }
@@ -246,7 +246,7 @@ export class LogCommand {
       // Prevent process from exiting
       setInterval(() => {}, 1000);
 
-    } catch (error) {
+    } catch (error: any) {
       const message = error instanceof Error ? error.message : String(error);
       console.log(Formatter.formatError(`Failed to follow logs: ${message}`));
     }
@@ -262,7 +262,7 @@ export class LogCommand {
 
       await this.followLogs(followOptions);
 
-    } catch (error) {
+    } catch (error: any) {
       const message = error instanceof Error ? error.message : String(error);
       console.log(Formatter.formatError(`Failed to tail logs: ${message}`));
     }
@@ -334,7 +334,7 @@ export class LogCommand {
         ));
       }
 
-    } catch (error) {
+    } catch (error: any) {
       const message = error instanceof Error ? error.message : String(error);
       SpinnerManager.fail(spinnerId, `Search failed: ${message}`);
     }
@@ -369,7 +369,7 @@ export class LogCommand {
         format: this.config.get('display.format') 
       }));
 
-    } catch (error) {
+    } catch (error: any) {
       const message = error instanceof Error ? error.message : String(error);
       console.log(Formatter.formatError(`Failed to get log levels: ${message}`));
     }
@@ -405,7 +405,7 @@ export class LogCommand {
         format: this.config.get('display.format') 
       }));
 
-    } catch (error) {
+    } catch (error: any) {
       const message = error instanceof Error ? error.message : String(error);
       console.log(Formatter.formatError(`Failed to get log components: ${message}`));
     }
@@ -451,7 +451,7 @@ export class LogCommand {
         }));
       }
 
-    } catch (error) {
+    } catch (error: any) {
       const message = error instanceof Error ? error.message : String(error);
       console.log(Formatter.formatError(`Failed to get log statistics: ${message}`));
     }
@@ -494,7 +494,7 @@ export class LogCommand {
         SpinnerManager.succeed(spinnerId, `Logs exported to ${file}`);
       }
 
-    } catch (error) {
+    } catch (error: any) {
       const message = error instanceof Error ? error.message : String(error);
       SpinnerManager.fail(spinnerId, `Failed to export logs: ${message}`);
     }
@@ -551,7 +551,7 @@ export class LogCommand {
         });
       }
 
-    } catch (error) {
+    } catch (error: any) {
       const message = error instanceof Error ? error.message : String(error);
       console.log(Formatter.formatError(`Failed to clear logs: ${message}`));
     }
@@ -583,7 +583,7 @@ export class LogCommand {
         });
       }
 
-    } catch (error) {
+    } catch (error: any) {
       const message = error instanceof Error ? error.message : String(error);
       SpinnerManager.fail(spinnerId, `Failed to rotate logs: ${message}`);
     }
@@ -675,7 +675,7 @@ export class LogCommand {
       // Prevent process from exiting
       setInterval(() => {}, 1000);
 
-    } catch (error) {
+    } catch (error: any) {
       const message = error instanceof Error ? error.message : String(error);
       console.log(Formatter.formatError(`Failed to watch logs: ${message}`));
     }
@@ -727,7 +727,7 @@ export class LogCommand {
         });
       }
 
-    } catch (error) {
+    } catch (error: any) {
       const message = error instanceof Error ? error.message : String(error);
       SpinnerManager.fail(spinnerId, `Log analysis failed: ${message}`);
     }

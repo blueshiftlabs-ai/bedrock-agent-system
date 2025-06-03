@@ -16,6 +16,6 @@
       "@types/*": ["src/types/*"]
     }
   },
-  "include": ["src/**/*", "test/**/*"],
-  "exclude": ["node_modules", "dist", "coverage"]
+  "include": ["src/**/*"],
+  "exclude": ["node_modules", "dist", "coverage", "test", "**/*.spec.ts", "**/*.e2e-spec.ts"]
 }

@@ -1,5 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { EventEmitter2 } from '@nestjs/event-emitter';
+import { getErrorMessage } from '@/common/utils/error-utils';
 
 export interface MCPToolParameter {
   type: string;
@@ -159,8 +160,8 @@ export class MCPToolRegistry {
       const executionTime = Date.now() - startTime;
       this.updateExecutionMetrics(toolName, false, executionTime);
       
-      this.logger.error(`Tool execution failed: ${toolName} - ${error.message}`);
-      this.eventEmitter.emit('tool.execution.failed', { toolName, error: error.message, executionTime });
+      this.logger.error(`Tool execution failed: ${toolName} - ${getErrorMessage(error)}`);
+      this.eventEmitter.emit('tool.execution.failed', { toolName, error: getErrorMessage(error), executionTime });
       
       throw error;
     }

@@ -101,7 +101,7 @@ export class MCPHealthService extends HealthIndicator {
         uptime: lifecycleStatus.server.uptime,
         error: lifecycleStatus.server.lastError,
       };
-    } catch (error) {
+    } catch (error: any) {
       this.logger.error('Failed to check server health:', error);
       return {
         enabled: true,
@@ -149,7 +149,7 @@ export class MCPHealthService extends HealthIndicator {
         connections: connectionHealth,
         summary,
       };
-    } catch (error) {
+    } catch (error: any) {
       this.logger.error('Failed to check client health:', error);
       return {
         enabled: true,
@@ -183,7 +183,7 @@ export class MCPHealthService extends HealthIndicator {
           await this.mcpClientService.listTools(connectionId);
           responseTime = Date.now() - startTime;
           lastPing = new Date();
-        } catch (error) {
+        } catch (error: any) {
           // Connection exists but not responsive
           return {
             id: connectionId,
@@ -202,7 +202,7 @@ export class MCPHealthService extends HealthIndicator {
         lastPing,
         error: connection.lastError,
       };
-    } catch (error) {
+    } catch (error: any) {
       return {
         id: connectionId,
         name: connection.name,
@@ -276,7 +276,7 @@ export class MCPHealthService extends HealthIndicator {
         responseTime,
         toolsAvailable: tools.length,
       };
-    } catch (error) {
+    } catch (error: any) {
       const responseTime = Date.now() - startTime;
       
       return {
@@ -326,7 +326,7 @@ export class MCPHealthService extends HealthIndicator {
           ...(resources.status === 'rejected' ? [`Resources: ${resources.reason}`] : []),
         ],
       };
-    } catch (error) {
+    } catch (error: any) {
       this.logger.error(`Failed to get metrics for connection ${connectionId}:`, error);
       return {
         id: connection.id,

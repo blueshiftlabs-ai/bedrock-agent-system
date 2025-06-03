@@ -189,7 +189,7 @@ export class ConfigCommand {
         this.displayConfiguration(response.data.config, options?.sensitive);
       }
 
-    } catch (error) {
+    } catch (error: any) {
       const message = error instanceof Error ? error.message : String(error);
       console.log(Formatter.formatError(`Failed to get configuration: ${message}`));
     }
@@ -236,7 +236,7 @@ export class ConfigCommand {
 
       SpinnerManager.succeed(spinnerId, `Server configuration updated: ${key} = ${this.formatValue(convertedValue)}`);
 
-    } catch (error) {
+    } catch (error: any) {
       const message = error instanceof Error ? error.message : String(error);
       SpinnerManager.fail(spinnerId, `Failed to set configuration: ${message}`);
     }
@@ -263,7 +263,7 @@ export class ConfigCommand {
 
       SpinnerManager.succeed(spinnerId, `Server configuration removed: ${key}`);
 
-    } catch (error) {
+    } catch (error: any) {
       const message = error instanceof Error ? error.message : String(error);
       SpinnerManager.fail(spinnerId, `Failed to remove configuration: ${message}`);
     }
@@ -305,7 +305,7 @@ export class ConfigCommand {
       console.log();
       this.displayConfigurationTable(configData, options?.filter, options?.sensitive);
 
-    } catch (error) {
+    } catch (error: any) {
       const message = error instanceof Error ? error.message : String(error);
       console.log(Formatter.formatError(`Failed to list configuration: ${message}`));
     }
@@ -359,7 +359,7 @@ export class ConfigCommand {
 
       SpinnerManager.succeed(spinnerId, `Configuration exported to ${file}`);
 
-    } catch (error) {
+    } catch (error: any) {
       const message = error instanceof Error ? error.message : String(error);
       SpinnerManager.fail(spinnerId, `Failed to export configuration: ${message}`);
     }
@@ -435,7 +435,7 @@ export class ConfigCommand {
         SpinnerManager.succeed(spinnerId, 'Configuration imported successfully');
       }
 
-    } catch (error) {
+    } catch (error: any) {
       const message = error instanceof Error ? error.message : String(error);
       SpinnerManager.fail(spinnerId, `Failed to import configuration: ${message}`);
     }
@@ -490,7 +490,7 @@ export class ConfigCommand {
         SpinnerManager.succeed(spinnerId, 'All configuration reset to defaults');
       }
 
-    } catch (error) {
+    } catch (error: any) {
       const message = error instanceof Error ? error.message : String(error);
       console.log(Formatter.formatError(`Failed to reset configuration: ${message}`));
     }
@@ -521,7 +521,7 @@ export class ConfigCommand {
             allValid = false;
           }
           
-        } catch (error) {
+        } catch (error: any) {
           issues.push(`CLI: ${error instanceof Error ? error.message : String(error)}`);
           allValid = false;
         }
@@ -551,7 +551,7 @@ export class ConfigCommand {
         });
       }
 
-    } catch (error) {
+    } catch (error: any) {
       const message = error instanceof Error ? error.message : String(error);
       SpinnerManager.fail(spinnerId, `Configuration validation failed: ${message}`);
     }
@@ -590,7 +590,7 @@ export class ConfigCommand {
         console.log(`  ${red('Unable to connect to server')}`);
       }
 
-    } catch (error) {
+    } catch (error: any) {
       const message = error instanceof Error ? error.message : String(error);
       console.log(Formatter.formatError(`Failed to get configuration info: ${message}`));
     }
@@ -627,7 +627,7 @@ export class ConfigCommand {
         await this.editServerConfig();
       }
 
-    } catch (error) {
+    } catch (error: any) {
       const message = error instanceof Error ? error.message : String(error);
       console.log(Formatter.formatError(`Failed to edit configuration: ${message}`));
     }
@@ -695,7 +695,7 @@ export class ConfigCommand {
       console.log(Formatter.formatInfo('Server configuration editing not fully implemented'));
       console.log(Formatter.formatInfo('Use "config set" commands to modify server configuration'));
 
-    } catch (error) {
+    } catch (error: any) {
       const message = error instanceof Error ? error.message : String(error);
       console.log(Formatter.formatError(`Failed to edit server configuration: ${message}`));
     }
@@ -716,7 +716,7 @@ export class ConfigCommand {
 
       SpinnerManager.succeed(spinnerId, `Configuration backup created: ${file}`);
 
-    } catch (error) {
+    } catch (error: any) {
       const message = error instanceof Error ? error.message : String(error);
       SpinnerManager.fail(spinnerId, `Failed to create backup: ${message}`);
     }
@@ -756,7 +756,7 @@ export class ConfigCommand {
         ...options
       });
 
-    } catch (error) {
+    } catch (error: any) {
       const message = error instanceof Error ? error.message : String(error);
       console.log(Formatter.formatError(`Failed to restore configuration: ${message}`));
     }

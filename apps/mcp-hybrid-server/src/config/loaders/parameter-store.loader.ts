@@ -39,7 +39,7 @@ export class ParameterStoreLoader {
 
       this.logger.log(`Loaded ${Object.keys(config).length} parameters from Parameter Store`);
       return config;
-    } catch (error) {
+    } catch (error: any) {
       this.logger.error('Failed to load parameters from Parameter Store', error);
       return {};
     }
@@ -66,7 +66,7 @@ export class ParameterStoreLoader {
         this.cache.set(fullName, value);
       }
       return value;
-    } catch (error) {
+    } catch (error: any) {
       this.logger.error(`Failed to get parameter: ${fullName}`, error);
       return undefined;
     }
@@ -102,7 +102,7 @@ export class ParameterStoreLoader {
       }
 
       return result;
-    } catch (error) {
+    } catch (error: any) {
       this.logger.error('Failed to get parameters', error);
       return result;
     }
@@ -132,7 +132,7 @@ export class ParameterStoreLoader {
       } while (nextToken);
 
       return parameters;
-    } catch (error) {
+    } catch (error: any) {
       this.logger.error(`Failed to get parameters by path: ${path}`, error);
       return [];
     }

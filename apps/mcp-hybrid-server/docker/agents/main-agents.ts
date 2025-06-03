@@ -53,7 +53,7 @@ async function bootstrap() {
     logger.log(`🌍 Environment: ${nodeEnv}`);
     logger.log(`🤖 Available Agents: Code Analyzer, Database Analyzer, Knowledge Builder, Documentation Generator`);
     
-  } catch (error) {
+  } catch (error: any) {
     logger.error('❌ Failed to start Agents Service:', error);
     process.exit(1);
   }
@@ -74,7 +74,7 @@ function setupGracefulShutdown(app: any, logger: Logger): void {
       clearTimeout(shutdownTimeout);
       logger.log('✅ Graceful shutdown completed');
       process.exit(0);
-    } catch (error) {
+    } catch (error: any) {
       logger.error('❌ Error during shutdown:', error);
       process.exit(1);
     }

@@ -19,7 +19,7 @@ export const configuration = async () => {
 
       parameterStoreConfig = parameters;
       secretsConfig = secrets;
-    } catch (error) {
+    } catch (error: any) {
       console.warn('Failed to load from Parameter Store/Secrets Manager:', error);
     }
   }

@@ -81,7 +81,7 @@ export class YourCustomTool implements MCPTool {
           format: options.format || 'json'
         }
       };
-    } catch (error) {
+    } catch (error: any) {
       return {
         success: false,
         error: {
@@ -403,7 +403,7 @@ export class RobustTool implements MCPTool {
         success: true,
         data: result
       };
-    } catch (error) {
+    } catch (error: any) {
       if (error instanceof ToolError) {
         return {
           success: false,
@@ -690,7 +690,7 @@ async execute(params: any): Promise<ToolResult> {
     });
     
     return result;
-  } catch (error) {
+  } catch (error: any) {
     this.metricsService.recordToolExecution({
       tool: 'your_custom_tool',
       duration: Date.now() - startTime,

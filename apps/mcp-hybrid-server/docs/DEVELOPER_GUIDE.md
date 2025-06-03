@@ -229,7 +229,7 @@ export class ToolService {
       const result = await this.performExecution(toolName, params);
       this.eventEmitter.emit('tool.execution.completed', { toolName, result });
       return result;
-    } catch (error) {
+    } catch (error: any) {
       this.eventEmitter.emit('tool.execution.failed', { toolName, error });
       throw error;
     }
@@ -303,7 +303,7 @@ export abstract class BaseAgent {
       const result = await this.processRequest(prompt, options);
       this.logger.log(`${this.name} agent completed successfully`);
       return result;
-    } catch (error) {
+    } catch (error: any) {
       this.logger.error(`Error in ${this.name} agent: ${error.message}`);
       throw error;
     }
@@ -432,7 +432,7 @@ Format your response as JSON with the following structure:
     try {
       const content = response.body.content[0].text;
       return JSON.parse(content);
-    } catch (error) {
+    } catch (error: any) {
       this.logger.error('Failed to parse agent response:', error);
       return {
         summary: 'Analysis completed with parsing errors',
@@ -600,7 +600,7 @@ export class CustomAnalysisTool {
       this.logger.log('Custom analysis completed successfully');
       return enhancedResult;
 
-    } catch (error) {
+    } catch (error: any) {
       this.logger.error(`Custom analysis failed: ${error.message}`);
       throw new Error(`Custom analysis failed: ${error.message}`);
     }
@@ -729,7 +729,7 @@ export class CustomWorkflowNodes {
         preprocessingResult: preprocessedData,
         lastUpdated: Date.now(),
       };
-    } catch (error) {
+    } catch (error: any) {
       this.logger.error(`Preprocessing failed: ${error.message}`);
       return {
         ...state,
@@ -762,7 +762,7 @@ export class CustomWorkflowNodes {
         analysisResult,
         lastUpdated: Date.now(),
       };
-    } catch (error) {
+    } catch (error: any) {
       this.logger.error(`Analysis failed: ${error.message}`);
       return {
         ...state,
@@ -790,7 +790,7 @@ export class CustomWorkflowNodes {
         finalResult: formattedResult,
         lastUpdated: Date.now(),
       };
-    } catch (error) {
+    } catch (error: any) {
       this.logger.error(`Postprocessing failed: ${error.message}`);
       return {
         ...state,
@@ -950,7 +950,7 @@ export class CustomWorkflow {
       
       this.logger.log(`Custom workflow completed: ${id}`);
       return result;
-    } catch (error) {
+    } catch (error: any) {
       this.logger.error(`Custom workflow failed: ${error.message}`);
       
       const errorState = {
@@ -1010,7 +1010,7 @@ export class CustomMemoryProvider {
 
       this.logger.log(`Memory item stored: ${memoryId}`);
       return memoryId;
-    } catch (error) {
+    } catch (error: any) {
       this.logger.error(`Failed to store memory item: ${error.message}`);
       throw error;
     }
@@ -1064,7 +1064,7 @@ export class CustomMemoryProvider {
 
       this.logger.log(`Memory search completed: ${results.length} results`);
       return rankedResults;
-    } catch (error) {
+    } catch (error: any) {
       this.logger.error(`Memory search failed: ${error.message}`);
       throw error;
     }
@@ -1130,7 +1130,7 @@ export class CustomMCPServer {
         default:
           throw new Error(`Unsupported method: ${request.method}`);
       }
-    } catch (error) {
+    } catch (error: any) {
       this.logger.error(`MCP request failed: ${error.message}`);
       return {
         jsonrpc: '2.0',
@@ -1208,7 +1208,7 @@ export class CustomMCPServer {
           isError: false,
         },
       };
-    } catch (error) {
+    } catch (error: any) {
       this.eventEmitter.emit('mcp.tool.failed', {
         toolName: name,
         error: error.message,
@@ -1680,7 +1680,7 @@ export class WorkflowService {
       });
 
       return result;
-    } catch (error) {
+    } catch (error: any) {
       this.logger.error('Workflow execution failed', {
         correlationId,
         error: error.message,

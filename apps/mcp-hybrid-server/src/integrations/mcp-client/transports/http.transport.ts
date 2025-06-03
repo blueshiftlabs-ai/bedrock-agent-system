@@ -38,7 +38,7 @@ export class HttpTransport implements MCPTransport {
         const responseMessage = JSON.parse(responseText) as MCPResponse;
         this.handleMessage(responseMessage);
       }
-    } catch (error) {
+    } catch (error: any) {
       this.logger.error('HTTP transport error:', error);
       this.handleError(error instanceof Error ? error : new Error(String(error)));
     }
@@ -64,7 +64,7 @@ export class HttpTransport implements MCPTransport {
     this.messageHandlers.forEach(handler => {
       try {
         handler(message);
-      } catch (error) {
+      } catch (error: any) {
         this.logger.error('Message handler error:', error);
       }
     });
@@ -84,7 +84,7 @@ export class HttpTransport implements MCPTransport {
     this.closeHandlers.forEach(handler => {
       try {
         handler();
-      } catch (error) {
+      } catch (error: any) {
         this.logger.error('Close handler error:', error);
       }
     });

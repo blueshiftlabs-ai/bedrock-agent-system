@@ -1,4 +1,4 @@
-import { Controller, Get } from '@nestjs/common';
+import { Controller, Get, Param } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
 import {
   HealthCheckService,
@@ -18,7 +18,7 @@ export class HealthController {
     private readonly memory: MemoryHealthIndicator,
     private readonly disk: DiskHealthIndicator,
     private readonly mcpLifecycle: MCPLifecycleService,
-    private readonly mcpHealth: MCPHealthService,
+    private readonly mcpHealthService: MCPHealthService,
   ) {}
 
   @Get()
@@ -34,7 +34,7 @@ export class HealthController {
       
       // MCP-specific health indicators
       () => this.mcpLifecycle.isHealthy(),
-      () => this.mcpHealth.isHealthy(),
+      () => this.mcpHealthService.isHealthy(),
     ]);
   }
 
@@ -42,7 +42,7 @@ export class HealthController {
   @ApiOperation({ summary: 'Get detailed MCP health status' })
   @ApiResponse({ status: 200, description: 'Detailed MCP health report' })
   async mcpHealth() {
-    return await this.mcpHealth.generateHealthReport();
+    return await this.mcpHealthService.generateHealthReport();
   }
 
   @Get('mcp/connections')
@@ -52,7 +52,7 @@ export class HealthController {
     const status = this.mcpLifecycle.getServiceStatus();
     const connectionDetails = await Promise.all(
       status.client.connections.map(async (conn) => {
-        const metrics = await this.mcpHealth.getConnectionMetrics(conn.id);
+        const metrics = await this.mcpHealthService.getConnectionMetrics(conn.id);
         return { ...conn, metrics };
       })
     );
@@ -70,7 +70,7 @@ export class HealthController {
   @Get('mcp/test/:connectionId')
   @ApiOperation({ summary: 'Test specific MCP connection' })
   @ApiResponse({ status: 200, description: 'Connection test results' })
-  async testConnection(@Controller('connectionId') connectionId: string) {
-    return await this.mcpHealth.performConnectionTest(connectionId);
+  async testConnection(@Param('connectionId') connectionId: string) {
+    return await this.mcpHealthService.performConnectionTest(connectionId);
   }
 }

@@ -235,7 +235,7 @@ class MCPCli {
           'Cache Path': configInfo.cachePath,
           'Logs Path': configInfo.logsPath
         });
-      } catch (error) {
+      } catch (error: any) {
         // Config might not be available
       }
     }
@@ -311,7 +311,7 @@ For more information about a specific command, run:
   public async run(): Promise<void> {
     try {
       await this.program.parseAsync(process.argv);
-    } catch (error) {
+    } catch (error: any) {
       SpinnerManager.stopAll();
       
       if (error instanceof Error) {

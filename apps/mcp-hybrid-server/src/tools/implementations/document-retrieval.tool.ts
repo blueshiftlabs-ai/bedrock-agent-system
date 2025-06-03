@@ -56,7 +56,7 @@ export class DocumentRetrievalTool {
       
       try {
         content = await this.awsService.getFromS3(docKey);
-      } catch (error) {
+      } catch (error: any) {
         // Generate new documentation if not found
         content = this.generateDocumentationTemplate(entityId, format);
         
@@ -80,7 +80,7 @@ export class DocumentRetrievalTool {
       };
 
       return result;
-    } catch (error) {
+    } catch (error: any) {
       this.logger.error(`Error retrieving documentation for ${entityId}:`, error);
       throw new Error(`Documentation retrieval failed: ${error.message}`);
     }

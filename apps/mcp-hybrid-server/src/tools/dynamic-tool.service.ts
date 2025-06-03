@@ -31,7 +31,7 @@ export class DynamicToolService implements OnModuleInit {
     try {
       await fs.mkdir(this.toolsDirectory, { recursive: true });
       this.logger.log(`Tools directory initialized: ${this.toolsDirectory}`);
-    } catch (error) {
+    } catch (error: any) {
       this.logger.error('Failed to initialize tools directory:', error);
     }
 
@@ -63,11 +63,11 @@ export class DynamicToolService implements OnModuleInit {
           // Validate and register tool
           await this.dynamicToolRegistry.registerToolWithMetadata(toolMetadata);
           this.logger.log(`Loaded existing tool: ${toolMetadata.id}`);
-        } catch (error) {
+        } catch (error: any) {
           this.logger.error(`Failed to load tool from ${metadataFile}:`, error);
         }
       }
-    } catch (error) {
+    } catch (error: any) {
       this.logger.error('Failed to load existing tools:', error);
     }
   }
@@ -113,7 +113,7 @@ export class DynamicToolService implements OnModuleInit {
 
       this.logger.log(`Tool installed successfully: ${toolMetadata.id}`);
       return registrationResult;
-    } catch (error) {
+    } catch (error: any) {
       this.logger.error('Tool installation failed:', error);
       return {
         valid: false,
@@ -246,7 +246,7 @@ export class DynamicToolService implements OnModuleInit {
       try {
         await fs.rm(toolMetadata.lifecycle.installPath, { recursive: true, force: true });
         this.logger.log(`Tool files removed: ${toolMetadata.lifecycle.installPath}`);
-      } catch (error) {
+      } catch (error: any) {
         this.logger.error(`Failed to remove tool files for ${toolId}:`, error);
       }
     }
@@ -274,7 +274,7 @@ export class DynamicToolService implements OnModuleInit {
 
       this.logger.log(`Tool reloaded successfully: ${toolId}`);
       return true;
-    } catch (error) {
+    } catch (error: any) {
       this.logger.error(`Failed to reload tool ${toolId}:`, error);
       return false;
     }
@@ -308,7 +308,7 @@ export class DynamicToolService implements OnModuleInit {
 
     try {
       return await toolMetadata.healthCheck.healthCheck();
-    } catch (error) {
+    } catch (error: any) {
       return {
         status: 'unhealthy',
         details: error.message,

@@ -57,7 +57,7 @@ export class StdioTransport extends EventEmitter implements MCPTransport {
         this.handleError(error);
       });
 
-    } catch (error) {
+    } catch (error: any) {
       this.logger.error('Failed to start MCP server process:', error);
       throw error;
     }
@@ -132,7 +132,7 @@ export class StdioTransport extends EventEmitter implements MCPTransport {
       try {
         const message = JSON.parse(messageContent) as MCPResponse | MCPNotification;
         this.handleMessage(message);
-      } catch (error) {
+      } catch (error: any) {
         this.logger.error('Failed to parse message:', error);
       }
     }
@@ -142,7 +142,7 @@ export class StdioTransport extends EventEmitter implements MCPTransport {
     this.messageHandlers.forEach(handler => {
       try {
         handler(message);
-      } catch (error) {
+      } catch (error: any) {
         this.logger.error('Message handler error:', error);
       }
     });
@@ -162,7 +162,7 @@ export class StdioTransport extends EventEmitter implements MCPTransport {
     this.closeHandlers.forEach(handler => {
       try {
         handler();
-      } catch (error) {
+      } catch (error: any) {
         this.logger.error('Close handler error:', error);
       }
     });

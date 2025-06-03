@@ -18,6 +18,7 @@ import {
   ToolVersion,
 } from '../interfaces/tool-management.interface';
 import * as crypto from 'crypto';
+import { getErrorMessage } from '@/common/utils/error-utils';
 import * as semver from 'semver';
 
 @Injectable()
@@ -252,7 +253,7 @@ export class DynamicToolRegistry extends MCPToolRegistry implements OnModuleDest
         const memoryUsage = process.memoryUsage().heapUsed - startMemory;
 
         this.emitToolEvent('error', toolMetadata.id, {
-          error: error.message,
+          error: getErrorMessage(error),
           executionTime,
           memoryUsage,
         });
@@ -300,10 +301,10 @@ export class DynamicToolRegistry extends MCPToolRegistry implements OnModuleDest
           this.logger.warn(`Tool ${toolMetadata.id} health check failed:`, result.details);
         }
       } catch (error) {
-        this.logger.error(`Health check failed for tool ${toolMetadata.id}:`, error.message);
+        this.logger.error(`Health check failed for tool ${toolMetadata.id}:`, getErrorMessage(error));
         this.emitToolEvent('health-check', toolMetadata.id, {
           status: 'unhealthy',
-          details: error.message,
+          details: getErrorMessage(error),
           timestamp: new Date(),
         });
       }
@@ -334,7 +335,7 @@ export class DynamicToolRegistry extends MCPToolRegistry implements OnModuleDest
 
       this.toolWatchers.set(toolMetadata.id, watcher);
     } catch (error) {
-      this.logger.error(`Failed to setup hot reload for tool ${toolMetadata.id}:`, error.message);
+      this.logger.error(`Failed to setup hot reload for tool ${toolMetadata.id}:`, getErrorMessage(error));
     }
   }
 
@@ -361,7 +362,7 @@ export class DynamicToolRegistry extends MCPToolRegistry implements OnModuleDest
       this.logger.log(`Successfully hot-reloaded tool: ${toolId}`);
       return true;
     } catch (error) {
-      this.logger.error(`Hot reload failed for tool ${toolId}:`, error.message);
+      this.logger.error(`Hot reload failed for tool ${toolId}:`, getErrorMessage(error));
       return false;
     }
   }

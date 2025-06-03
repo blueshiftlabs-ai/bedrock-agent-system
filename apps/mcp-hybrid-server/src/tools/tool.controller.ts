@@ -25,6 +25,7 @@ import {
   ApiBody,
 } from '@nestjs/swagger';
 import { z } from 'zod';
+import { getErrorMessage } from '@/common/utils/error-utils';
 import { DynamicToolService } from './dynamic-tool.service';
 import { ToolAuthGuard } from './guards/tool-auth.guard';
 import { ToolPermissionGuard } from './guards/tool-permission.guard';
@@ -42,6 +43,8 @@ import {
   ToolSearchDto,
   ToolInstallDto,
   ToolConfigurationDto,
+  ToolInstallDtoClass,
+  ToolConfigurationDtoClass,
   ToolSearchSchema,
   ToolInstallSchema,
   ToolConfigurationSchema,
@@ -57,7 +60,7 @@ class ZodValidationPipe {
   transform(value: any) {
     try {
       return this.schema.parse(value);
-    } catch (error) {
+    } catch (error: any) {
       if (error instanceof z.ZodError) {
         const messages = error.errors.map(err => 
           `${err.path.join('.')}: ${err.message}`
@@ -100,7 +103,7 @@ export class ToolController {
       };
 
       return this.dynamicToolService.searchTools(criteria);
-    } catch (error) {
+    } catch (error: any) {
       if (error instanceof z.ZodError) {
         const messages = error.errors.map(err => 
           `${err.path.join('.')}: ${err.message}`
@@ -133,14 +136,14 @@ export class ToolController {
   @ApiResponse({ status: 201, description: 'Tool installed successfully' })
   @ApiResponse({ status: 400, description: 'Invalid installation configuration' })
   @ApiResponse({ status: 409, description: 'Tool already exists' })
-  @ApiBody({ type: ToolInstallDto })
+  @ApiBody({ type: ToolInstallDtoClass })
   async installTool(@Body() installBody: any): Promise<ToolValidationResult> {
     try {
       // Validate install configuration with Zod
       const installConfig = validateToolInstall(installBody) as ToolInstallationConfig;
       
       return await this.dynamicToolService.installTool(installConfig);
-    } catch (error) {
+    } catch (error: any) {
       if (error instanceof z.ZodError) {
         const messages = error.errors.map(err => 
           `${err.path.join('.')}: ${err.message}`
@@ -150,11 +153,12 @@ export class ToolController {
       
       this.logger.error('Failed to install tool:', error);
       
-      if (error.message.includes('already exists')) {
-        throw new ConflictException(error.message);
+      const errorMsg = getErrorMessage(error);
+      if (errorMsg.includes('already exists')) {
+        throw new ConflictException(errorMsg);
       }
       
-      throw new BadRequestException(`Tool installation failed: ${error.message}`);
+      throw new BadRequestException(`Tool installation failed: ${errorMsg}`);
     }
   }
 
@@ -258,7 +262,7 @@ export class ToolController {
   @ApiResponse({ status: 200, description: 'Tool configuration updated successfully' })
   @ApiResponse({ status: 404, description: 'Tool not found' })
   @ApiParam({ name: 'toolId', description: 'Tool identifier' })
-  @ApiBody({ type: ToolConfigurationDto })
+  @ApiBody({ type: ToolConfigurationDtoClass })
   async updateToolConfiguration(
     @Param('toolId') toolId: string,
     @Body() configBody: any
@@ -274,7 +278,7 @@ export class ToolController {
       }
 
       return { success: true, message: `Configuration updated for tool ${toolId}` };
-    } catch (error) {
+    } catch (error: any) {
       if (error instanceof z.ZodError) {
         const messages = error.errors.map(err => 
           `${err.path.join('.')}: ${err.message}`
@@ -312,7 +316,7 @@ export class ToolController {
       return await this.dynamicToolService.executeTool(toolId, body.parameters, body.context);
     } catch (error) {
       this.logger.error(`Tool execution failed for ${toolId}:`, error);
-      throw new BadRequestException(`Tool execution failed: ${error.message}`);
+      throw new BadRequestException(`Tool execution failed: ${getErrorMessage(error)}`);
     }
   }
 

@@ -69,7 +69,7 @@ async function bootstrap() {
     logger.log(`🔧 MCP Server: http://${host}:${port}/mcp`);
     logger.log(`🌍 Environment: ${nodeEnv}`);
     
-  } catch (error) {
+  } catch (error: any) {
     logger.error('❌ Failed to start API Gateway:', error);
     process.exit(1);
   }
@@ -90,7 +90,7 @@ function setupGracefulShutdown(app: any, logger: Logger): void {
       clearTimeout(shutdownTimeout);
       logger.log('✅ Graceful shutdown completed');
       process.exit(0);
-    } catch (error) {
+    } catch (error: any) {
       logger.error('❌ Error during shutdown:', error);
       process.exit(1);
     }

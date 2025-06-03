@@ -228,7 +228,7 @@ export class UserService {
         throw new NotFoundException(`User ${id} not found`);
       }
       return user;
-    } catch (error) {
+    } catch (error: any) {
       this.logger.error(`Failed to get user ${id}`, error);
       throw error;
     }

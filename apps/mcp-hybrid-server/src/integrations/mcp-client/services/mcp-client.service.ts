@@ -70,7 +70,7 @@ export class MCPClientService implements OnModuleDestroy {
       this.eventEmitter.emit('mcp.connection.established', { connectionId: config.id, serverInfo });
 
       return connection;
-    } catch (error) {
+    } catch (error: any) {
       connection.status = 'error';
       connection.lastError = error instanceof Error ? error.message : String(error);
       this.logger.error(`Failed to connect to MCP server ${config.name}:`, error);
@@ -92,13 +92,13 @@ export class MCPClientService implements OnModuleDestroy {
       if (connection.status === 'connected') {
         await this.sendRequest(connectionId, MCPMethod.SHUTDOWN, {});
       }
-    } catch (error) {
+    } catch (error: any) {
       this.logger.warn('Error during shutdown:', error);
     }
 
     try {
       await connection.transport.close();
-    } catch (error) {
+    } catch (error: any) {
       this.logger.warn('Error closing transport:', error);
     }
 
@@ -142,10 +142,10 @@ export class MCPClientService implements OnModuleDestroy {
     return response.prompts || [];
   }
 
-  async getPrompt(connectionId: string, promptName: string, arguments?: any): Promise<any> {
+  async getPrompt(connectionId: string, promptName: string, args?: any): Promise<any> {
     const response = await this.sendRequest(connectionId, MCPMethod.PROMPTS_GET, {
       name: promptName,
-      arguments,
+      arguments: args,
     });
     return response;
   }

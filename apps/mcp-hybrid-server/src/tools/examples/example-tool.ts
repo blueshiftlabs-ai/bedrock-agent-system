@@ -168,7 +168,7 @@ export class ExampleAnalysisTool {
                 lastTestResult: testResult.wordCount === 7 ? 'pass' : 'fail'
               }
             };
-          } catch (error) {
+          } catch (error: any) {
             return {
               status: 'unhealthy' as const,
               details: `Health check failed: ${error.message}`,

@@ -61,7 +61,7 @@ export class ToolAuthMiddleware implements NestMiddleware {
       }
 
       next();
-    } catch (error) {
+    } catch (error: any) {
       if (error instanceof jwt.JsonWebTokenError) {
         throw new UnauthorizedException('Invalid token');
       }

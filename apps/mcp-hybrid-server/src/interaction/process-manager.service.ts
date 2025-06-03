@@ -175,7 +175,7 @@ export class ProcessManagerService {
     if (executor && typeof executor.cancel === 'function') {
       try {
         await executor.cancel(force);
-      } catch (error) {
+      } catch (error: any) {
         this.logger.warn(`Error cancelling executor for process ${processId}: ${error.message}`);
       }
     }
@@ -427,7 +427,7 @@ export class ProcessManagerService {
 
           this.emitEvent('resource_update', processId, usage);
         }
-      } catch (error) {
+      } catch (error: any) {
         this.logger.warn(`Error monitoring resources for process ${processId}: ${error.message}`);
       }
     }, 5000); // Every 5 seconds
@@ -480,7 +480,7 @@ export class ProcessManagerService {
       if (typeof executor.cancel === 'function') {
         try {
           await executor.cancel(true);
-        } catch (error) {
+        } catch (error: any) {
           this.logger.warn(`Error cancelling executor for process ${processId}: ${error.message}`);
         }
       }

@@ -153,7 +153,7 @@ export class ExternalToolAdapter {
           originalToolName,
           executionContext: context ? { ...context, external: true } : { external: true },
         };
-      } catch (error) {
+      } catch (error: any) {
         this.logger.error(`External tool execution failed: ${originalToolName}:`, error);
         throw new Error(`External tool execution failed: ${error instanceof Error ? error.message : String(error)}`);
       }
