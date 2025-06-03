@@ -8,7 +8,7 @@ import { MCPModule } from '../mcp/mcp.module';
   imports: [
     TerminusModule,
     HttpModule,
-    MCPModule.forRoot(),
+    MCPModule,
   ],
   controllers: [HealthController],
 })

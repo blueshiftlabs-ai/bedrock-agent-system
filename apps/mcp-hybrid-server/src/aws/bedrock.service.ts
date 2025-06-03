@@ -1,6 +1,5 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { AwsService } from './aws.service';
 
 /**
  * Service for interacting with AWS Bedrock for AI model invocations
@@ -11,7 +10,6 @@ export class BedrockService {
 
   constructor(
     private readonly configService: ConfigService,
-    private readonly awsService: AwsService,
   ) {
     this.logger.log('BedrockService initialized');
   }

@@ -1,5 +1,5 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { DynamoDBService } from '@aws/dynamodb.service';
+import { DynamoDBService } from '../../aws/dynamodb.service';
 import { BaseState } from '../states/base-state';
 import { getErrorMessage } from '@/common/utils/error-utils';
 
@@ -23,7 +23,7 @@ export class WorkflowStateService {
     }
   }
 
-  async getWorkflowState(workflowId: string): Promise<BaseState | null> {
+  async getWorkflowState<T extends BaseState = BaseState>(workflowId: string): Promise<T | null> {
     try {
       const item = await this.dynamoService.getItem('WorkflowState', { workflowId });
       return item ? JSON.parse(item.state) : null;

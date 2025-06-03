@@ -26,7 +26,7 @@ export const ToolPermissionSchema = z.object({
 export const ToolSearchSchema = z.object({
   query: z.string().optional().describe('Search query'),
   category: z.string().optional().describe('Filter by category'),
-  status: z.string().optional().describe('Filter by status'),
+  status: z.enum(['installing', 'installed', 'enabled', 'disabled', 'updating', 'uninstalling', 'error', 'deprecated']).optional().describe('Filter by status'),
   author: z.string().optional().describe('Filter by author'),
   keywords: z.array(z.string()).optional().describe('Filter by keywords'),
   enabled: z.boolean().optional().describe('Filter by enabled status'),

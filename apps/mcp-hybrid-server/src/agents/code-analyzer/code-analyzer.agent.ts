@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { BaseAgent } from '../base/base.agent';
-import { BedrockMcpClient } from '@integrations/bedrock/bedrock-mcp.client';
+import { BedrockMcpClient } from '../../integrations/bedrock/bedrock-mcp.client';
 
 @Injectable()
 export class CodeAnalyzerAgent extends BaseAgent {

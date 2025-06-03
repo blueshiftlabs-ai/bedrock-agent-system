@@ -1,6 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { MCPTool, MCPToolRegistry } from '../registry/tool.registry';
-import { AwsService } from '@aws/aws.service';
+import { AwsService } from '@/aws/aws.service';
 
 @Injectable()
 export class KnowledgeGraphTool {
@@ -132,7 +132,11 @@ export class KnowledgeGraphTool {
     let existingEntity;
     
     try {
-      const existingData = await this.awsService.getFromS3(entityKey);
+      const buffer = await this.awsService.getFromS3(entityKey);
+      if (!buffer) {
+        throw new Error('Entity not found');
+      }
+      const existingData = buffer.toString('utf-8');
       existingEntity = JSON.parse(existingData);
     } catch (error: any) {
       // Entity doesn't exist
@@ -175,7 +179,11 @@ export class KnowledgeGraphTool {
     let existingRelationship;
     
     try {
-      const existingData = await this.awsService.getFromS3(relationshipKey);
+      const buffer = await this.awsService.getFromS3(relationshipKey);
+      if (!buffer) {
+        throw new Error('Relationship not found');
+      }
+      const existingData = buffer.toString('utf-8');
       existingRelationship = JSON.parse(existingData);
     } catch (error: any) {
       // Relationship doesn't exist

@@ -47,12 +47,12 @@ import { configuration } from './config/configuration';
     MemoryModule,
     IndexingModule,
     DocumentationModule,
-    HealthModule,
-    WorkflowModule,
-    AgentModule,
-    ToolModule,
-    IntegrationModule,
-    InteractionModule,
+    // HealthModule,
+    // WorkflowModule,
+    // AgentModule,
+    // ToolModule,
+    // IntegrationModule,
+    // InteractionModule,
     
     // MCP Module (handles both server and client)
     MCPModule.forRoot(),

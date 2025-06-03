@@ -1,9 +1,9 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { CodeAnalysisState } from '../states/analysis-state';
-import { CodeAnalyzerAgent } from '@agents/code-analyzer/code-analyzer.agent';
-import { DatabaseAnalyzerAgent } from '@agents/db-analyzer/db-analyzer.agent';
-import { KnowledgeBuilderAgent } from '@agents/knowledge-builder/knowledge-builder.agent';
-import { DocumentationGeneratorAgent } from '@agents/documentation-generator/documentation-generator.agent';
+import { CodeAnalyzerAgent } from '../../agents/code-analyzer/code-analyzer.agent';
+import { DatabaseAnalyzerAgent } from '../../agents/db-analyzer/db-analyzer.agent';
+import { KnowledgeBuilderAgent } from '../../agents/knowledge-builder/knowledge-builder.agent';
+import { DocumentationGeneratorAgent } from '../../agents/documentation-generator/documentation-generator.agent';
 import { getErrorMessage } from '@/common/utils/error-utils';
 
 @Injectable()

@@ -22,7 +22,7 @@ import { getErrorMessage } from '@/common/utils/error-utils';
 import * as semver from 'semver';
 
 @Injectable()
-export class DynamicToolRegistry extends MCPToolRegistry implements OnModuleDestroy {
+export class DynamicToolRegistry implements OnModuleDestroy {
   private readonly logger = new Logger(DynamicToolRegistry.name);
   private toolMetadata: Map<string, ToolMetadata> = new Map();
   private toolConfigurations: Map<string, ToolConfiguration> = new Map();
@@ -31,8 +31,34 @@ export class DynamicToolRegistry extends MCPToolRegistry implements OnModuleDest
   private eventHistory: ToolEvent[] = [];
   private readonly maxEventHistory = 1000;
 
-  constructor(eventEmitter: EventEmitter2) {
-    super(eventEmitter);
+  constructor(
+    private readonly mcpRegistry: MCPToolRegistry,
+    private readonly eventEmitter: EventEmitter2,
+  ) {}
+
+  // Delegate methods to MCPToolRegistry
+  registerTool(tool: MCPTool): void {
+    return this.mcpRegistry.registerTool(tool);
+  }
+
+  unregisterTool(name: string): boolean {
+    return this.mcpRegistry.unregisterTool(name);
+  }
+
+  getTool(name: string): MCPTool | undefined {
+    return this.mcpRegistry.getTool(name);
+  }
+
+  getToolCategories(): string[] {
+    return this.mcpRegistry.getToolCategories();
+  }
+
+  listTools(): MCPTool[] {
+    return this.mcpRegistry.getAllTools();
+  }
+
+  async executeTool(name: string, params: any, context?: any): Promise<any> {
+    return this.mcpRegistry.executeTool(name, params, context);
   }
 
   onModuleDestroy() {

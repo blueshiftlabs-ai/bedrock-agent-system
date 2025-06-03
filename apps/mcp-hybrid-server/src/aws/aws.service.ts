@@ -1,4 +1,4 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable, Logger, Inject, forwardRef } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { S3Service } from './s3.service';
 import { BedrockService } from './bedrock.service';
@@ -12,7 +12,9 @@ export class AwsService {
 
   constructor(
     private readonly configService: ConfigService,
+    @Inject(forwardRef(() => S3Service))
     private readonly s3Service: S3Service,
+    @Inject(forwardRef(() => BedrockService))
     private readonly bedrockService: BedrockService,
   ) {
     this.logger.log('AwsService initialized');

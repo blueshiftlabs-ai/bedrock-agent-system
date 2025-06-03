@@ -1,7 +1,7 @@
 import { Module, OnModuleInit, MiddlewareConsumer, NestModule } from '@nestjs/common';
 import { EventEmitterModule } from '@nestjs/event-emitter';
 import { ConfigModule } from '@nestjs/config';
-import { AwsModule } from '@aws/aws.module';
+import { AwsModule } from '../aws/aws.module';
 import { MCPToolRegistry } from './registry/tool.registry';
 import { DynamicToolRegistry } from './registry/dynamic-tool.registry';
 import { CodeAnalysisTool } from './implementations/code-analysis.tool';

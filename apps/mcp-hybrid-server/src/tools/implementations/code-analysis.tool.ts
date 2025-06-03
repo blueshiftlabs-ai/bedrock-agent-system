@@ -1,6 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { MCPTool, MCPToolRegistry } from '../registry/tool.registry';
-import { AwsService } from '@aws/aws.service';
+import { AwsService } from '@/aws/aws.service';
 import { z } from 'zod';
 
 @Injectable()
@@ -58,7 +58,11 @@ export class CodeAnalysisTool {
       let fileContent: string;
       if (filePath.startsWith('s3://')) {
         const s3Key = filePath.replace('s3://', '').split('/').slice(1).join('/');
-        fileContent = await this.awsService.getFromS3(s3Key);
+        const buffer = await this.awsService.getFromS3(s3Key);
+        if (!buffer) {
+          throw new Error(`File not found in S3: ${s3Key}`);
+        }
+        fileContent = buffer.toString('utf-8');
       } else {
         // For local files, we'd need file system access
         // In a real implementation, you might use a different approach

@@ -25,39 +25,17 @@ export class MCPModule {
         EventEmitterModule,
         ScheduleModule.forRoot(),
         
-        // Configure MCP Server (conditionally)
-        ReKogMcpModule.forRoot({
-          imports: [ConfigModule],
-          inject: [ConfigService],
-          useFactory: (configService: ConfigService) => {
-            const serverEnabled = configService.get<boolean>('mcp.server.enabled', true);
-            
-            if (!serverEnabled) {
-              return null; // Don't configure server if disabled
-            }
-
-            return {
-              name: configService.get<string>('mcp.server.name', 'hybrid-mcp-server'),
-              version: configService.get<string>('mcp.server.version', '1.0.0'),
-              description: configService.get<string>('mcp.server.description', 'Advanced MCP server with NestJS and LangGraph integration'),
-              transport: {
-                type: configService.get<string>('mcp.server.transport.type', 'http+sse'),
-                options: {
-                  endpoint: configService.get<string>('mcp.server.endpoint', '/mcp'),
-                  enableCors: configService.get<boolean>('mcp.server.transport.enableCors', true),
-                  maxConnections: configService.get<number>('mcp.server.transport.maxConnections', 100),
-                  connectionTimeout: configService.get<number>('mcp.server.transport.connectionTimeout', 30000),
-                },
-              },
-            };
-          },
-        }),
+        // Configure MCP Server with basic options
+        // ReKogMcpModule.forRoot({
+        //   name: 'hybrid-mcp-server',
+        //   version: '1.0.0',
+        // }),
         
         // Import client module (conditionally based on config)
         MCPClientModule,
         
         // Import tool module for server tools
-        ToolModule,
+        // ToolModule,
       ],
       providers: [
         MCPLifecycleService,
@@ -69,7 +47,7 @@ export class MCPModule {
         MCPHealthService,
         MCPConfigValidationService,
         MCPClientModule,
-        ToolModule,
+        // ToolModule,
       ],
     };
   }

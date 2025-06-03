@@ -1,6 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { MCPTool, MCPToolRegistry } from '../registry/tool.registry';
-import { AwsService } from '@aws/aws.service';
+import { AwsService } from '@/aws/aws.service';
 
 @Injectable()
 export class DatabaseAnalysisTool {

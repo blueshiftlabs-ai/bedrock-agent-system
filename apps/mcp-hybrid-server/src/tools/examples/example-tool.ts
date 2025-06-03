@@ -102,19 +102,7 @@ export class ExampleAnalysisTool {
           options: {
             type: 'object',
             description: 'Analysis options',
-            required: false,
-            properties: {
-              maxKeywords: {
-                type: 'number',
-                description: 'Maximum number of keywords to extract',
-                default: 10
-              },
-              includeSentiment: {
-                type: 'boolean',
-                description: 'Whether to include sentiment analysis',
-                default: true
-              }
-            }
+            required: false
           }
         }
       },

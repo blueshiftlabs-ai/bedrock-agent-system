@@ -17,6 +17,13 @@ import { DynamoDBService } from './dynamodb.service';
     S3Service,
     DynamoDBService,
   ],
-  exports: [AwsService, DynamoDBService],
+  exports: [
+    AwsService,
+    BedrockService,
+    OpenSearchService,
+    NeptuneService,
+    S3Service,
+    DynamoDBService,
+  ],
 })
 export class AwsModule {}

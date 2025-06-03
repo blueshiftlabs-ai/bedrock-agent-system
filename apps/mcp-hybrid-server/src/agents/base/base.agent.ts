@@ -1,5 +1,5 @@
 import { Logger } from '@nestjs/common';
-import { BedrockMcpClient } from '@integrations/bedrock/bedrock-mcp.client';
+import { BedrockMcpClient } from '../../integrations/bedrock/bedrock-mcp.client';
 import { getErrorMessage } from '@/common/utils/error-utils';
 
 export abstract class BaseAgent {

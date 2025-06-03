@@ -1,6 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { MCPTool, MCPToolRegistry } from '../registry/tool.registry';
-import { AwsService } from '@aws/aws.service';
+import { AwsService } from '@/aws/aws.service';
 
 @Injectable()
 export class DocumentRetrievalTool {
@@ -55,7 +55,11 @@ export class DocumentRetrievalTool {
       let content: string;
       
       try {
-        content = await this.awsService.getFromS3(docKey);
+        const buffer = await this.awsService.getFromS3(docKey);
+        if (!buffer) {
+          throw new Error('Document not found');
+        }
+        content = buffer.toString('utf-8');
       } catch (error: any) {
         // Generate new documentation if not found
         content = this.generateDocumentationTemplate(entityId, format);
