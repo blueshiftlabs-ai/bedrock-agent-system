@@ -89,6 +89,29 @@ DATA_BUCKET=$(aws cloudformation describe-stacks \
   --query 'Stacks[0].Outputs[?OutputKey==`DataBucketName`].OutputValue' \
   --output text 2>/dev/null || echo "Not deployed yet")
 
+PARAMETER_MANIFEST=$(aws cloudformation describe-stacks \
+  --stack-name "McpHybridStack-${STAGE}" \
+  --region "${AWS_REGION}" \
+  --query 'Stacks[0].Outputs[?OutputKey==`ParameterManifestPath`].OutputValue' \
+  --output text 2>/dev/null || echo "")
+
+# Generate environment files from Parameter Store
+if [[ -n "$PARAMETER_MANIFEST" && -f "$PARAMETER_MANIFEST" ]]; then
+    echo -e "${YELLOW}📝 Generating environment files from Parameter Store...${NC}"
+    cd ../..
+    
+    # Generate .env files for all apps and packages
+    export AWS_REGION="$AWS_REGION"
+    export STAGE="$STAGE"
+    export PARAMETER_STORE_PREFIX="/mcp-hybrid/${STAGE}"
+    pnpm build:env:${STAGE}
+
+    # Copy the manifest to the deployment directory
+    cp "infrastructure/mcp-hybrid-stack/$PARAMETER_MANIFEST" "deployment/parameter-manifest-${STAGE}.json"
+    
+    cd infrastructure/mcp-hybrid-stack
+fi
+
 cd ../..
 
 # Health check
@@ -111,6 +134,15 @@ if [[ "$SERVICE_URL" != "Not deployed yet" ]]; then
     done
 fi
 
+# Retrieve key parameters from Parameter Store
+echo -e "${YELLOW}📋 Retrieving key parameters from Parameter Store...${NC}"
+PARAMETERS=$(aws ssm get-parameters-by-path \
+    --path "/mcp-hybrid/${STAGE}" \
+    --recursive \
+    --query 'Parameters[?contains(Name, `/alb/url`) || contains(Name, `/neptune/cluster/endpoint`) || contains(Name, `/opensearch/collection/endpoint`)].[Name,Value]' \
+    --output json \
+    --region "$AWS_REGION" 2>/dev/null || echo "[]")
+
 echo -e "${GREEN}✅ Deployment completed successfully!${NC}"
 echo -e "${BLUE}======================================${NC}"
 echo -e "${GREEN}🌐 Service URL: ${SERVICE_URL}${NC}"
@@ -118,6 +150,14 @@ echo -e "${GREEN}🔧 MCP Endpoint: ${SERVICE_URL}/mcp${NC}"
 echo -e "${GREEN}📚 API Documentation: ${SERVICE_URL}/api/docs${NC}"
 echo -e "${GREEN}💗 Health Check: ${SERVICE_URL}/api/v1/health${NC}"
 echo -e "${GREEN}🗄️  Data Bucket: ${DATA_BUCKET}${NC}"
+
+# Display key parameters
+if [[ "$PARAMETERS" != "[]" ]]; then
+    echo -e "${BLUE}======================================${NC}"
+    echo -e "${GREEN}🔑 Key Parameters:${NC}"
+    echo "$PARAMETERS" | jq -r '.[] | "   \(.0): \(.1)"'
+fi
+
 echo -e "${BLUE}======================================${NC}"
 
 # Save deployment info
@@ -129,5 +169,12 @@ cat > deployment-info-${STAGE}.json << EOF
   "accountId": "${AWS_ACCOUNT_ID}",
   "serviceUrl": "${SERVICE_URL}",
   "dataBucket": "${DATA_BUCKET}",
-  "imageTag": "${IMAGE_TAG}"
+  "imageTag": "${IMAGE_TAG}",
+  "parameterStorePrefix": "/mcp-hybrid/${STAGE}",
+  "parameterManifest": "parameter-manifest-${STAGE}.json"
 }
+EOF
+
+echo -e "${CYAN}💡 To retrieve environment variables, run:${NC}"
+echo -e "${CYAN}   cd infrastructure/mcp-hybrid-stack${NC}"
+echo -e "${CYAN}   pnpm build-env generate --manifest parameter-manifest-${STAGE}.json --region ${AWS_REGION}${NC}"

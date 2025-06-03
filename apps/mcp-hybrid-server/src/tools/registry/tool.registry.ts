@@ -199,4 +199,69 @@ export class MCPToolRegistry {
   getToolCategories(): string[] {
     return Array.from(this.toolCategories.keys());
   }
+
+  unregisterTool(toolName: string): boolean {
+    const tool = this.tools.get(toolName);
+    if (!tool) {
+      this.logger.warn(`Attempted to unregister non-existent tool: ${toolName}`);
+      return false;
+    }
+
+    // Remove from tools map
+    this.tools.delete(toolName);
+
+    // Update category mapping
+    const category = tool.category;
+    const toolNames = this.toolCategories.get(category);
+    if (toolNames) {
+      const index = toolNames.indexOf(toolName);
+      if (index > -1) {
+        toolNames.splice(index, 1);
+        if (toolNames.length === 0) {
+          this.toolCategories.delete(category);
+        }
+      }
+    }
+
+    // Clear execution metrics
+    this.executionMetrics.delete(toolName);
+
+    this.logger.log(`Unregistered tool: ${toolName}`);
+    
+    // Emit unregistration event
+    this.eventEmitter.emit('tool.unregistered', { toolName, category });
+    
+    return true;
+  }
+
+  unregisterToolsByCategory(category: string): number {
+    const toolNames = this.toolCategories.get(category);
+    if (!toolNames) {
+      return 0;
+    }
+
+    const toolNamesToRemove = [...toolNames]; // Create copy
+    let removedCount = 0;
+
+    for (const toolName of toolNamesToRemove) {
+      if (this.unregisterTool(toolName)) {
+        removedCount++;
+      }
+    }
+
+    return removedCount;
+  }
+
+  unregisterToolsByPattern(pattern: RegExp): number {
+    const toolNames = Array.from(this.tools.keys());
+    let removedCount = 0;
+
+    for (const toolName of toolNames) {
+      if (pattern.test(toolName) && this.unregisterTool(toolName)) {
+        removedCount++;
+      }
+    }
+
+    return removedCount;
+  }
 }

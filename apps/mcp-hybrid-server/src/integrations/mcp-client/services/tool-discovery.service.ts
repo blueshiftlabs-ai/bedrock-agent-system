@@ -197,23 +197,7 @@ export class ToolDiscoveryService {
   }
 
   private unregisterTool(toolName: string): void {
-    // Access the private tools map - we'll need to add this method to MCPToolRegistry
-    const registry = this.toolRegistry as any;
-    if (registry.tools && registry.tools.has(toolName)) {
-      registry.tools.delete(toolName);
-      
-      // Update category mapping
-      for (const [category, toolNames] of registry.toolCategories.entries()) {
-        const index = toolNames.indexOf(toolName);
-        if (index > -1) {
-          toolNames.splice(index, 1);
-          if (toolNames.length === 0) {
-            registry.toolCategories.delete(category);
-          }
-          break;
-        }
-      }
-    }
+    this.toolRegistry.unregisterTool(toolName);
   }
 
   private async handleConnectionEstablished(event: { connectionId: string; serverInfo: any }): Promise<void> {

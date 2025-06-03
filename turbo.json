@@ -1,10 +1,16 @@
 {
   "$schema": "https://turbo.build/schema.json",
-  "globalDependencies": ["**/.env.*local"],
+  "globalDependencies": ["**/.env.*local", "**/.env"],
   "tasks": {
+    "build:env": {
+      "outputs": ["**/.env", "**/.env.example"],
+      "cache": false,
+      "env": ["AWS_REGION", "STAGE", "PARAMETER_STORE_PREFIX"]
+    },
     "build": {
-      "dependsOn": ["^build"],
-      "outputs": ["dist/**", ".next/**", "!.next/cache/**"]
+      "dependsOn": ["build:env", "^build"],
+      "outputs": ["dist/**", ".next/**", "!.next/cache/**"],
+      "env": ["NODE_ENV", "AWS_REGION", "STAGE"]
     },
     "lint": {
       "dependsOn": ["^lint"]
@@ -20,8 +26,10 @@
       "cache": false
     },
     "dev": {
+      "dependsOn": ["build:env"],
       "cache": false,
-      "persistent": true
+      "persistent": true,
+      "env": ["NODE_ENV", "AWS_REGION", "STAGE"]
     },
     "clean": {
       "cache": false

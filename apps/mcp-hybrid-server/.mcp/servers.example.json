@@ -1,0 +1,55 @@
+{
+  "version": "1.0.0",
+  "servers": [
+    {
+      "id": "sequential-thinking-example",
+      "name": "Sequential Thinking",
+      "transport": "stdio",
+      "command": "npx",
+      "args": ["-y", "@anthropic-ai/mcp-server-sequential-thinking"],
+      "enabled": true,
+      "autoConnect": false,
+      "reconnectAttempts": 3,
+      "reconnectDelay": 5000
+    },
+    {
+      "id": "filesystem-example",
+      "name": "Filesystem",
+      "transport": "stdio",
+      "command": "npx",
+      "args": ["-y", "@anthropic-ai/mcp-server-filesystem", "."],
+      "enabled": true,
+      "autoConnect": false,
+      "reconnectAttempts": 3,
+      "reconnectDelay": 5000
+    },
+    {
+      "id": "brave-search-example",
+      "name": "Brave Search",
+      "transport": "stdio",
+      "command": "npx",
+      "args": ["-y", "@anthropic-ai/mcp-server-brave-search"],
+      "env": {
+        "BRAVE_API_KEY": "your-api-key-here"
+      },
+      "enabled": false,
+      "autoConnect": false,
+      "reconnectAttempts": 3,
+      "reconnectDelay": 5000
+    },
+    {
+      "id": "http-server-example",
+      "name": "HTTP MCP Server",
+      "transport": "http",
+      "url": "http://localhost:8080/mcp",
+      "headers": {
+        "Authorization": "Bearer your-token-here"
+      },
+      "enabled": false,
+      "autoConnect": false,
+      "reconnectAttempts": 3,
+      "reconnectDelay": 5000
+    }
+  ],
+  "lastUpdated": "2024-01-01T00:00:00.000Z"
+}

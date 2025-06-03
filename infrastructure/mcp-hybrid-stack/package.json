@@ -6,16 +6,23 @@
   "scripts": {
     "build": "tsc",
     "synth": "cdk synth",
+    "synth:microservices": "cdk synth --app 'npx ts-node --prefer-ts-exts bin/microservices-app.ts'",
     "deploy": "cdk deploy --all",
+    "deploy:microservices": "cdk deploy --app 'npx ts-node --prefer-ts-exts bin/microservices-app.ts' --all",
     "destroy": "cdk destroy --all",
+    "destroy:microservices": "cdk destroy --app 'npx ts-node --prefer-ts-exts bin/microservices-app.ts' --all",
     "diff": "cdk diff",
+    "diff:microservices": "cdk diff --app 'npx ts-node --prefer-ts-exts bin/microservices-app.ts'",
     "bootstrap": "cdk bootstrap",
     "lint": "eslint . --max-warnings 0",
     "format": "prettier --write .",
-    "test": "jest"
+    "test": "jest",
+    "build-env": "ts-node scripts/build-env-from-parameters.ts"
   },
   "dependencies": {
     "aws-cdk-lib": "^2.174.0",
+    "aws-sdk": "^2.1498.0",
+    "commander": "^11.1.0",
     "constructs": "^10.4.2",
     "source-map-support": "^0.5.21"
   },

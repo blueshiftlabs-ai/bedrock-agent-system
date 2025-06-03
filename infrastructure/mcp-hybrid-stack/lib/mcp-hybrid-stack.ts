@@ -11,6 +11,8 @@ import * as secretsmanager from 'aws-cdk-lib/aws-secretsmanager';
 import * as route53 from 'aws-cdk-lib/aws-route53';
 import * as certificatemanager from 'aws-cdk-lib/aws-certificatemanager';
 import { Construct } from 'constructs';
+import { ParameterStoreManager } from '../constructs/parameter-store-manager';
+import { NeptuneCluster } from '../constructs/neptune-cluster';
 
 export interface McpHybridStackProps extends cdk.StackProps {
   stage: 'dev' | 'staging' | 'prod';
@@ -23,11 +25,18 @@ export class McpHybridStack extends cdk.Stack {
   public readonly serviceUrl: cdk.CfnOutput;
   public readonly vpc: ec2.IVpc;
   public readonly cluster: ecs.Cluster;
+  public readonly parameterStore: ParameterStoreManager;
 
   constructor(scope: Construct, id: string, props: McpHybridStackProps) {
     super(scope, id, props);
 
     const { stage } = props;
+
+    // Initialize Parameter Store Manager
+    this.parameterStore = new ParameterStoreManager(this, 'ParameterStore', {
+      stage,
+      prefix: '/mcp-hybrid',
+    });
 
     // VPC
     this.vpc = props.vpcId
@@ -53,6 +62,20 @@ export class McpHybridStack extends cdk.Stack {
             }
           ]
         });
+
+    // Store VPC configuration in Parameter Store
+    this.parameterStore.addParameters([
+      {
+        path: 'vpc/id',
+        value: this.vpc.vpcId,
+        description: 'VPC ID for MCP Hybrid Server',
+      },
+      {
+        path: 'vpc/cidr',
+        value: this.vpc.vpcCidrBlock,
+        description: 'VPC CIDR block',
+      },
+    ]);
 
     // S3 Buckets
     const dataBucket = new s3.Bucket(this, 'DataBucket', {
@@ -82,6 +105,30 @@ export class McpHybridStack extends cdk.Stack {
       removalPolicy: stage === 'prod' ? cdk.RemovalPolicy.RETAIN : cdk.RemovalPolicy.DESTROY,
     });
 
+    // Store S3 bucket configurations
+    this.parameterStore.addParameters([
+      {
+        path: 's3/data-bucket/name',
+        value: dataBucket.bucketName,
+        description: 'S3 bucket name for data storage',
+      },
+      {
+        path: 's3/data-bucket/arn',
+        value: dataBucket.bucketArn,
+        description: 'S3 bucket ARN for data storage',
+      },
+      {
+        path: 's3/logs-bucket/name',
+        value: logsBucket.bucketName,
+        description: 'S3 bucket name for logs',
+      },
+      {
+        path: 's3/logs-bucket/arn',
+        value: logsBucket.bucketArn,
+        description: 'S3 bucket ARN for logs',
+      },
+    ]);
+
     // DynamoDB Tables
     const metadataTable = new dynamodb.Table(this, 'MetadataTable', {
       tableName: `MCPMetadata-${stage}`,
@@ -110,6 +157,35 @@ export class McpHybridStack extends cdk.Stack {
       sortKey: { name: 'lastUpdated', type: dynamodb.AttributeType.NUMBER },
     });
 
+    // Store DynamoDB configurations
+    this.parameterStore.addParameters([
+      {
+        path: 'dynamodb/metadata-table/name',
+        value: metadataTable.tableName,
+        description: 'DynamoDB table name for metadata',
+      },
+      {
+        path: 'dynamodb/metadata-table/arn',
+        value: metadataTable.tableArn,
+        description: 'DynamoDB table ARN for metadata',
+      },
+      {
+        path: 'dynamodb/workflow-state-table/name',
+        value: workflowStateTable.tableName,
+        description: 'DynamoDB table name for workflow state',
+      },
+      {
+        path: 'dynamodb/workflow-state-table/arn',
+        value: workflowStateTable.tableArn,
+        description: 'DynamoDB table ARN for workflow state',
+      },
+      {
+        path: 'dynamodb/workflow-state-table/status-index',
+        value: 'StatusIndex',
+        description: 'GSI name for status queries',
+      },
+    ]);
+
     // OpenSearch Serverless Collection
     const openSearchCollection = new opensearch.CfnCollection(this, 'OpenSearchCollection', {
       name: `mcp-hybrid-${stage}`,
@@ -117,13 +193,71 @@ export class McpHybridStack extends cdk.Stack {
       description: 'Vector search for MCP hybrid server',
     });
 
+    // Store OpenSearch configuration
+    this.parameterStore.addParameters([
+      {
+        path: 'opensearch/collection/name',
+        value: openSearchCollection.name,
+        description: 'OpenSearch collection name',
+      },
+      {
+        path: 'opensearch/collection/endpoint',
+        value: openSearchCollection.attrCollectionEndpoint,
+        description: 'OpenSearch collection endpoint',
+      },
+      {
+        path: 'opensearch/collection/arn',
+        value: openSearchCollection.attrArn,
+        description: 'OpenSearch collection ARN',
+      },
+    ]);
+
+    // Neptune Cluster
+    const neptuneCluster = new NeptuneCluster(this, 'NeptuneCluster', {
+      vpc: this.vpc,
+      stage,
+    });
+
+    // Store Neptune configuration
+    this.parameterStore.addParameters([
+      {
+        path: 'neptune/cluster/endpoint',
+        value: neptuneCluster.clusterEndpoint,
+        description: 'Neptune cluster endpoint',
+      },
+      {
+        path: 'neptune/cluster/port',
+        value: neptuneCluster.clusterPort,
+        description: 'Neptune cluster port',
+      },
+      {
+        path: 'neptune/cluster/resource-id',
+        value: neptuneCluster.clusterResourceId,
+        description: 'Neptune cluster resource identifier',
+      },
+    ]);
+
     // Secrets for sensitive configuration
-    const dbCredentials = new secretsmanager.Secret(this, 'DatabaseCredentials', {
-      secretName: `mcp-hybrid-db-credentials-${stage}`,
+    const dbCredentials = this.parameterStore.addSecret({
+      name: 'database/credentials',
       description: 'Database credentials for MCP hybrid server',
       generateSecretString: {
         secretStringTemplate: JSON.stringify({ username: 'mcpuser' }),
         generateStringKey: 'password',
+        excludeCharacters: '"@/\\',
+      },
+    });
+
+    // API Keys and other secrets
+    const apiKeys = this.parameterStore.addSecret({
+      name: 'api/keys',
+      description: 'API keys for external services',
+      generateSecretString: {
+        secretStringTemplate: JSON.stringify({
+          openai: '',
+          anthropic: '',
+        }),
+        generateStringKey: 'internal',
         excludeCharacters: '"@/\\',
       },
     });
@@ -134,6 +268,20 @@ export class McpHybridStack extends cdk.Stack {
       containerInsights: true,
       clusterName: `mcp-hybrid-${stage}`,
     });
+
+    // Store ECS configuration
+    this.parameterStore.addParameters([
+      {
+        path: 'ecs/cluster/name',
+        value: this.cluster.clusterName,
+        description: 'ECS cluster name',
+      },
+      {
+        path: 'ecs/cluster/arn',
+        value: this.cluster.clusterArn,
+        description: 'ECS cluster ARN',
+      },
+    ]);
 
     // Task Execution Role
     const executionRole = new iam.Role(this, 'TaskExecutionRole', {
@@ -153,7 +301,10 @@ export class McpHybridStack extends cdk.Stack {
     logsBucket.grantWrite(taskRole);
     metadataTable.grantReadWriteData(taskRole);
     workflowStateTable.grantReadWriteData(taskRole);
-    dbCredentials.grantRead(taskRole);
+    neptuneCluster.grantDataAccess(taskRole);
+    
+    // Grant Parameter Store and Secrets Manager access
+    this.parameterStore.grantRead(taskRole);
 
     // Bedrock permissions
     taskRole.addToPrincipalPolicy(
@@ -178,6 +329,25 @@ export class McpHybridStack extends cdk.Stack {
       })
     );
 
+    // Store IAM role configurations
+    this.parameterStore.addParameters([
+      {
+        path: 'iam/task-role/arn',
+        value: taskRole.roleArn,
+        description: 'ECS task role ARN',
+      },
+      {
+        path: 'iam/task-role/name',
+        value: taskRole.roleName,
+        description: 'ECS task role name',
+      },
+      {
+        path: 'iam/execution-role/arn',
+        value: executionRole.roleArn,
+        description: 'ECS execution role ARN',
+      },
+    ]);
+
     // Application Load Balanced Fargate Service
     const fargateService = new ecsPatterns.ApplicationLoadBalancedFargateService(this, 'McpService', {
       cluster: this.cluster,
@@ -201,12 +371,8 @@ export class McpHybridStack extends cdk.Stack {
           STAGE: stage,
           PORT: '3000',
           
-          // AWS Service Configuration
-          AWS_S3_BUCKET: dataBucket.bucketName,
-          AWS_LOGS_BUCKET: logsBucket.bucketName,
-          DYNAMODB_METADATA_TABLE: metadataTable.tableName,
-          DYNAMODB_WORKFLOW_STATE_TABLE: workflowStateTable.tableName,
-          AWS_OPENSEARCH_ENDPOINT: openSearchCollection.attrCollectionEndpoint,
+          // Parameter Store Configuration
+          PARAMETER_STORE_PREFIX: `/mcp-hybrid/${stage}`,
           
           // Application Configuration
           WORKFLOW_ENABLE_PERSISTENCE: 'true',
@@ -215,7 +381,7 @@ export class McpHybridStack extends cdk.Stack {
           ENABLE_FILE_LOGGING: 'true',
         },
         secrets: {
-          DB_PASSWORD: ecs.Secret.fromSecretsManager(dbCredentials, 'password'),
+          // Secrets will be loaded from Secrets Manager at runtime
         },
         taskRole,
         executionRole,
@@ -230,6 +396,40 @@ export class McpHybridStack extends cdk.Stack {
         route53.HostedZone.fromLookup(this, 'HostedZone', { domainName: props.domainName }) : 
         undefined,
     });
+
+    // Allow Neptune connections
+    neptuneCluster.allowConnectionsFrom(fargateService.service);
+
+    // Store ECS service configuration
+    this.parameterStore.addParameters([
+      {
+        path: 'ecs/service/name',
+        value: fargateService.service.serviceName,
+        description: 'ECS service name',
+      },
+      {
+        path: 'ecs/service/arn',
+        value: fargateService.service.serviceArn,
+        description: 'ECS service ARN',
+      },
+      {
+        path: 'alb/dns-name',
+        value: fargateService.loadBalancer.loadBalancerDnsName,
+        description: 'Application Load Balancer DNS name',
+      },
+      {
+        path: 'alb/arn',
+        value: fargateService.loadBalancer.loadBalancerArn,
+        description: 'Application Load Balancer ARN',
+      },
+      {
+        path: 'alb/url',
+        value: props.domainName 
+          ? `https://${props.domainName}`
+          : `http://${fargateService.loadBalancer.loadBalancerDnsName}`,
+        description: 'Application URL',
+      },
+    ]);
 
     // Health check configuration
     fargateService.targetGroup.configureHealthCheck({
@@ -269,32 +469,42 @@ export class McpHybridStack extends cdk.Stack {
       adjustmentType: cdk.aws_applicationautoscaling.AdjustmentType.CHANGE_IN_CAPACITY,
     });
 
-    // Outputs
+    // Store auto-scaling configuration
+    this.parameterStore.addParameters([
+      {
+        path: 'autoscaling/min-capacity',
+        value: (stage === 'prod' ? 3 : 2).toString(),
+        description: 'Minimum number of tasks',
+      },
+      {
+        path: 'autoscaling/max-capacity',
+        value: (stage === 'prod' ? 20 : 10).toString(),
+        description: 'Maximum number of tasks',
+      },
+      {
+        path: 'autoscaling/cpu-target',
+        value: '70',
+        description: 'Target CPU utilization percentage',
+      },
+      {
+        path: 'autoscaling/memory-target',
+        value: '80',
+        description: 'Target memory utilization percentage',
+      },
+    ]);
+
+    // Export parameter manifest
+    this.parameterStore.exportManifest();
+
+    // Create outputs for all parameters and secrets
+    this.parameterStore.createOutputs();
+
+    // Legacy outputs for backward compatibility
     this.serviceUrl = new cdk.CfnOutput(this, 'ServiceUrl', {
       value: props.domainName 
         ? `https://${props.domainName}`
         : `http://${fargateService.loadBalancer.loadBalancerDnsName}`,
       description: 'URL of the MCP Hybrid Server',
-    });
-
-    new cdk.CfnOutput(this, 'DataBucketName', {
-      value: dataBucket.bucketName,
-      description: 'S3 bucket for data storage',
-    });
-
-    new cdk.CfnOutput(this, 'MetadataTableName', {
-      value: metadataTable.tableName,
-      description: 'DynamoDB table for metadata',
-    });
-
-    new cdk.CfnOutput(this, 'WorkflowStateTableName', {
-      value: workflowStateTable.tableName,
-      description: 'DynamoDB table for workflow state',
-    });
-
-    new cdk.CfnOutput(this, 'OpenSearchEndpoint', {
-      value: openSearchCollection.attrCollectionEndpoint,
-      description: 'OpenSearch Serverless collection endpoint',
     });
 
     // Tags

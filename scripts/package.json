@@ -1,0 +1,21 @@
+{
+  "name": "@scripts/build-env",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Environment builder for Bedrock Agent System monorepo",
+  "main": "build-env.ts",
+  "scripts": {
+    "build": "tsc",
+    "run": "ts-node build-env.ts",
+    "clean": "rm -rf ../dist/scripts"
+  },
+  "dependencies": {
+    "@aws-sdk/client-ssm": "^3.658.0",
+    "@aws-sdk/client-secrets-manager": "^3.658.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.0.0"
+  }
+}
