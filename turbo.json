@@ -31,8 +31,61 @@
       "persistent": true,
       "env": ["NODE_ENV", "AWS_REGION", "STAGE"]
     },
+    "dev:local": {
+      "dependsOn": ["build:env"],
+      "cache": false,
+      "persistent": true,
+      "env": ["NODE_ENV", "USE_LOCAL_STORAGE", "MEMORY_MODE"]
+    },
+    "dev:server": {
+      "dependsOn": ["build:env"],
+      "cache": false,
+      "persistent": true,
+      "env": ["NODE_ENV", "USE_LOCAL_STORAGE", "MEMORY_MODE", "AWS_REGION"]
+    },
+    "start": {
+      "dependsOn": ["build"],
+      "cache": false,
+      "persistent": true,
+      "env": ["NODE_ENV", "AWS_REGION", "STAGE"]
+    },
+    "start:local": {
+      "dependsOn": ["build"],
+      "cache": false,
+      "persistent": true,
+      "env": ["NODE_ENV", "USE_LOCAL_STORAGE", "MEMORY_MODE"]
+    },
+    "start:dev": {
+      "dependsOn": ["build"],
+      "cache": false,
+      "persistent": true,
+      "env": ["NODE_ENV", "USE_LOCAL_STORAGE", "MEMORY_MODE", "AWS_REGION"]
+    },
+    "start:prod": {
+      "dependsOn": ["build"],
+      "cache": false,
+      "persistent": true,
+      "env": ["NODE_ENV", "USE_LOCAL_STORAGE", "MEMORY_MODE", "AWS_REGION", "STAGE"]
+    },
     "clean": {
       "cache": false
+    },
+    "docker:build": {
+      "dependsOn": ["build"],
+      "cache": false,
+      "env": ["DOCKER_BUILDKIT"]
+    },
+    "docker:push": {
+      "dependsOn": ["docker:build"],
+      "cache": false
+    },
+    "setup:local": {
+      "cache": false,
+      "env": ["NODE_ENV"]
+    },
+    "health": {
+      "cache": false,
+      "env": ["NODE_ENV", "AWS_REGION"]
     }
   }
 }

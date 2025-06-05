@@ -1,0 +1,31 @@
+{
+  "name": "@packages/mcp-core",
+  "version": "1.0.0",
+  "description": "Core MCP utilities and base classes for the bedrock agent system",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "require": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    }
+  },
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "clean": "rm -rf dist"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.12.1",
+    "@nestjs/common": "^11.1.2",
+    "@nestjs/core": "^11.1.2"
+  },
+  "devDependencies": {
+    "@packages/typescript-config": "workspace:*",
+    "typescript": "^5.8.3"
+  },
+  "files": [
+    "dist"
+  ]
+}
