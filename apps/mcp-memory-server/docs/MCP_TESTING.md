@@ -4,12 +4,24 @@
 
 This guide explains how to test MCP servers using various methods including the MCP Inspector, curl commands, and integration with Claude Code.
 
-## Transport Type: STREAMABLE_HTTP
+## Transport Types: Multi-Transport Support
 
-We use `STREAMABLE_HTTP` transport for our MCP servers because:
-- **Fargate Compatible**: Works well in containerized environments
-- **Stateless Mode**: Better scalability without session management
-- **JSON Support**: Allows both streaming and JSON responses
+We support multiple MCP transports for different use cases:
+
+### STREAMABLE_HTTP (`/memory/mcp`)
+- **Use Case**: HTTP clients, testing, Fargate deployment
+- **Features**: Stateless mode, JSON responses, streaming support
+- **Best For**: Production deployments, web clients, curl testing
+
+### SSE (`/memory/sse`) 
+- **Use Case**: Claude Code, browsers, real-time applications
+- **Features**: Server-Sent Events, ping/keepalive, event streaming
+- **Best For**: Claude Code integration, web dashboards
+
+### STDIO
+- **Use Case**: CLI tools, local development, process-based connections
+- **Features**: Standard input/output communication
+- **Best For**: Local CLI tools, development scripts
 
 ## Testing Methods
 
@@ -19,19 +31,25 @@ The MCP Inspector is the official tool for testing MCP servers.
 
 #### Web Version
 1. Open https://inspector.modelcontextprotocol.com
-2. Enter server URL: `http://localhost:4100/memory/mcp`
+2. Choose transport and enter URL:
+   - **HTTP**: `http://localhost:4100/memory/mcp`
+   - **SSE**: `http://localhost:4100/memory/sse`
 3. Click "Connect"
 4. Browse and test available tools
 
 #### CLI Version
 ```bash
-# Install and run locally
+# Test HTTP transport
 npx @modelcontextprotocol/inspector http://localhost:4100/memory/mcp
+
+# Test SSE transport
+npx @modelcontextprotocol/inspector http://localhost:4100/memory/sse
 ```
 
 ### 2. Curl Testing
 
-Test the MCP endpoint with JSON-RPC:
+#### HTTP/Streamable Transport
+Test the HTTP MCP endpoint with JSON-RPC:
 
 ```bash
 # List available tools
@@ -62,6 +80,25 @@ curl -X POST http://localhost:4100/memory/mcp \
   }'
 ```
 
+#### SSE Transport
+Test the SSE endpoint:
+
+```bash
+# Connect to SSE stream
+curl -N -H "Accept: text/event-stream" \
+  http://localhost:4100/memory/sse
+
+# Send JSON-RPC via POST (in another terminal)
+curl -X POST http://localhost:4100/memory/sse \
+  -H "Content-Type: application/json" \
+  -d '{
+    "jsonrpc": "2.0",
+    "method": "tools/list",
+    "params": {},
+    "id": 1
+  }'
+```
+
 ### 3. Test Script
 
 Use our automated test script:
@@ -78,17 +115,21 @@ This script:
 ## MCP Endpoints
 
 ### Memory Server (Port 4100)
-- **MCP Endpoint**: `http://localhost:4100/memory/mcp`
+- **MCP HTTP**: `http://localhost:4100/memory/mcp`
+- **MCP SSE**: `http://localhost:4100/memory/sse`
+- **MCP STDIO**: Process-based connection
 - **Health Check**: `http://localhost:4100/memory/health`
 - **REST API**: `http://localhost:4100/memory/*`
 
 ### Storage Server (Port 4200)
-- **MCP Endpoint**: `http://localhost:4200/storage/mcp`
+- **MCP HTTP**: `http://localhost:4200/storage/mcp`
+- **MCP SSE**: `http://localhost:4200/storage/sse`
 - **Health Check**: `http://localhost:4200/storage/health`
 - **REST API**: `http://localhost:4200/storage/*`
 
 ### Bedrock Server (Port 4300)
-- **MCP Endpoint**: `http://localhost:4300/bedrock/mcp`
+- **MCP HTTP**: `http://localhost:4300/bedrock/mcp`
+- **MCP SSE**: `http://localhost:4300/bedrock/sse`
 - **Health Check**: `http://localhost:4300/bedrock/health`
 - **REST API**: `http://localhost:4300/bedrock/*`
 
@@ -105,22 +146,32 @@ This script:
 
 To use these MCP servers with Claude Code:
 
-1. **Configure Claude Desktop** (when available):
-   ```json
-   {
-     "mcpServers": {
-       "memory": {
-         "command": "node",
-         "args": ["path/to/memory-server"],
-         "env": {
-           "PORT": "4100"
-         }
-       }
-     }
-   }
-   ```
+### 1. SSE Transport (Recommended for Claude Code)
+Use the SSE endpoint for real-time integration:
+- **Memory Server SSE**: `http://localhost:4100/memory/sse`
+- **Features**: Event streaming, automatic reconnection, keepalive pings
 
-2. **Direct HTTP Usage**: Our servers expose HTTP endpoints that can be called directly.
+### 2. STDIO Transport (For Process-Based)
+Configure for process-based connection:
+```json
+{
+  "mcpServers": {
+    "memory": {
+      "command": "node",
+      "args": ["dist/main.js"],
+      "cwd": "/path/to/mcp-memory-server",
+      "env": {
+        "NODE_ENV": "development",
+        "USE_LOCAL_STORAGE": "true"
+      }
+    }
+  }
+}
+```
+
+### 3. HTTP Transport (For Testing)
+Direct HTTP calls for testing and debugging:
+- **Memory Server HTTP**: `http://localhost:4100/memory/mcp`
 
 ## Troubleshooting
 

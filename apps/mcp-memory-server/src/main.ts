@@ -25,8 +25,11 @@ async function bootstrap() {
   await app.listen(port);
   
   console.log(`🧠 MCP Memory Server running on port ${port}`);
-  console.log(`🔗 MCP HTTP endpoint: http://localhost:${port}/memory/mcp`);
-  console.log(`📡 Memory REST API: http://localhost:${port}/memory`);
+  console.log(`\n🔗 MCP Endpoints:`);
+  console.log(`   HTTP/Stream: http://localhost:${port}/memory/mcp`);
+  console.log(`   SSE:         http://localhost:${port}/memory/sse`);
+  console.log(`   STDIO:       Available for process connections`);
+  console.log(`\n📡 Memory REST API: http://localhost:${port}/memory`);
   console.log(`❤️  Health check: http://localhost:${port}/memory/health`);
   console.log(`\n📚 MCP Tools Available:`);
   console.log(`   - store-memory: Store memories with semantic understanding`);

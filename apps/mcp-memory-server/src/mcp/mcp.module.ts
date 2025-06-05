@@ -9,7 +9,12 @@ import { MemoryModule } from '../memory/memory.module';
     MCPNestModule.forRoot({
       name: 'mcp-memory-server',
       version: '1.0.0',
-      transport: [McpTransportType.STREAMABLE_HTTP],
+      // Support multiple transports for different use cases
+      transport: [
+        McpTransportType.STREAMABLE_HTTP,  // For HTTP clients and Fargate
+        McpTransportType.SSE,              // For Claude Code and browsers
+        McpTransportType.STDIO,            // For local CLI tools
+      ],
       streamableHttp: {
         // Enable JSON responses for non-streaming requests (good for testing)
         enableJsonResponse: true,
@@ -17,6 +22,17 @@ import { MemoryModule } from '../memory/memory.module';
         statelessMode: true,
         // Set the endpoint path to match server namespace
         path: '/memory/mcp',
+      },
+      sse: {
+        // SSE configuration for Claude Code compatibility
+        pingEnabled: true,
+        pingIntervalMs: 30000,
+        // Set the endpoint path to match server namespace
+        path: '/memory/sse',
+      },
+      stdio: {
+        // STDIO configuration for CLI tools
+        // This will be available for process-based connections
       },
     }),
   ],
