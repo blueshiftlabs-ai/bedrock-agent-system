@@ -17,7 +17,7 @@ import { ExternalToolAdapter } from './adapters/external-tool.adapter';
   imports: [
     EventEmitterModule,
     ScheduleModule.forRoot(),
-    // ToolModule,
+    ToolModule,
   ],
   providers: [
     MCPClientService,

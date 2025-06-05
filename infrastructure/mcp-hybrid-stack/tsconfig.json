@@ -1,5 +1,5 @@
 {
-  "extends": "@repo/typescript-config/base",
+  "extends": "@packages/typescript-config/base",
   "compilerOptions": {
     "target": "ES2022",
     "module": "nodenext",

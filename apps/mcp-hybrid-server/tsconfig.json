@@ -1,5 +1,5 @@
 {
-  "extends": "@repo/typescript-config/nest",
+  "extends": "@packages/typescript-config/nest",
   "compilerOptions": {
     "baseUrl": "./",
     "outDir": "./dist",
@@ -17,5 +17,21 @@
     }
   },
   "include": ["src/**/*"],
-  "exclude": ["node_modules", "dist", "coverage", "test", "**/*.spec.ts", "**/*.e2e-spec.ts"]
+  "exclude": [
+    "node_modules", 
+    "dist", 
+    "coverage", 
+    "test", 
+    "**/*.spec.ts", 
+    "**/*.e2e-spec.ts",
+    "src/aws/**/*",
+    "src/tools/implementations/**/*",
+    "src/integrations/bedrock/**/*",
+    "src/memory/**/*",
+    "src/indexing/**/*",
+    "src/documentation/**/*",
+    "src/workflows/**/*",
+    "src/agents/**/*",
+    "src/interaction/**/*"
+  ]
 }

@@ -1,8 +1,10 @@
 #!/usr/bin/env node
 
-import * as AWS from 'aws-sdk';
 import * as fs from 'fs';
 import * as path from 'path';
+
+import { SecretsManager } from '@aws-sdk/client-secrets-manager';
+import { SSM } from '@aws-sdk/client-ssm';
 import { Command } from 'commander';
 
 interface ParameterManifest {
@@ -22,14 +24,21 @@ interface EnvVariable {
 }
 
 class ParameterStoreEnvBuilder {
-  private ssm: AWS.SSM;
-  private secretsManager: AWS.SecretsManager;
+  private ssm: SSM;
+  private secretsManager: SecretsManager;
   private manifest: ParameterManifest;
 
   constructor(region: string, manifestPath: string) {
+    // JS SDK v3 does not support global configuration.
+    // Codemod has attempted to pass values to each service client in this file.
+    // You may need to update clients outside of this file, if they use global config.
     AWS.config.update({ region });
-    this.ssm = new AWS.SSM();
-    this.secretsManager = new AWS.SecretsManager();
+    this.ssm = new SSM({
+      region,
+    });
+    this.secretsManager = new SecretsManager({
+      region,
+    });
     this.manifest = JSON.parse(fs.readFileSync(manifestPath, 'utf-8'));
   }
 
@@ -48,10 +57,10 @@ class ParameterStoreEnvBuilder {
         const response = await this.ssm.getParameters({
           Names: chunk,
           WithDecryption: true,
-        }).promise();
+        });
 
         if (response.Parameters) {
-          response.Parameters.forEach(param => {
+          response.Parameters.forEach((param) => {
             if (param.Name && param.Value) {
               parameterMap.set(param.Name, param.Value);
             }
@@ -80,7 +89,7 @@ class ParameterStoreEnvBuilder {
       try {
         const response = await this.secretsManager.getSecretValue({
           SecretId: secretName,
-        }).promise();
+        });
 
         if (response.SecretString) {
           const secretValue = JSON.parse(response.SecretString);
@@ -157,21 +166,17 @@ class ParameterStoreEnvBuilder {
    */
   public async generateEnvFile(outputPath: string): Promise<void> {
     const envVariables = await this.buildEnvVariables();
-    
+
     const envContent = [
       '# Generated from AWS Parameter Store and Secrets Manager',
       `# Stage: ${this.manifest.stage}`,
       `# Generated at: ${new Date().toISOString()}`,
       '',
       '# Parameters from Parameter Store',
-      ...envVariables
-        .filter(v => v.source === 'parameter')
-        .map(v => `${v.name}=${v.value}`),
+      ...envVariables.filter((v) => v.source === 'parameter').map((v) => `${v.name}=${v.value}`),
       '',
       '# Secrets from Secrets Manager',
-      ...envVariables
-        .filter(v => v.source === 'secret')
-        .map(v => `${v.name}=${v.value}`),
+      ...envVariables.filter((v) => v.source === 'secret').map((v) => `${v.name}=${v.value}`),
     ].join('\n');
 
     fs.writeFileSync(outputPath, envContent);
@@ -183,7 +188,7 @@ class ParameterStoreEnvBuilder {
    */
   public async generateExportScript(outputPath: string): Promise<void> {
     const envVariables = await this.buildEnvVariables();
-    
+
     const scriptContent = [
       '#!/bin/bash',
       '# Generated from AWS Parameter Store and Secrets Manager',
@@ -191,7 +196,7 @@ class ParameterStoreEnvBuilder {
       `# Generated at: ${new Date().toISOString()}`,
       '',
       '# Export all environment variables',
-      ...envVariables.map(v => `export ${v.name}="${v.value}"`),
+      ...envVariables.map((v) => `export ${v.name}="${v.value}"`),
     ].join('\n');
 
     fs.writeFileSync(outputPath, scriptContent);
@@ -204,10 +209,8 @@ class ParameterStoreEnvBuilder {
    */
   public async generateDockerEnvFile(outputPath: string): Promise<void> {
     const envVariables = await this.buildEnvVariables();
-    
-    const envContent = envVariables
-      .map(v => `${v.name}=${v.value}`)
-      .join('\n');
+
+    const envContent = envVariables.map((v) => `${v.name}=${v.value}`).join('\n');
 
     fs.writeFileSync(outputPath, envContent);
     console.log(`Docker env file written to: ${outputPath}`);
@@ -249,9 +252,7 @@ program
         fs.mkdirSync(outputDir, { recursive: true });
       }
 
-      const formats = options.format === 'all' 
-        ? ['env', 'export', 'docker'] 
-        : [options.format];
+      const formats = options.format === 'all' ? ['env', 'export', 'docker'] : [options.format];
 
       for (const format of formats) {
         switch (format) {
@@ -281,9 +282,7 @@ program
   .requiredOption('-r, --region <region>', 'AWS region')
   .action(async (options) => {
     try {
-      const manifest: ParameterManifest = JSON.parse(
-        fs.readFileSync(options.manifest, 'utf-8')
-      );
+      const manifest: ParameterManifest = JSON.parse(fs.readFileSync(options.manifest, 'utf-8'));
 
       console.log(`Validating parameters for stage: ${manifest.stage}`);
       console.log(`Parameter count: ${Object.keys(manifest.parameters).length}`);
@@ -293,8 +292,8 @@ program
       const envVariables = await builder.buildEnvVariables();
 
       console.log(`\nSuccessfully retrieved ${envVariables.length} environment variables`);
-      console.log(`Parameters: ${envVariables.filter(v => v.source === 'parameter').length}`);
-      console.log(`Secrets: ${envVariables.filter(v => v.source === 'secret').length}`);
+      console.log(`Parameters: ${envVariables.filter((v) => v.source === 'parameter').length}`);
+      console.log(`Secrets: ${envVariables.filter((v) => v.source === 'secret').length}`);
     } catch (error: any) {
       console.error('Validation failed:', error);
       process.exit(1);

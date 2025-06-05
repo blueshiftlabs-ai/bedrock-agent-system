@@ -1,5 +1,5 @@
 import { Injectable, Logger } from '@nestjs/common';
-import * as AWS from 'aws-sdk';
+import { GetParametersByPathCommandOutput, Parameter, SSM } from '@aws-sdk/client-ssm';
 
 export interface ParameterStoreConfig {
   [key: string]: string | undefined;
@@ -8,12 +8,12 @@ export interface ParameterStoreConfig {
 @Injectable()
 export class ParameterStoreLoader {
   private readonly logger = new Logger(ParameterStoreLoader.name);
-  private readonly ssm: AWS.SSM;
+  private readonly ssm: SSM;
   private readonly cache: Map<string, string> = new Map();
   private readonly prefix: string;
 
   constructor() {
-    this.ssm = new AWS.SSM({
+    this.ssm = new SSM({
       region: process.env.AWS_REGION || 'us-east-1',
     });
     this.prefix = process.env.PARAMETER_STORE_PREFIX || `/mcp-hybrid/${process.env.STAGE || 'dev'}`;
@@ -59,7 +59,7 @@ export class ParameterStoreLoader {
       const response = await this.ssm.getParameter({
         Name: fullName,
         WithDecryption: true,
-      }).promise();
+      });
 
       const value = response.Parameter?.Value;
       if (value) {
@@ -89,7 +89,7 @@ export class ParameterStoreLoader {
         const response = await this.ssm.getParameters({
           Names: chunk,
           WithDecryption: true,
-        }).promise();
+        });
 
         if (response.Parameters) {
           for (const param of response.Parameters) {
@@ -111,18 +111,18 @@ export class ParameterStoreLoader {
   /**
    * Get all parameters by path
    */
-  private async getParametersByPath(path: string): Promise<AWS.SSM.Parameter[]> {
-    const parameters: AWS.SSM.Parameter[] = [];
+  private async getParametersByPath(path: string): Promise<Parameter[]> {
+    const parameters: Parameter[] = [];
     let nextToken: string | undefined;
 
     try {
       do {
-        const response: AWS.SSM.GetParametersByPathResult = await this.ssm.getParametersByPath({
+        const response: GetParametersByPathCommandOutput = await this.ssm.getParametersByPath({
           Path: path,
           Recursive: true,
           WithDecryption: true,
           NextToken: nextToken,
-        }).promise();
+        });
 
         if (response.Parameters) {
           parameters.push(...response.Parameters);

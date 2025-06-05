@@ -1,5 +1,5 @@
 import { Injectable, Logger } from '@nestjs/common';
-import * as AWS from 'aws-sdk';
+import { SecretsManager } from '@aws-sdk/client-secrets-manager';
 
 export interface SecretsConfig {
   [key: string]: any;
@@ -8,12 +8,12 @@ export interface SecretsConfig {
 @Injectable()
 export class SecretsManagerLoader {
   private readonly logger = new Logger(SecretsManagerLoader.name);
-  private readonly secretsManager: AWS.SecretsManager;
+  private readonly secretsManager: SecretsManager;
   private readonly cache: Map<string, any> = new Map();
   private readonly prefix: string;
 
   constructor() {
-    this.secretsManager = new AWS.SecretsManager({
+    this.secretsManager = new SecretsManager({
       region: process.env.AWS_REGION || 'us-east-1',
     });
     this.prefix = `/mcp-hybrid/${process.env.STAGE || 'dev'}`;
@@ -58,7 +58,7 @@ export class SecretsManagerLoader {
     try {
       const response = await this.secretsManager.getSecretValue({
         SecretId: fullName,
-      }).promise();
+      });
 
       let value: any;
       if (response.SecretString) {
@@ -76,7 +76,7 @@ export class SecretsManagerLoader {
       }
       return value;
     } catch (error: any) {
-      if (error.code !== 'ResourceNotFoundException') {
+      if (error.name !== 'ResourceNotFoundException') {
         this.logger.error(`Failed to get secret: ${fullName}`, error);
       }
       return undefined;
@@ -95,7 +95,7 @@ export class SecretsManagerLoader {
         const response = await this.secretsManager.listSecrets({
           NextToken: nextToken,
           MaxResults: 100,
-        }).promise();
+        });
 
         if (response.SecretList) {
           const filteredSecrets = response.SecretList
