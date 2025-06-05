@@ -19,14 +19,14 @@ The MCP Inspector is the official tool for testing MCP servers.
 
 #### Web Version
 1. Open https://inspector.modelcontextprotocol.com
-2. Enter server URL: `http://localhost:4100/mcp`
+2. Enter server URL: `http://localhost:4100/memory/mcp`
 3. Click "Connect"
 4. Browse and test available tools
 
 #### CLI Version
 ```bash
 # Install and run locally
-npx @modelcontextprotocol/inspector http://localhost:4100/mcp
+npx @modelcontextprotocol/inspector http://localhost:4100/memory/mcp
 ```
 
 ### 2. Curl Testing
@@ -35,7 +35,7 @@ Test the MCP endpoint with JSON-RPC:
 
 ```bash
 # List available tools
-curl -X POST http://localhost:4100/mcp \
+curl -X POST http://localhost:4100/memory/mcp \
   -H "Content-Type: application/json" \
   -d '{
     "jsonrpc": "2.0",
@@ -45,7 +45,7 @@ curl -X POST http://localhost:4100/mcp \
   }'
 
 # Call a specific tool
-curl -X POST http://localhost:4100/mcp \
+curl -X POST http://localhost:4100/memory/mcp \
   -H "Content-Type: application/json" \
   -d '{
     "jsonrpc": "2.0",
@@ -78,9 +78,19 @@ This script:
 ## MCP Endpoints
 
 ### Memory Server (Port 4100)
-- **MCP Endpoint**: `http://localhost:4100/mcp`
+- **MCP Endpoint**: `http://localhost:4100/memory/mcp`
 - **Health Check**: `http://localhost:4100/memory/health`
 - **REST API**: `http://localhost:4100/memory/*`
+
+### Storage Server (Port 4200)
+- **MCP Endpoint**: `http://localhost:4200/storage/mcp`
+- **Health Check**: `http://localhost:4200/storage/health`
+- **REST API**: `http://localhost:4200/storage/*`
+
+### Bedrock Server (Port 4300)
+- **MCP Endpoint**: `http://localhost:4300/bedrock/mcp`
+- **Health Check**: `http://localhost:4300/bedrock/health`
+- **REST API**: `http://localhost:4300/bedrock/*`
 
 ### Available Tools
 1. **store-memory**: Store memories with semantic understanding

@@ -30,12 +30,20 @@ test_mcp_server() {
         
         # Launch MCP Inspector for this server
         echo "🚀 Launching MCP Inspector..."
-        echo "   URL: $url/mcp"
+        if [[ "$name" == "Memory Server" ]]; then
+            echo "   URL: $url/memory/mcp"
+        elif [[ "$name" == "Storage Server" ]]; then
+            echo "   URL: $url/storage/mcp"
+        elif [[ "$name" == "Bedrock Server" ]]; then
+            echo "   URL: $url/bedrock/mcp"
+        else
+            echo "   URL: $url/mcp"
+        fi
         echo ""
         echo "To test this server:"
-        echo "1. Run: npx @modelcontextprotocol/inspector $url/mcp"
+        echo "1. Run: npx @modelcontextprotocol/inspector $url/memory/mcp"
         echo "2. Or use the hosted version: https://inspector.modelcontextprotocol.com"
-        echo "   - Enter server URL: $url/mcp"
+        echo "   - Enter server URL: $url/memory/mcp"
         echo "   - Click 'Connect'"
         echo ""
     else
@@ -63,7 +71,13 @@ echo ""
 echo "📚 Quick Inspector Commands:"
 echo "----------------------------"
 echo "# Test Memory Server:"
-echo "npx @modelcontextprotocol/inspector http://localhost:4100/mcp"
+echo "npx @modelcontextprotocol/inspector http://localhost:4100/memory/mcp"
+echo ""
+echo "# Test Storage Server:"
+echo "npx @modelcontextprotocol/inspector http://localhost:4200/storage/mcp"
+echo ""
+echo "# Test Bedrock Server:"
+echo "npx @modelcontextprotocol/inspector http://localhost:4300/bedrock/mcp"
 echo ""
 echo "# Test Gateway Server:"
 echo "npx @modelcontextprotocol/inspector http://localhost:4101/mcp"

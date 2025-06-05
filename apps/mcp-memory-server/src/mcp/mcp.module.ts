@@ -15,6 +15,8 @@ import { MemoryModule } from '../memory/memory.module';
         enableJsonResponse: true,
         // Use stateless mode for better scalability in Fargate
         statelessMode: true,
+        // Set the endpoint path to match server namespace
+        path: '/memory/mcp',
       },
     }),
   ],
