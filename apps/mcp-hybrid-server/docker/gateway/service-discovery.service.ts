@@ -1,16 +1,16 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import * as AWS from 'aws-sdk';
+import { ServiceDiscovery } from '@aws-sdk/client-servicediscovery';
 
 @Injectable()
 export class ServiceDiscoveryService {
   private readonly logger = new Logger(ServiceDiscoveryService.name);
-  private readonly serviceDiscovery: AWS.ServiceDiscovery;
+  private readonly serviceDiscovery: ServiceDiscovery;
   private readonly serviceCache = new Map<string, { endpoint: string; lastUpdated: number }>();
   private readonly cacheTimeout = 60000; // 1 minute cache
 
   constructor(private readonly configService: ConfigService) {
-    this.serviceDiscovery = new AWS.ServiceDiscovery({
+    this.serviceDiscovery = new ServiceDiscovery({
       region: this.configService.get('AWS_REGION'),
     });
   }

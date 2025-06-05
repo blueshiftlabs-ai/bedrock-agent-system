@@ -254,7 +254,7 @@ Each package extends the appropriate TypeScript configuration:
 
 ```json
 {
-  "extends": "@repo/typescript-config/nest",
+  "extends": "@packages/typescript-config/nest",
   "compilerOptions": {
     // Package-specific options
   }

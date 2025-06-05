@@ -161,8 +161,22 @@ export interface SystemStatus {
   activeProcesses: number
   runningWorkflows: number
   activeTools: number
+  memoryServerStatus?: MemoryServerStatus
   lastUpdate: Date
   alerts: Alert[]
+}
+
+export interface MemoryServerStatus {
+  connected: boolean
+  memoriesStored: number
+  activeAgents: number
+  indexHealth: {
+    opensearch: boolean
+    dynamodb: boolean
+    neptune: boolean
+  }
+  lastMemoryCreated?: Date
+  totalMemorySize: number
 }
 
 export interface Alert {

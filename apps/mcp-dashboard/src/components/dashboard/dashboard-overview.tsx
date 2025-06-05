@@ -5,7 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { useWebSocket } from '@/lib/websocket-provider'
 import { SystemStatus, Alert } from '@/types'
 import { formatDuration, getStatusColor } from '@/lib/utils'
-import { Activity, Server, Workflow, Wrench, AlertTriangle, CheckCircle } from 'lucide-react'
+import { Activity, Server, Workflow, Wrench, AlertTriangle, CheckCircle, Brain, Database } from 'lucide-react'
 
 export function DashboardOverview() {
   const { connected, subscribe, unsubscribe } = useWebSocket()
@@ -61,6 +61,12 @@ export function DashboardOverview() {
       value: systemStatus.activeTools,
       icon: <Wrench className="h-4 w-4" />,
       color: 'text-orange-600 bg-orange-100'
+    },
+    {
+      title: 'Stored Memories',
+      value: systemStatus.memoryServerStatus?.memoriesStored || 0,
+      icon: <Brain className="h-4 w-4" />,
+      color: `${systemStatus.memoryServerStatus?.connected ? 'text-cyan-600 bg-cyan-100' : 'text-gray-600 bg-gray-100'}`
     }
   ]
 
@@ -78,7 +84,7 @@ export function DashboardOverview() {
         </div>
       </div>
 
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-5">
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
         {statusCards.map((card, index) => (
           <Card key={index}>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
@@ -159,6 +165,41 @@ export function DashboardOverview() {
                   {connected ? 'Connected' : 'Disconnected'}
                 </span>
               </div>
+              {systemStatus.memoryServerStatus && (
+                <>
+                  <div className="border-t pt-3 mt-3">
+                    <h4 className="text-sm font-medium mb-2 flex items-center gap-2">
+                      <Brain className="h-4 w-4" />
+                      Memory Server
+                    </h4>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm">Connection</span>
+                    <span className={`px-2 py-1 rounded-md text-xs font-medium ${
+                      systemStatus.memoryServerStatus.connected ? 'text-green-600 bg-green-100' : 'text-red-600 bg-red-100'
+                    }`}>
+                      {systemStatus.memoryServerStatus.connected ? 'Connected' : 'Disconnected'}
+                    </span>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm">Active Agents</span>
+                    <span className="text-sm text-muted-foreground">
+                      {systemStatus.memoryServerStatus.activeAgents}
+                    </span>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm">Storage Health</span>
+                    <div className="flex gap-1">
+                      <div className={`w-2 h-2 rounded-full ${systemStatus.memoryServerStatus.indexHealth.opensearch ? 'bg-green-500' : 'bg-red-500'}`} 
+                           title="OpenSearch" />
+                      <div className={`w-2 h-2 rounded-full ${systemStatus.memoryServerStatus.indexHealth.dynamodb ? 'bg-green-500' : 'bg-red-500'}`} 
+                           title="DynamoDB" />
+                      <div className={`w-2 h-2 rounded-full ${systemStatus.memoryServerStatus.indexHealth.neptune ? 'bg-green-500' : 'bg-red-500'}`} 
+                           title="Neptune" />
+                    </div>
+                  </div>
+                </>
+              )}
             </div>
           </CardContent>
         </Card>
