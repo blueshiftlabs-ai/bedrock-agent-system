@@ -18,14 +18,15 @@ async function bootstrap() {
     credentials: true,
   });
 
-  // Set global prefix for all routes
-  app.setGlobalPrefix('memory');
+  // Note: No global prefix to allow MCP SSE endpoint at /sse
+  // Memory endpoints are prefixed in the controller itself
 
   const port = process.env.PORT || 4100;
   await app.listen(port);
   
   console.log(`🧠 MCP Memory Server running on port ${port}`);
-  console.log(`🔗 MCP endpoint: http://localhost:${port}/memory/mcp`);
+  console.log(`🔗 MCP SSE endpoint: http://localhost:${port}/sse`);
+  console.log(`📡 Memory REST API: http://localhost:${port}/memory`);
   console.log(`❤️  Health check: http://localhost:${port}/memory/health`);
 }
 

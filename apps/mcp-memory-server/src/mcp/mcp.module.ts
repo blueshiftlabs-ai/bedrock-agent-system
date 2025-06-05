@@ -1,5 +1,5 @@
 import { Module } from '@nestjs/common';
-import { McpModule as MCPNestModule } from '@rekog/mcp-nest';
+import { McpModule as MCPNestModule, McpTransportType } from '@rekog/mcp-nest';
 import { MCPToolsService } from './mcp-tools.service';
 import { MemoryModule } from '../memory/memory.module';
 
@@ -9,7 +9,11 @@ import { MemoryModule } from '../memory/memory.module';
     MCPNestModule.forRoot({
       name: 'mcp-memory-server',
       version: '1.0.0',
-      instructions: 'Sophisticated memory server with semantic search and knowledge graphs',
+      transport: [McpTransportType.SSE],
+      sse: {
+        pingEnabled: true,
+        pingIntervalMs: 30000,
+      },
     }),
   ],
   providers: [MCPToolsService],
