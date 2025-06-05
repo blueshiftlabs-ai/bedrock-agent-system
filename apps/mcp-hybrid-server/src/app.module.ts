@@ -3,6 +3,7 @@ import { ConfigModule } from '@nestjs/config';
 import { EventEmitterModule } from '@nestjs/event-emitter';
 import { TerminusModule } from '@nestjs/terminus';
 import { ScheduleModule } from '@nestjs/schedule';
+import { HttpModule } from '@nestjs/axios';
 
 import { ConfigurationModule } from './config/config.module';
 import { AwsModule } from './aws/aws.module';
@@ -16,6 +17,8 @@ import { ToolModule } from './tools/tool.module';
 import { IntegrationModule } from './integrations/integration.module';
 import { InteractionModule } from './interaction/interaction.module';
 import { MCPModule } from './mcp/mcp.module';
+import { WebSocketModule } from './websocket/websocket.module';
+import { MCPRegistryModule } from './mcp-registry/mcp-registry.module';
 import { configuration } from './config/configuration';
 
 @Module({
@@ -40,13 +43,17 @@ import { configuration } from './config/configuration';
     }),
     ScheduleModule.forRoot(),
     TerminusModule,
+    HttpModule.register({
+      timeout: 10000,
+      maxRedirects: 5,
+    }),
     
     // Application modules
     ConfigurationModule,
-    AwsModule,
-    MemoryModule,
-    IndexingModule,
-    DocumentationModule,
+    // AwsModule, // Temporarily disabled due to missing AWS SDK deps
+    // MemoryModule,
+    // IndexingModule,
+    // DocumentationModule,
     // HealthModule,
     // WorkflowModule,
     // AgentModule,
@@ -55,12 +62,18 @@ import { configuration } from './config/configuration';
     // InteractionModule,
     
     // MCP Module (handles both server and client)
-    MCPModule.forRoot(),
+    // MCPModule.forRoot(), // Temporarily disabled
+    
+    // New gateway modules
+    WebSocketModule,
+    MCPRegistryModule,
   ],
 })
 export class AppModule {
   constructor() {
     // Log successful module initialization
-    console.log('🏗️  AppModule initialized with bi-directional MCP support');
+    console.log('🏗️  AppModule initialized with MCP Gateway & WebSocket support');
+    console.log('📡  WebSocket server available for dashboard connections');
+    console.log('🔍  MCP server discovery and tool registry active');
   }
 }
