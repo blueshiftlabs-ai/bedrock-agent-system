@@ -1,29 +1,19 @@
 import { Module } from '@nestjs/common';
 import { ConfigurationModule } from '../config/config.module';
-import { AwsService } from './aws.service';
-import { BedrockService } from './bedrock.service';
-import { OpenSearchService } from './opensearch.service';
-import { NeptuneService } from './neptune.service';
-import { S3Service } from './s3.service';
-import { DynamoDBService } from './dynamodb.service';
+import { MCPAwsService } from './mcp-aws.service';
 
+/**
+ * AWS module that orchestrates containerized MCP microservices
+ * Each AWS service runs in its own container for scalability and isolation
+ * Uses MCP protocol for inter-service communication
+ */
 @Module({
   imports: [ConfigurationModule],
   providers: [
-    AwsService,
-    BedrockService,
-    OpenSearchService,
-    NeptuneService,
-    S3Service,
-    DynamoDBService,
+    MCPAwsService,
   ],
   exports: [
-    AwsService,
-    BedrockService,
-    OpenSearchService,
-    NeptuneService,
-    S3Service,
-    DynamoDBService,
+    MCPAwsService,
   ],
 })
 export class AwsModule {}
