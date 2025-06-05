@@ -25,9 +25,17 @@ async function bootstrap() {
   await app.listen(port);
   
   console.log(`🧠 MCP Memory Server running on port ${port}`);
-  console.log(`🔗 MCP SSE endpoint: http://localhost:${port}/sse`);
+  console.log(`🔗 MCP HTTP endpoint: http://localhost:${port}/mcp`);
   console.log(`📡 Memory REST API: http://localhost:${port}/memory`);
   console.log(`❤️  Health check: http://localhost:${port}/memory/health`);
+  console.log(`\n📚 MCP Tools Available:`);
+  console.log(`   - store-memory: Store memories with semantic understanding`);
+  console.log(`   - retrieve-memories: Retrieve using semantic search`);
+  console.log(`   - add-connection: Create knowledge graph connections`);
+  console.log(`   - create-observation: Store agent observations`);
+  console.log(`   - consolidate-memories: Deduplicate and merge memories`);
+  console.log(`   - delete-memory: Remove memories`);
+  console.log(`   - get-memory-statistics: Get memory analytics`);
 }
 
 bootstrap().catch(err => {

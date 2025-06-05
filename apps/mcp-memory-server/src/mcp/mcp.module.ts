@@ -9,10 +9,12 @@ import { MemoryModule } from '../memory/memory.module';
     MCPNestModule.forRoot({
       name: 'mcp-memory-server',
       version: '1.0.0',
-      transport: [McpTransportType.SSE],
-      sse: {
-        pingEnabled: true,
-        pingIntervalMs: 30000,
+      transport: [McpTransportType.STREAMABLE_HTTP],
+      streamableHttp: {
+        // Enable JSON responses for non-streaming requests (good for testing)
+        enableJsonResponse: true,
+        // Use stateless mode for better scalability in Fargate
+        statelessMode: true,
       },
     }),
   ],
