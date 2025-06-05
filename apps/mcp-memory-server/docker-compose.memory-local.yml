@@ -1,0 +1,93 @@
+version: '3.8'
+
+services:
+  # DynamoDB Local for development
+  dynamodb-local:
+    image: amazon/dynamodb-local:latest
+    container_name: dynamodb-local
+    ports:
+      - "5100:8000"
+    command: ["-jar", "DynamoDBLocal.jar", "-sharedDb", "-dbPath", "./data"]
+    volumes:
+      - dynamodb-data:/home/dynamodblocal/data
+    working_dir: /home/dynamodblocal
+    networks:
+      - memory-network
+
+  # DynamoDB Admin UI
+  dynamodb-admin:
+    image: aaronshaf/dynamodb-admin:latest
+    container_name: dynamodb-admin
+    ports:
+      - "5101:8001"
+    environment:
+      - DYNAMO_ENDPOINT=http://dynamodb-local:8000
+    depends_on:
+      - dynamodb-local
+    networks:
+      - memory-network
+
+  # OpenSearch for vector storage
+  opensearch-node01:
+    image: opensearchproject/opensearch:latest
+    container_name: opensearch-node01
+    environment:
+      - cluster.name=opensearch-cluster
+      - node.name=opensearch-node01
+      - discovery.seed_hosts=opensearch-node01
+      - cluster.initial_cluster_manager_nodes=opensearch-node01
+      - bootstrap.memory_lock=true
+      - "OPENSEARCH_JAVA_OPTS=-Xms512m -Xmx512m"
+      - "DISABLE_INSTALL_DEMO_CONFIG=true"
+      - "DISABLE_SECURITY_PLUGIN=true"
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+      nofile:
+        soft: 65536
+        hard: 65536
+    volumes:
+      - opensearch-data01:/usr/share/opensearch/data
+    ports:
+      - "5102:9200"
+      - "5103:9600"
+    networks:
+      - memory-network
+
+  # OpenSearch Dashboards
+  opensearch-dashboards:
+    image: opensearchproject/opensearch-dashboards:latest
+    container_name: opensearch-dashboards
+    ports:
+      - "5104:5601"
+    expose:
+      - "5601"
+    environment:
+      OPENSEARCH_HOSTS: '["http://opensearch-node01:9200"]'
+      DISABLE_SECURITY_DASHBOARDS_PLUGIN: "true"
+    depends_on:
+      - opensearch-node01
+    networks:
+      - memory-network
+
+  # Gremlin Server (Neptune local alternative)
+  gremlin-server:
+    image: tinkerpop/gremlin-server:latest
+    container_name: gremlin-server
+    ports:
+      - "5105:8182"
+    volumes:
+      - ./gremlin-config:/opt/gremlin-server/conf
+      - gremlin-data:/opt/gremlin-server/data
+    networks:
+      - memory-network
+
+volumes:
+  dynamodb-data:
+  opensearch-data01:
+  gremlin-data:
+
+networks:
+  memory-network:
+    driver: bridge

@@ -1,0 +1,15 @@
+{
+  "jsonrpc": "2.0",
+  "method": "tools/call",
+  "params": {
+    "name": "store-memory",
+    "arguments": {
+      "content": "Testing memory storage with local DynamoDB, OpenSearch, and Gremlin Server",
+      "agent_id": "test-agent",
+      "type": "semantic",
+      "content_type": "text",
+      "tags": ["test", "local-setup"]
+    }
+  },
+  "id": 4
+}

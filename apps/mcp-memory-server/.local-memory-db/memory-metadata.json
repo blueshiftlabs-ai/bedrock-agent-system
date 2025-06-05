@@ -1,0 +1,63 @@
+{
+  "MEMORY#mem_1749070709924_4354afc7": {
+    "PK": "MEMORY#mem_1749070709924_4354afc7",
+    "SK": "METADATA",
+    "memory_id": "mem_1749070709924_4354afc7",
+    "type": "semantic",
+    "content_type": "text",
+    "agent_id": "test-agent-4100",
+    "created_at": 1749070709924,
+    "updated_at": 1749070709924,
+    "opensearch_index": "memory-text",
+    "opensearch_id": "a81a7d3c-0716-45cf-aa30-ca2cdb69b8e1",
+    "neptune_node_id": "memory_mem_1749070709924_4354afc7",
+    "tags": [
+      "test",
+      "local-json",
+      "port-strategy",
+      "4100"
+    ],
+    "access_count": 0,
+    "last_accessed": 1749070709924,
+    "language": "en",
+    "topics": [
+      "port",
+      "4100",
+      "testing",
+      "memory",
+      "storage"
+    ],
+    "sentiment": "neutral",
+    "entities": [
+      "Testing"
+    ]
+  },
+  "MEMORY#mem_1749071732578_33c75daa": {
+    "PK": "MEMORY#mem_1749071732578_33c75daa",
+    "SK": "METADATA",
+    "memory_id": "mem_1749071732578_33c75daa",
+    "type": "semantic",
+    "content_type": "code",
+    "agent_id": "test-coder",
+    "created_at": 1749071732578,
+    "updated_at": 1749071732578,
+    "opensearch_index": "memory-code",
+    "opensearch_id": "c99a328d-0c3b-4a8a-8698-e9e2b531bf89",
+    "neptune_node_id": "memory_mem_1749071732578_33c75daa",
+    "tags": [
+      "fibonacci",
+      "recursion",
+      "algorithm",
+      "transformers-test"
+    ],
+    "access_count": 0,
+    "last_accessed": 1749071732578,
+    "programming_language": "unknown",
+    "functions": [
+      "calculateFibonacci"
+    ],
+    "imports": [],
+    "patterns": [],
+    "complexity": "low"
+  }
+}
