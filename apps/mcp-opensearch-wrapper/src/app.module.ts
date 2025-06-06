@@ -33,5 +33,6 @@ import { OpenSearchService } from './opensearch.service';
     }),
   ],
   providers: [OpenSearchService],
+  controllers: [],
 })
 export class AppModule {}
