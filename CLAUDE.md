@@ -196,7 +196,7 @@ While Next.js + shadcn/ui is preferred for bespoke dashboards, consider these al
 ### MCP Memory Server
 The `mcp-memory-server` provides sophisticated memory capabilities for AI agents:
 
-**Endpoint**: `http://localhost:3001/memory/mcp` (SSE transport)
+**Endpoint**: `http://localhost:4100/memory/mcp` (SSE transport)
 
 **Storage Layers**:
 - **OpenSearch**: Vector similarity search with separate text/code indexes
@@ -398,3 +398,97 @@ time curl -X POST http://localhost:4100/memory/mcp \
   -H "Content-Type: application/json" \
   -d '{"method": "tools/call", "params": {"name": "retrieve-memories", "arguments": {"query": "performance testing", "project": "bedrock-agent-system", "limit": 50}}}'
 ```
+
+## Current Implementation Status & Key File References
+
+### Working Systems (Deployed & Active)
+
+**MCP Memory Server** - Production Ready ✅
+- **Location**: `apps/mcp-memory-server/`
+- **Port**: 4100 (http://localhost:4100/memory/mcp)
+- **Status**: Active, working with Claude Desktop, MCP Inspector accessible
+- **Key Files**:
+  - `apps/mcp-memory-server/src/main.ts` - Server entry point
+  - `apps/mcp-memory-server/src/mcp/mcp-tools.service.ts` - MCP tools implementation
+  - `apps/mcp-memory-server/src/services/embedding.service.ts` - Bedrock embeddings (respects BEDROCK_ENABLED flag)
+- **Available Tools**: store-memory, retrieve-memories, add-connection, create-observation, consolidate-memories, delete-memory, get-memory-statistics
+- **Transport**: SSE (Server-Sent Events)
+
+**MCP Dashboard** - Production Ready ✅
+- **Location**: `apps/mcp-dashboard/`
+- **Port**: 3100 (http://localhost:3100)
+- **Status**: Active, monitors memory server health and provides MCP server management
+- **Key Files**:
+  - `apps/mcp-dashboard/src/app/page.tsx` - Main dashboard interface
+  - `apps/mcp-dashboard/src/components/dashboard/dashboard-overview.tsx` - Overview component
+  - `apps/mcp-dashboard/src/components/servers/mcp-server-management.tsx` - Server management
+
+### In Development Systems
+
+**Distributed MCP Architecture** - Under Development 🚧
+- **Location**: `apps/mcp-memory-orchestrator/`, `docker-compose.distributed-mcp.yml`
+- **Port Range**: 4200-4203 (following sophisticated port strategy)
+- **Status**: Core infrastructure implemented, external MCP servers not yet integrated
+- **Key Files**:
+  - `apps/mcp-memory-orchestrator/src/memory-orchestrator/memory-orchestrator.service.ts` - Orchestration logic
+  - `apps/mcp-memory-orchestrator/src/clients/mcp-client.service.ts` - MCP client coordination
+  - `docker-compose.distributed-mcp.yml` - Complete distributed environment
+  - `config/genai-toolbox-config.yaml` - PostgreSQL tool configuration
+  - `database/init.sql` - PostgreSQL schema initialization
+- **Planned Tools**: store-comprehensive-memory, retrieve-comprehensive-memories, create-memory-connection, get-memory-statistics
+- **Architecture**: Coordinates OpenSearch MCP (4201), PostgreSQL MCP (4202), Neo4j MCP (4203)
+
+### Architecture Documentation
+
+**Key Strategy Documents**:
+- `docs/PORT_STRATEGY.md` - Sophisticated port allocation strategy (4100=core, 4200=distributed, etc.)
+- `docs/architecture/MCP_ECOSYSTEM_PIVOT_STRATEGY.md` - Strategy for using official MCP servers
+- `docs/architecture/LOCAL_VS_DISTRIBUTED_MCP_ARCHITECTURE.md` - Architecture comparison
+- `docs/implementation/DISTRIBUTED_MCP_IMPLEMENTATION_PLAN.md` - Detailed implementation plan
+
+**Implementation Progress Documents**:
+- `docs/implementation/MCP_HYBRID_SERVER_PROGRESS.md` - Progress tracking
+- `docs/implementation/MEMORY_SERVER_FIX_PLAN.md` - Previous fixes applied
+
+### Development Commands Reference
+
+**Working Memory Server**:
+```bash
+# Health check
+curl http://localhost:4100/health
+
+# Memory health with storage details  
+curl http://localhost:4100/memory/health
+
+# Test memory storage (available as MCP tool to Claude)
+curl -X POST http://localhost:4100/memory/mcp \
+  -H "Content-Type: application/json" \
+  -d '{"method": "tools/call", "params": {"name": "store-memory", "arguments": {"content": "Test memory", "type": "episodic", "project": "bedrock-agent-system"}}}'
+```
+
+**Distributed Architecture**:
+```bash
+# Start core databases + orchestrator
+cd /home/acoose/projects/bedrock-agent-system
+docker-compose -f docker-compose.distributed-mcp.yml up -d opensearch postgresql neo4j memory-orchestrator
+
+# Check orchestrator health
+curl http://localhost:4200/health
+
+# Test orchestrator MCP tools (inside container)
+docker-compose -f docker-compose.distributed-mcp.yml exec memory-orchestrator curl -X POST http://localhost:4100/mcp -H "Content-Type: application/json" -H "Accept: application/json, text/event-stream" -d '{"jsonrpc":"2.0","id":1,"method":"tools/list","params":{}}'
+```
+
+### Next Steps & Immediate Tasks
+
+1. **Complete Distributed MCP Integration**: Research and integrate actual OpenSearch, GenAI Toolbox, and Neo4j MCP server images
+2. **Test End-to-End Distributed Operations**: Verify memory storage across all three systems
+3. **Memory System Dogfooding**: Use available memory tools to store implementation context and decisions
+4. **Documentation Updates**: Update implementation progress documents as features are completed
+
+### Important Notes for Claude Code
+
+- **Always use the memory tools available** - The memory server at 4100 is registered and working
+- **Follow port strategy strictly** - 4100=core, 4200=distributed, avoid lazy +1 incrementing
+- **Commit frequently with conventional commits** - Prevent context loss and maintain clear history
+- **Update CLAUDE.md regularly** - Keep implementation status current to prevent confusion
