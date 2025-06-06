@@ -3,7 +3,7 @@ version: '3.8'
 services:
   # OpenSearch for vector similarity search
   opensearch:
-    image: opensearchproject/opensearch:2.11.0
+    image: opensearchproject/opensearch:3.0.0
     container_name: mcp-memory-opensearch
     environment:
       - discovery.type=single-node

@@ -1,0 +1,51 @@
+version: '3.8'
+
+services:
+  # Dgraph Zero
+  dgraph-zero:
+    image: dgraph/dgraph:${DGRAPH_VERSION:-latest}
+    container_name: mcp-dgraph-zero
+    command: dgraph zero --my=dgraph-zero:5080
+    ports:
+      - "5080:5080"
+      - "6080:6080"
+    networks:
+      - mcp-network
+    volumes:
+      - graph-data:/dgraph
+
+  # Dgraph Alpha
+  dgraph-alpha:
+    image: dgraph/dgraph:${DGRAPH_VERSION:-latest}
+    container_name: mcp-dgraph-alpha
+    command: dgraph alpha --my=dgraph-alpha:7080 --zero=dgraph-zero:5080
+    ports:
+      - "8080:8080"
+      - "9080:9080"
+    depends_on:
+      - dgraph-zero
+    networks:
+      - mcp-network
+    volumes:
+      - graph-data:/dgraph
+
+  # Dgraph MCP Wrapper (to be implemented)
+  dgraph-mcp:
+    build:
+      context: ./apps/mcp-dgraph-wrapper
+      dockerfile: Dockerfile
+    container_name: dgraph-mcp-server
+    environment:
+      - DGRAPH_ALPHA_ENDPOINT=${DGRAPH_ALPHA_ENDPOINT:-http://dgraph-alpha:8080}
+      - PORT=8000
+    ports:
+      - "${GRAPH_MCP_PORT:-4203}:8000"
+    depends_on:
+      - dgraph-alpha
+    networks:
+      - mcp-network
+    healthcheck:
+      test: ["CMD", "wget", "-q", "--spider", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3

@@ -5,9 +5,11 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ## Commit Management Strategy
 
 ### Automatic Commit Guidelines
+
 Claude Code should automatically create commits throughout development sessions using conventional commit format to maintain clear project history:
 
 **Conventional Commit Format:**
+
 ```
 <type>[optional scope]: <description>
 
@@ -17,6 +19,7 @@ Claude Code should automatically create commits throughout development sessions 
 ```
 
 **Types:**
+
 - `feat`: New features or major functionality additions
 - `fix`: Bug fixes and issue resolutions
 - `refactor`: Code restructuring without changing external behavior
@@ -28,6 +31,7 @@ Claude Code should automatically create commits throughout development sessions 
 - `build`: Build system or external dependency changes
 
 **When to Commit:**
+
 1. **Feature Completion**: After implementing a complete feature or significant functionality
 2. **Logical Milestones**: When reaching a stable, working state of a component
 3. **Bug Fixes**: After resolving issues or compilation errors
@@ -36,12 +40,14 @@ Claude Code should automatically create commits throughout development sessions 
 6. **Before Major Changes**: Before starting risky refactoring or architectural changes
 
 **When NOT to Commit:**
+
 - After every single file change or minor edit
 - In the middle of implementing a feature
 - When code is in a broken or incomplete state
 - For experimental changes that may be reverted
 
 **Examples:**
+
 ```bash
 feat(mcp-hybrid): implement WebSocket gateway for real-time dashboard communication
 fix(memory-server): correct health endpoint path for server discovery
@@ -74,6 +80,7 @@ bedrock-agent-system/
 ## Key Commands
 
 ### Monorepo Commands
+
 ```bash
 pnpm install              # Install all dependencies
 turbo build               # Build all packages
@@ -83,6 +90,7 @@ turbo lint                # Lint all packages
 ```
 
 ### Application-Specific Commands
+
 ```bash
 pnpm app:dev              # Run MCP server in dev mode
 pnpm app:build            # Build MCP server
@@ -91,6 +99,7 @@ pnpm --filter @apps/mcp-hybrid-server docker:build  # Build Docker image
 ```
 
 ### Infrastructure Commands
+
 ```bash
 pnpm infrastructure:synth    # Synthesize CloudFormation
 pnpm infrastructure:deploy   # Deploy infrastructure
@@ -98,12 +107,14 @@ pnpm infrastructure:destroy  # Destroy infrastructure
 ```
 
 ### Deployment
+
 ```bash
 ./deployment/deploy.sh dev   # Deploy to development
 ./deployment/deploy.sh prod  # Deploy to production
 ```
 
 ### Setup
+
 ```bash
 pnpm install
 pnpm --filter @apps/mcp-hybrid-server run setup-local-dev  # Setup local development
@@ -112,6 +123,7 @@ pnpm --filter @apps/mcp-hybrid-server run setup-local-dev  # Setup local develop
 ## Architecture Overview
 
 ### Module Structure
+
 The application uses NestJS's modular architecture with these core modules:
 
 - **WorkflowModule**: Orchestrates LangGraph workflows for complex multi-step analysis
@@ -130,6 +142,7 @@ The application uses NestJS's modular architecture with these core modules:
 5. **MCP Protocol**: Exposed at `/mcp` endpoint for tool interactions
 
 ### AWS Integration
+
 - **Bedrock**: AI model invocation for agents
 - **DynamoDB**: Workflow state and metadata persistence
 - **S3**: File storage for analysis artifacts
@@ -137,9 +150,11 @@ The application uses NestJS's modular architecture with these core modules:
 - **Neptune**: Knowledge graph storage
 
 ### Port Strategy
+
 See `docs/PORT_STRATEGY.md` for complete port allocation strategy.
 
 **Key Ports:**
+
 - **4100**: MCP Memory Server
 - **4101**: MCP Hybrid Server
 - **3100**: MCP Dashboard
@@ -148,6 +163,7 @@ See `docs/PORT_STRATEGY.md` for complete port allocation strategy.
 **Avoided:** Common development ports (3000-3099, 8000-8099, 9000-9099)
 
 ### Testing Approach
+
 - Unit tests are located alongside source files
 - Integration tests in `test/integration/`
 - E2E tests in `test/e2e/`
@@ -155,6 +171,7 @@ See `docs/PORT_STRATEGY.md` for complete port allocation strategy.
 - Mock AWS services using LocalStack in development
 
 ### Important Files
+
 - `apps/mcp-hybrid-server/src/main.ts`: Application entry point
 - `apps/mcp-hybrid-server/src/workflows/graphs/`: Workflow definitions
 - `apps/mcp-hybrid-server/src/agents/base/base.agent.ts`: Base agent implementation
@@ -167,6 +184,7 @@ See `docs/PORT_STRATEGY.md` for complete port allocation strategy.
 ## UI Development Standards
 
 ### Frontend Technology Stack
+
 For all user interface applications in this project, use the following technology stack:
 
 - **Framework**: Next.js 14+ with App Router (TypeScript)
@@ -178,6 +196,7 @@ For all user interface applications in this project, use the following technolog
 - **Data Fetching**: TanStack Query (React Query) for server state management
 
 ### Component Standards
+
 - Follow shadcn/ui design patterns and conventions
 - Use TypeScript strict mode for all components
 - Implement dark/light mode support with system preference detection
@@ -186,7 +205,9 @@ For all user interface applications in this project, use the following technolog
 - Use consistent spacing, colors, and typography from Tailwind CSS
 
 ### Alternative Frameworks
+
 While Next.js + shadcn/ui is preferred for bespoke dashboards, consider these alternatives only for specific use cases:
+
 - **Chainlit**: For rapid AI chat interfaces (if heavy conversational AI features needed)
 - **Streamlit**: For data science prototyping (avoid for production UIs)
 - Stick with Next.js for sophisticated, production-ready interfaces
@@ -194,22 +215,26 @@ While Next.js + shadcn/ui is preferred for bespoke dashboards, consider these al
 ## Memory System Architecture
 
 ### MCP Memory Server
+
 The `mcp-memory-server` provides sophisticated memory capabilities for AI agents:
 
 **Endpoint**: `http://localhost:4100/memory/mcp` (SSE transport)
 
 **Storage Layers**:
+
 - **OpenSearch**: Vector similarity search with separate text/code indexes
 - **DynamoDB**: Metadata storage, session management, agent profiles  
 - **Neptune**: Knowledge graph for memory relationships and connections
 
 **Memory Types**:
+
 - **Episodic**: Conversation histories and events
 - **Semantic**: Learned patterns, best practices, concepts
 - **Procedural**: Code patterns, workflows, strategies
 - **Working**: Temporary memory with TTL support
 
 ### Project-Based Memory Isolation
+
 Memories are organized by project context to prevent cross-contamination:
 
 - **Project Memories**: Isolated to specific project contexts
@@ -218,6 +243,7 @@ Memories are organized by project context to prevent cross-contamination:
 - **Environment Configuration**: Project name set via environment variable `PROJECT_NAME`
 
 **Configuration**:
+
 ```bash
 # Memory Server Project Configuration
 PROJECT_NAME=bedrock-agent-system  # Current project
@@ -228,17 +254,20 @@ DEFAULT_PROJECT=general           # Fallback project for common memories
 ### Memory Dashboard Applications
 
 **MCP Dashboard** (`apps/mcp-dashboard`):
+
 - Monitors overall system health including memory server status
 - Shows memory server connection, storage health, and basic statistics
 - General MCP server management and monitoring
 
 **Memory Dashboard** (`apps/mcp-memory-dashboard` - planned):
+
 - Dedicated memory visualization and management interface
 - Interactive knowledge graph similar to Neo4j Browser
 - Memory browser, analytics, and agent management
 - Built with Next.js + shadcn/ui + D3.js for graph visualization
 
 ### Memory Tools Available
+
 1. `store-memory` - Store memories with automatic analysis
 2. `retrieve-memories` - Semantic search with filtering
 3. `add-connection` - Create knowledge graph relationships
@@ -252,6 +281,7 @@ DEFAULT_PROJECT=general           # Fallback project for common memories
 ### Development Modes
 
 **Local Development (JSON Storage)**:
+
 ```bash
 # Start memory server with local JSON storage
 pnpm memory:dev:local
@@ -260,6 +290,7 @@ pnpm turbo run --filter=@apps/mcp-memory-server dev:local
 ```
 
 **Server Development (DynamoDB)**:
+
 ```bash
 # Start local databases first
 pnpm memory:local:up
@@ -268,6 +299,7 @@ pnpm memory:dev:server
 ```
 
 **Production Mode**:
+
 ```bash
 pnpm memory:start:prod
 ```
@@ -275,6 +307,7 @@ pnpm memory:start:prod
 ### Health Check & Testing
 
 **Quick Health Check**:
+
 ```bash
 # Basic server health
 curl http://localhost:4100/health
@@ -284,6 +317,7 @@ curl http://localhost:4100/memory/health
 ```
 
 **Expected Health Response**:
+
 ```json
 {
   "status": "ok",
@@ -302,6 +336,7 @@ curl http://localhost:4100/memory/health
 ```
 
 **MCP Tool Testing**:
+
 ```bash
 # Test store-memory tool via HTTP
 curl -X POST http://localhost:4100/memory/mcp \
@@ -338,11 +373,13 @@ curl -X POST http://localhost:4100/memory/mcp \
 ### Troubleshooting Common Issues
 
 **Memory Server Won't Start**:
+
 1. Check port 4100 availability: `lsof -i :4100`
 2. Verify environment variables in `.env.local`
 3. Check database connectivity (OpenSearch: 5102, Gremlin: 5103)
 
 **Storage Connection Issues**:
+
 ```bash
 # Test OpenSearch
 curl http://localhost:5102/_cluster/health
@@ -352,12 +389,14 @@ curl http://localhost:5102/_cluster/health
 ```
 
 **Memory Operations Failing**:
+
 1. Check memory server logs for detailed error messages
 2. Verify project context is correctly set
 3. Test with simple memory storage first
 4. Check embedding service status for semantic search issues
 
 ### Local Database Setup
+
 ```bash
 # Start all local databases for memory server
 pnpm memory:local:up
@@ -385,6 +424,7 @@ The MCP Dashboard monitors memory server health automatically. If the dashboard 
 ### Performance Testing
 
 **Load Testing Memory Operations**:
+
 ```bash
 # Store 100 test memories
 for i in {1..100}; do
@@ -404,8 +444,9 @@ time curl -X POST http://localhost:4100/memory/mcp \
 ### Working Systems (Deployed & Active)
 
 **MCP Memory Server** - Production Ready ✅
+
 - **Location**: `apps/mcp-memory-server/`
-- **Port**: 4100 (http://localhost:4100/memory/mcp)
+- **Port**: 4100 (<http://localhost:4100/memory/mcp>)
 - **Status**: Active, working with Claude Desktop, MCP Inspector accessible
 - **Key Files**:
   - `apps/mcp-memory-server/src/main.ts` - Server entry point
@@ -415,8 +456,9 @@ time curl -X POST http://localhost:4100/memory/mcp \
 - **Transport**: SSE (Server-Sent Events)
 
 **MCP Dashboard** - Production Ready ✅
+
 - **Location**: `apps/mcp-dashboard/`
-- **Port**: 3100 (http://localhost:3100)
+- **Port**: 3100 (<http://localhost:3100>)
 - **Status**: Active, monitors memory server health and provides MCP server management
 - **Key Files**:
   - `apps/mcp-dashboard/src/app/page.tsx` - Main dashboard interface
@@ -426,6 +468,7 @@ time curl -X POST http://localhost:4100/memory/mcp \
 ### In Development Systems
 
 **Distributed MCP Architecture** - Under Development 🚧
+
 - **Location**: `apps/mcp-memory-orchestrator/`, `docker-compose.distributed-mcp.yml`
 - **Port Range**: 4200-4203 (following sophisticated port strategy)
 - **Status**: Core infrastructure implemented, external MCP servers not yet integrated
@@ -441,18 +484,21 @@ time curl -X POST http://localhost:4100/memory/mcp \
 ### Architecture Documentation
 
 **Key Strategy Documents**:
+
 - `docs/PORT_STRATEGY.md` - Sophisticated port allocation strategy (4100=core, 4200=distributed, etc.)
 - `docs/architecture/MCP_ECOSYSTEM_PIVOT_STRATEGY.md` - Strategy for using official MCP servers
 - `docs/architecture/LOCAL_VS_DISTRIBUTED_MCP_ARCHITECTURE.md` - Architecture comparison
 - `docs/implementation/DISTRIBUTED_MCP_IMPLEMENTATION_PLAN.md` - Detailed implementation plan
 
 **Implementation Progress Documents**:
+
 - `docs/implementation/MCP_HYBRID_SERVER_PROGRESS.md` - Progress tracking
 - `docs/implementation/MEMORY_SERVER_FIX_PLAN.md` - Previous fixes applied
 
 ### Development Commands Reference
 
 **Working Memory Server**:
+
 ```bash
 # Health check
 curl http://localhost:4100/health
@@ -467,6 +513,7 @@ curl -X POST http://localhost:4100/memory/mcp \
 ```
 
 **Distributed Architecture**:
+
 ```bash
 # Start core databases + orchestrator
 cd /home/acoose/projects/bedrock-agent-system

@@ -3,7 +3,7 @@ version: '3.8'
 services:
   # Database Services
   opensearch:
-    image: opensearchproject/opensearch:2.11.0
+    image: opensearchproject/opensearch:3.0.0
     container_name: mcp-opensearch
     environment:
       - discovery.type=single-node
@@ -59,13 +59,13 @@ services:
 
   # MCP Server Services
   opensearch-mcp:
-    image: mcp/opensearch:latest
+    build:
+      context: ./apps/mcp-opensearch-wrapper
+      dockerfile: Dockerfile
     container_name: opensearch-mcp-server
     environment:
       - OPENSEARCH_ENDPOINT=http://opensearch:9200
-      - OPENSEARCH_USERNAME=admin
-      - OPENSEARCH_PASSWORD=Admin123!
-      - OPENSEARCH_VERIFY_CERTS=false
+      - PORT=3000
     ports:
       - "4201:3000"
     depends_on:
@@ -73,7 +73,7 @@ services:
     networks:
       - mcp-network
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:3000/health"]
+      test: ["CMD", "wget", "-q", "--spider", "http://localhost:3000/health"]
       interval: 30s
       timeout: 10s
       retries: 3

@@ -1,0 +1,38 @@
+version: '3.8'
+
+services:
+  # PostgreSQL for metadata storage
+  postgresql:
+    image: postgres:15-alpine
+    container_name: mcp-postgresql
+    environment:
+      - POSTGRES_USER=${POSTGRES_USER:-postgres}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-password}
+      - POSTGRES_DB=${POSTGRES_DB:-memory_db}
+    ports:
+      - "${POSTGRES_PORT:-5432}:5432"
+    volumes:
+      - storage-data:/var/lib/postgresql/data
+      - ./database/init.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - mcp-network
+
+  # GenAI Toolbox MCP Server (PostgreSQL tools)
+  genai-toolbox-mcp:
+    image: us-central1-docker.pkg.dev/database-toolbox/toolbox/toolbox:${GENAI_TOOLBOX_VERSION:-0.6.0}
+    container_name: genai-toolbox-mcp-server
+    environment:
+      - DATABASE_URL=postgresql://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-password}@postgresql:${POSTGRES_PORT:-5432}/${POSTGRES_DB:-memory_db}
+    ports:
+      - "${STORAGE_MCP_PORT:-4202}:8080"
+    depends_on:
+      - postgresql
+    networks:
+      - mcp-network
+    volumes:
+      - ./config/genai-toolbox-config.yaml:/app/tools.yaml
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
