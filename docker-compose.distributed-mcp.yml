@@ -1,0 +1,173 @@
+version: '3.8'
+
+services:
+  # Database Services
+  opensearch:
+    image: opensearchproject/opensearch:2.11.0
+    container_name: mcp-opensearch
+    environment:
+      - discovery.type=single-node
+      - OPENSEARCH_INITIAL_ADMIN_PASSWORD=Admin123!
+      - plugins.security.disabled=true
+    ports:
+      - "5102:9200"  # OpenSearch API
+      - "5103:9600"  # Performance Analyzer
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+      nofile:
+        soft: 65536
+        hard: 65536
+    volumes:
+      - opensearch-data:/usr/share/opensearch/data
+    networks:
+      - mcp-network
+
+  postgresql:
+    image: postgres:15-alpine
+    container_name: mcp-postgresql
+    environment:
+      - POSTGRES_DB=memory_db
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=password
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgresql-data:/var/lib/postgresql/data
+      - ./database/init.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - mcp-network
+
+  neo4j:
+    image: neo4j:5-community
+    container_name: mcp-neo4j
+    environment:
+      - NEO4J_AUTH=neo4j/password
+      - NEO4J_PLUGINS=["apoc"]
+      - NEO4J_dbms_security_procedures_unrestricted=apoc.*
+    ports:
+      - "7474:7474"
+      - "7687:7687"
+    volumes:
+      - neo4j-data:/data
+      - neo4j-logs:/logs
+      - neo4j-import:/var/lib/neo4j/import
+      - neo4j-plugins:/plugins
+    networks:
+      - mcp-network
+
+  # MCP Server Services
+  opensearch-mcp:
+    image: mcp/opensearch:latest
+    container_name: opensearch-mcp-server
+    environment:
+      - OPENSEARCH_ENDPOINT=http://opensearch:9200
+      - OPENSEARCH_USERNAME=admin
+      - OPENSEARCH_PASSWORD=Admin123!
+      - OPENSEARCH_VERIFY_CERTS=false
+    ports:
+      - "4201:3000"
+    depends_on:
+      - opensearch
+    networks:
+      - mcp-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  genai-toolbox-mcp:
+    image: us-central1-docker.pkg.dev/database-toolbox/toolbox/toolbox:0.6.0
+    container_name: genai-toolbox-mcp-server
+    environment:
+      - DATABASE_URL=postgresql://postgres:password@postgresql:5432/memory_db
+    ports:
+      - "4202:8080"
+    depends_on:
+      - postgresql
+    networks:
+      - mcp-network
+    volumes:
+      - ./config/genai-toolbox-config.yaml:/app/tools.yaml
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  neo4j-mcp:
+    image: mcp/neo4j-cypher:latest
+    container_name: neo4j-mcp-server
+    environment:
+      - NEO4J_URI=bolt://neo4j:7687
+      - NEO4J_USERNAME=neo4j
+      - NEO4J_PASSWORD=password
+    ports:
+      - "4203:8000"
+    depends_on:
+      - neo4j
+    networks:
+      - mcp-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Memory Orchestrator (Our Custom MCP Server)
+  memory-orchestrator:
+    build:
+      context: ./apps/mcp-memory-orchestrator
+      dockerfile: Dockerfile
+    container_name: memory-orchestrator
+    environment:
+      - NODE_ENV=development
+      - PORT=4100
+      - ENVIRONMENT=local
+      - OPENSEARCH_MCP_ENDPOINT=http://opensearch-mcp:3000
+      - DATABASE_MCP_ENDPOINT=http://genai-toolbox-mcp:8080
+      - GRAPH_MCP_ENDPOINT=http://neo4j-mcp:8000
+      - LOG_LEVEL=debug
+    ports:
+      - "4200:4100"
+    depends_on:
+      - opensearch
+      - postgresql
+      - neo4j
+    networks:
+      - mcp-network
+    volumes:
+      - ./apps/mcp-memory-orchestrator:/app
+      - /app/node_modules
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:4100/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Optional: MCP Inspector for debugging
+  mcp-inspector:
+    image: mcp/inspector:latest
+    container_name: mcp-inspector
+    ports:
+      - "5173:5173"
+    environment:
+      - MCP_SERVERS=http://memory-orchestrator:4100,http://opensearch-mcp:3000,http://genai-toolbox-mcp:8080,http://neo4j-mcp:8000
+    depends_on:
+      - memory-orchestrator
+    networks:
+      - mcp-network
+
+volumes:
+  opensearch-data:
+  postgresql-data:
+  neo4j-data:
+  neo4j-logs:
+  neo4j-import:
+  neo4j-plugins:
+
+networks:
+  mcp-network:
+    driver: bridge

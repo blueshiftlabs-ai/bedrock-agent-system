@@ -1,0 +1,179 @@
+# GenAI Toolbox MCP Server Configuration
+# This configuration defines the PostgreSQL database tools for memory operations
+
+sources:
+  memory-postgres:
+    kind: postgres
+    host: postgresql
+    port: 5432
+    database: memory_db
+    user: postgres
+    password: password
+    ssl_mode: disable
+
+tools:
+  # Memory management tools
+  store-memory-metadata:
+    kind: postgres-sql
+    source: memory-postgres
+    description: Store memory metadata in PostgreSQL
+    sql: |
+      INSERT INTO memory_metadata (id, content, content_hash, type, content_type, agent_id, session_id, tags, metadata, expires_at)
+      VALUES ($1, $2, $3, $4, $5, $6, $7, $8::jsonb, $9::jsonb, $10)
+      RETURNING *;
+    
+  retrieve-memory-metadata:
+    kind: postgres-sql
+    source: memory-postgres
+    description: Retrieve memory metadata by ID
+    sql: |
+      SELECT * FROM memory_metadata 
+      WHERE id = $1;
+    
+  search-memories-by-agent:
+    kind: postgres-sql
+    source: memory-postgres
+    description: Search memories by agent ID with optional filters
+    sql: |
+      SELECT * FROM memory_metadata 
+      WHERE agent_id = $1
+      AND ($2::text IS NULL OR type = $2)
+      AND ($3::text IS NULL OR session_id = $3)
+      ORDER BY created_at DESC
+      LIMIT COALESCE($4, 50);
+      
+  search-memories-by-tags:
+    kind: postgres-sql
+    source: memory-postgres
+    description: Search memories by tags using JSONB contains operator
+    sql: |
+      SELECT * FROM memory_metadata 
+      WHERE tags @> $1::jsonb
+      ORDER BY created_at DESC
+      LIMIT COALESCE($2, 50);
+      
+  update-memory-metadata:
+    kind: postgres-sql
+    source: memory-postgres
+    description: Update memory metadata
+    sql: |
+      UPDATE memory_metadata 
+      SET content = COALESCE($2, content),
+          tags = COALESCE($3::jsonb, tags),
+          metadata = COALESCE($4::jsonb, metadata),
+          updated_at = CURRENT_TIMESTAMP
+      WHERE id = $1
+      RETURNING *;
+      
+  delete-memory:
+    kind: postgres-sql
+    source: memory-postgres
+    description: Delete memory by ID
+    sql: |
+      DELETE FROM memory_metadata 
+      WHERE id = $1
+      RETURNING id;
+      
+  # Session management tools
+  create-session:
+    kind: postgres-sql
+    source: memory-postgres
+    description: Create a new session
+    sql: |
+      INSERT INTO session_metadata (id, agent_id, context)
+      VALUES ($1, $2, $3::jsonb)
+      RETURNING *;
+      
+  get-session:
+    kind: postgres-sql
+    source: memory-postgres
+    description: Get session by ID
+    sql: |
+      SELECT * FROM session_metadata 
+      WHERE id = $1;
+      
+  update-session-activity:
+    kind: postgres-sql
+    source: memory-postgres
+    description: Update session last activity
+    sql: |
+      UPDATE session_metadata 
+      SET last_activity = CURRENT_TIMESTAMP
+      WHERE id = $1
+      RETURNING *;
+      
+  # Memory connections tools
+  create-memory-connection:
+    kind: postgres-sql
+    source: memory-postgres
+    description: Create a connection between two memories
+    sql: |
+      INSERT INTO memory_connections (from_memory_id, to_memory_id, relationship_type, relationship_properties, bidirectional)
+      VALUES ($1, $2, $3, $4::jsonb, $5)
+      RETURNING *;
+      
+  get-memory-connections:
+    kind: postgres-sql
+    source: memory-postgres
+    description: Get all connections for a memory
+    sql: |
+      SELECT mc.*, 
+             m1.content as from_content,
+             m2.content as to_content
+      FROM memory_connections mc
+      JOIN memory_metadata m1 ON mc.from_memory_id = m1.id
+      JOIN memory_metadata m2 ON mc.to_memory_id = m2.id
+      WHERE mc.from_memory_id = $1 
+         OR (mc.bidirectional = true AND mc.to_memory_id = $1)
+      ORDER BY mc.created_at DESC;
+      
+  # Statistics and analytics tools
+  get-memory-statistics:
+    kind: postgres-sql
+    source: memory-postgres
+    description: Get memory statistics for an agent
+    sql: |
+      SELECT 
+        COUNT(*) as total_memories,
+        COUNT(*) FILTER (WHERE type = 'episodic') as episodic_memories,
+        COUNT(*) FILTER (WHERE type = 'semantic') as semantic_memories,
+        COUNT(*) FILTER (WHERE type = 'procedural') as procedural_memories,
+        COUNT(*) FILTER (WHERE type = 'working') as working_memories,
+        COUNT(DISTINCT session_id) as unique_sessions,
+        SUM(LENGTH(content)) as total_content_size,
+        MIN(created_at) as earliest_memory,
+        MAX(created_at) as latest_memory
+      FROM memory_metadata 
+      WHERE ($1::text IS NULL OR agent_id = $1);
+      
+  cleanup-expired-memories:
+    kind: postgres-sql
+    source: memory-postgres
+    description: Clean up expired working memories
+    sql: |
+      SELECT cleanup_expired_memories();
+      
+  # Advanced search tools
+  search-memories-by-content:
+    kind: postgres-sql
+    source: memory-postgres
+    description: Search memories by content using full-text search
+    sql: |
+      SELECT *, 
+             ts_rank(to_tsvector('english', content), plainto_tsquery('english', $1)) as rank
+      FROM memory_metadata 
+      WHERE to_tsvector('english', content) @@ plainto_tsquery('english', $1)
+      ORDER BY rank DESC, created_at DESC
+      LIMIT COALESCE($2, 20);
+      
+  get-recent-memories:
+    kind: postgres-sql
+    source: memory-postgres
+    description: Get recent memories with optional filtering
+    sql: |
+      SELECT * FROM memory_metadata 
+      WHERE ($1::text IS NULL OR agent_id = $1)
+      AND ($2::text IS NULL OR type = $2)
+      AND created_at > CURRENT_TIMESTAMP - INTERVAL '1 day' * COALESCE($3, 7)
+      ORDER BY created_at DESC
+      LIMIT COALESCE($4, 50);

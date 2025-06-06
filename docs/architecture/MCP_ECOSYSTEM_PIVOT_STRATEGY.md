@@ -252,3 +252,32 @@ const graphResult = await neo4jMcp.createNode({
 4. Advanced memory composition patterns
 
 This pivot transforms our memory server from a monolithic custom implementation to a sophisticated orchestration layer that leverages the growing MCP ecosystem.
+
+## Database Flexibility Considerations (Future Enhancement)
+
+### GenAI Toolbox Database Options
+The Google GenAI Toolbox MCP server supports multiple database backends, providing teams flexibility in choosing their preferred database:
+- PostgreSQL (default for local development)
+- MySQL
+- SQLite
+- BigQuery (for Google Cloud deployments)
+- And more...
+
+Reference: https://googleapis.github.io/genai-toolbox
+
+### Local DynamoDB Option
+For teams preferring DynamoDB consistency between local and AWS:
+- DynamoDB Local: https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/DynamoDBLocal.html
+- Can be used instead of PostgreSQL for local development
+- Maintains exact same API as production DynamoDB
+
+### Environment-Based Abstraction
+Through environment configuration (.env files), the same MCP orchestrator can connect to:
+- **Local**: PostgreSQL, DynamoDB Local, local OpenSearch, Neo4j containers
+- **AWS**: RDS PostgreSQL, DynamoDB, OpenSearch Serverless, Neptune
+- **Google Cloud**: Cloud SQL, Firestore, Vertex AI Search
+- **Azure**: Cosmos DB, Azure Cognitive Search
+
+This flexibility is enabled by the MCP protocol abstraction - agents don't need to know which database is being used, only which capabilities are available.
+
+**Note**: This database flexibility is a future consideration. Current focus is on implementing the distributed system with existing, official MCP servers.
