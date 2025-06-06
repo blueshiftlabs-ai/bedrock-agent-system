@@ -59,5 +59,108 @@
     "imports": [],
     "patterns": [],
     "complexity": "low"
+  },
+  "MEMORY#mem_1749167018616_b5fd5c7f": {
+    "PK": "MEMORY#mem_1749167018616_b5fd5c7f",
+    "SK": "METADATA",
+    "memory_id": "mem_1749167018616_b5fd5c7f",
+    "type": "episodic",
+    "content_type": "text",
+    "agent_id": "claude-code",
+    "session_id": "architecture-cleanup",
+    "created_at": 1749167018616,
+    "updated_at": 1749167018616,
+    "opensearch_index": "memory-text",
+    "opensearch_id": "00b8cea3-39bc-4965-914b-12c39c2f109d",
+    "tags": [
+      "architecture",
+      "mcp",
+      "cleanup",
+      "bedrock-agent-system"
+    ],
+    "access_count": 0,
+    "last_accessed": 1749167018616,
+    "language": "en",
+    "topics": [
+      "memory",
+      "server",
+      "architectural",
+      "cleanup",
+      "completed"
+    ],
+    "sentiment": "neutral",
+    "entities": [
+      "Memory Server"
+    ]
+  },
+  "MEMORY#mem_1749175769310_61782f6e": {
+    "PK": "MEMORY#mem_1749175769310_61782f6e",
+    "SK": "METADATA",
+    "memory_id": "mem_1749175769310_61782f6e",
+    "type": "episodic",
+    "content_type": "text",
+    "agent_id": "claude-code",
+    "session_id": "mcp-fixes",
+    "created_at": 1749175769310,
+    "updated_at": 1749175769310,
+    "opensearch_index": "memory-text",
+    "opensearch_id": "45a9e90a-4d25-45b4-9bd1-70a65fe9a918",
+    "tags": [
+      "mcp",
+      "capabilities",
+      "success",
+      "bedrock-agent-system"
+    ],
+    "access_count": 0,
+    "last_accessed": 1749175769310,
+    "language": "en",
+    "topics": [
+      "tools",
+      "successfully",
+      "fixed",
+      "server",
+      "capabilities"
+    ],
+    "sentiment": "neutral",
+    "entities": [
+      "Successfully"
+    ]
+  },
+  "MEMORY#mem_1749220580807_f61c5c5a": {
+    "PK": "MEMORY#mem_1749220580807_f61c5c5a",
+    "SK": "METADATA",
+    "memory_id": "mem_1749220580807_f61c5c5a",
+    "type": "semantic",
+    "content_type": "text",
+    "agent_id": "claude-code",
+    "session_id": "architecture-planning",
+    "created_at": 1749220580807,
+    "updated_at": 1749220580807,
+    "opensearch_index": "memory-text",
+    "opensearch_id": "85614436-cd50-42a5-8e7e-7837d4484bc1",
+    "tags": [
+      "architecture",
+      "local-vs-distributed",
+      "orchestration",
+      "mcp"
+    ],
+    "access_count": 0,
+    "last_accessed": 1749220580807,
+    "language": "en",
+    "topics": [
+      "local",
+      "servers",
+      "opensearch",
+      "production",
+      "architectural"
+    ],
+    "sentiment": "neutral",
+    "entities": [
+      "Architectural",
+      "The",
+      "Neptune",
+      "Serverless",
+      "This"
+    ]
   }
 }

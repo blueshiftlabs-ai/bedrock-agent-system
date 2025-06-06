@@ -106,8 +106,8 @@ export class MemoryConfigService {
    */
   get neptuneConfig() {
     return {
-      endpoint: this.configService.get<string>('NEPTUNE_ENDPOINT', 'ws://localhost:5105/gremlin'),
-      port: this.configService.get<number>('NEPTUNE_PORT', 5105),
+      endpoint: this.configService.get<string>('NEPTUNE_ENDPOINT', 'ws://localhost:8182/gremlin'),
+      port: this.configService.get<number>('NEPTUNE_PORT', 8182),
     };
   }
 

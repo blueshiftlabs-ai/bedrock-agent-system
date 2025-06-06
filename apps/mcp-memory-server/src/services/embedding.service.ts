@@ -17,6 +17,7 @@ export class EmbeddingService {
   // Model configuration for different content types
   private readonly textEmbeddingModel = 'amazon.titan-embed-text-v1';
   private readonly codeEmbeddingModel = 'amazon.titan-embed-text-v1';
+  private readonly bedrockEnabled: boolean;
 
   // Local transformer pipelines for fallback
   private textEmbeddingPipeline: FeatureExtractionPipeline | null = null;
@@ -25,7 +26,12 @@ export class EmbeddingService {
 
   constructor(private readonly configService: ConfigService) {
     this.region = this.configService.get<string>('AWS_REGION', 'us-east-1');
-    this.bedrockClient = new BedrockRuntimeClient({ region: this.region });
+    this.bedrockEnabled = this.configService.get<string>('BEDROCK_ENABLED', 'false') === 'true';
+    
+    // Only initialize Bedrock client if enabled
+    if (this.bedrockEnabled) {
+      this.bedrockClient = new BedrockRuntimeClient({ region: this.region });
+    }
     
     // Initialize local transformer pipelines asynchronously
     this.initializeLocalEmbeddings();
@@ -113,6 +119,11 @@ export class EmbeddingService {
     modelUsed: string;
     tokenCount: number;
   }> {
+    // Use local embeddings if Bedrock is disabled
+    if (!this.bedrockEnabled) {
+      return this.generateLocalTextEmbedding(text);
+    }
+
     try {
       // Preprocess text for better embeddings
       const processedText = this.preprocessTextForEmbedding(text);
@@ -153,6 +164,11 @@ export class EmbeddingService {
     modelUsed: string;
     tokenCount: number;
   }> {
+    // Use local embeddings if Bedrock is disabled
+    if (!this.bedrockEnabled) {
+      return this.generateLocalCodeEmbedding(code, programmingLanguage);
+    }
+
     try {
       // Preprocess code for better embeddings
       const processedCode = this.preprocessCodeForEmbedding(code, programmingLanguage);

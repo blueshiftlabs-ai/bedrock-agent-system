@@ -18,8 +18,9 @@ async function bootstrap() {
     credentials: true,
   });
 
-  // Note: No global prefix to allow MCP SSE endpoint at /sse
-  // Memory endpoints are prefixed in the controller itself
+  // No global prefix needed - controllers handle their own paths
+  // Memory REST API uses @Controller('memory')
+  // MCP endpoints configured with custom paths in module
 
   const port = process.env.PORT || 4100;
   await app.listen(port);
@@ -28,10 +29,8 @@ async function bootstrap() {
   console.log(`\n🔗 MCP Endpoints:`);
   console.log(`   HTTP/Stream: http://localhost:${port}/memory/mcp`);
   console.log(`   SSE:         http://localhost:${port}/memory/sse`);
-  console.log(`   STDIO:       Available for process connections`);
-  console.log(`\n📡 Memory REST API: http://localhost:${port}/memory`);
-  console.log(`❤️  Health check: http://localhost:${port}/memory/health`);
-  console.log(`\n📚 MCP Tools Available:`);
+  console.log(`\n❤️  Health check: http://localhost:${port}/memory/health`);
+  console.log(`\n📚 MCP Tools Available (use MCP protocol only):`);
   console.log(`   - store-memory: Store memories with semantic understanding`);
   console.log(`   - retrieve-memories: Retrieve using semantic search`);
   console.log(`   - add-connection: Create knowledge graph connections`);
