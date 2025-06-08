@@ -219,6 +219,11 @@ export class OpenSearchService implements OnModuleInit {
     parameters: z.object({}),
   })
   async getClusterHealth() {
+    return this.getClusterHealthInternal();
+  }
+
+  // Internal method for health checks
+  async getClusterHealthInternal() {
     const response = await this.client.cluster.health();
     
     return {

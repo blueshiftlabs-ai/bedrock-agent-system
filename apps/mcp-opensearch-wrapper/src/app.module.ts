@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 import { McpModule as MCPNestModule, McpTransportType } from '@rekog/mcp-nest';
 import { OpenSearchService } from './opensearch.service';
+import { HealthController } from './health.controller';
 
 @Module({
   imports: [
@@ -8,8 +9,20 @@ import { OpenSearchService } from './opensearch.service';
       name: 'opensearch-mcp',
       version: '1.0.0',
       
+      // Custom endpoint paths for namespaced MCP endpoints
+      mcpEndpoint: 'opensearch/mcp',
+      sseEndpoint: 'opensearch/sse',
+      messagesEndpoint: 'opensearch/messages',
+      
       capabilities: {
         tools: {
+          listChanged: true
+        },
+        resources: {
+          subscribe: true,
+          listChanged: true
+        },
+        prompts: {
           listChanged: true
         }
       },
@@ -33,6 +46,6 @@ import { OpenSearchService } from './opensearch.service';
     }),
   ],
   providers: [OpenSearchService],
-  controllers: [],
+  controllers: [HealthController],
 })
 export class AppModule {}
