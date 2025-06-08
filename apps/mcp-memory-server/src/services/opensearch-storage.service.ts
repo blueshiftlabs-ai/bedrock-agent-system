@@ -134,6 +134,7 @@ export class OpenSearchStorageService {
           type: { type: 'keyword' },
           agent_id: { type: 'keyword' },
           session_id: { type: 'keyword' },
+          project: { type: 'keyword' },
           tags: { type: 'keyword' },
           created_at: { type: 'date' },
           language: { type: 'keyword' },
@@ -194,6 +195,7 @@ export class OpenSearchStorageService {
           type: { type: 'keyword' },
           agent_id: { type: 'keyword' },
           session_id: { type: 'keyword' },
+          project: { type: 'keyword' },
           tags: { type: 'keyword' },
           created_at: { type: 'date' },
           programming_language: { type: 'keyword' },
@@ -224,6 +226,7 @@ export class OpenSearchStorageService {
       type: memory.metadata.type,
       agent_id: memory.metadata.agent_id,
       session_id: memory.metadata.session_id,
+      project: memory.metadata.project,
       tags: memory.metadata.tags,
       created_at: memory.metadata.created_at.toISOString(),
     };
@@ -288,6 +291,11 @@ export class OpenSearchStorageService {
     // Add session filter
     if (query.session_id) {
       filterClauses.push({ term: { session_id: query.session_id } });
+    }
+
+    // Add project filter
+    if (query.project) {
+      filterClauses.push({ term: { project: query.project } });
     }
 
     // Add tag filters
@@ -596,55 +604,118 @@ export class OpenSearchStorageService {
     try {
       const mustClauses = agentId ? [{ term: { agent_id: agentId } }] : [];
 
-      const aggregations = {
+      // Basic aggregations that should work with keyword fields
+      const safeAggregations = {
         by_type: {
-          terms: { field: 'type' },
+          terms: { 
+            field: 'type',
+            size: 10
+          },
         },
         by_content_type: {
-          terms: { field: 'content_type' },
-        },
-        by_language: {
-          terms: { field: 'programming_language' },
+          terms: { 
+            field: 'content_type',
+            size: 10
+          },
         },
         recent_memories: {
           date_histogram: {
             field: 'created_at',
             calendar_interval: 'day',
+            min_doc_count: 1
           },
         },
       };
 
-      const { body: textStats } = await this.opensearchClient.search({
-        index: this.textIndexName,
-        body: {
-          size: 0,
-          query: {
-            bool: { must: mustClauses },
+      // Try to get basic counts first
+      const [textResult, codeResult] = await Promise.allSettled([
+        this.opensearchClient.search({
+          index: this.textIndexName,
+          body: {
+            size: 0,
+            query: {
+              bool: { must: mustClauses },
+            },
+            aggs: safeAggregations,
           },
-          aggs: aggregations,
-        },
-      });
-
-      const { body: codeStats } = await this.opensearchClient.search({
-        index: this.codeIndexName,
-        body: {
-          size: 0,
-          query: {
-            bool: { must: mustClauses },
+        }),
+        this.opensearchClient.search({
+          index: this.codeIndexName,
+          body: {
+            size: 0,
+            query: {
+              bool: { must: mustClauses },
+            },
+            aggs: {
+              ...safeAggregations,
+              by_language: {
+                terms: { 
+                  field: 'programming_language',
+                  size: 20
+                },
+              },
+            },
           },
-          aggs: aggregations,
-        },
-      });
+        }),
+      ]);
 
-      return {
-        text_memories: textStats.hits.total.value,
-        code_memories: codeStats.hits.total.value,
-        text_aggregations: textStats.aggregations,
-        code_aggregations: codeStats.aggregations,
+      const stats: any = {
+        total_memories: 0,
+        text_memories: 0,
+        code_memories: 0,
+        aggregations: {
+          by_type: { buckets: [] },
+          by_content_type: { buckets: [] },
+          by_language: { buckets: [] },
+          recent_memories: { buckets: [] }
+        },
+        errors: []
       };
+
+      if (textResult.status === 'fulfilled') {
+        const textStats = textResult.value.body;
+        stats.text_memories = textStats.hits.total.value;
+        stats.total_memories += textStats.hits.total.value;
+        
+        if (textStats.aggregations) {
+          stats.aggregations.by_type.buckets.push(...(textStats.aggregations.by_type?.buckets || []));
+          stats.aggregations.by_content_type.buckets.push(...(textStats.aggregations.by_content_type?.buckets || []));
+          stats.aggregations.recent_memories.buckets.push(...(textStats.aggregations.recent_memories?.buckets || []));
+        }
+      } else {
+        stats.errors.push(`Text index error: ${textResult.reason?.message || 'Unknown error'}`);
+      }
+
+      if (codeResult.status === 'fulfilled') {
+        const codeStats = codeResult.value.body;
+        stats.code_memories = codeStats.hits.total.value;
+        stats.total_memories += codeStats.hits.total.value;
+        
+        if (codeStats.aggregations) {
+          stats.aggregations.by_type.buckets.push(...(codeStats.aggregations.by_type?.buckets || []));
+          stats.aggregations.by_content_type.buckets.push(...(codeStats.aggregations.by_content_type?.buckets || []));
+          stats.aggregations.by_language.buckets.push(...(codeStats.aggregations.by_language?.buckets || []));
+          stats.aggregations.recent_memories.buckets.push(...(codeStats.aggregations.recent_memories?.buckets || []));
+        }
+      } else {
+        stats.errors.push(`Code index error: ${codeResult.reason?.message || 'Unknown error'}`);
+      }
+
+      return stats;
     } catch (error) {
       this.logger.error(`Failed to get memory statistics: ${error.message}`);
-      return {};
+      return {
+        total_memories: 0,
+        text_memories: 0,
+        code_memories: 0,
+        error: error.message,
+        aggregations: {
+          by_type: { buckets: [] },
+          by_content_type: { buckets: [] },
+          by_language: { buckets: [] },
+          recent_memories: { buckets: [] }
+        }
+      };
     }
   }
 
@@ -659,5 +730,26 @@ export class OpenSearchStorageService {
       this.logger.error(`OpenSearch health check failed: ${error.message}`);
       return false;
     }
+  }
+
+  /**
+   * Get the OpenSearch client for direct queries
+   */
+  getClient() {
+    return this.opensearchClient;
+  }
+
+  /**
+   * Get the text index name
+   */
+  getTextIndexName(): string {
+    return this.textIndexName;
+  }
+
+  /**
+   * Get the code index name
+   */
+  getCodeIndexName(): string {
+    return this.codeIndexName;
   }
 }

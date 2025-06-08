@@ -77,6 +77,7 @@ export class LocalStorageService {
       content_type: metadata.content_type,
       agent_id: metadata.agent_id,
       session_id: metadata.session_id,
+      project: metadata.project, // Add missing project field
       created_at: metadata.created_at.getTime(),
       updated_at: metadata.updated_at.getTime(),
       ttl: metadata.ttl ? Math.floor(metadata.ttl.getTime() / 1000) : undefined,
@@ -243,6 +244,19 @@ export class LocalStorageService {
       learned_patterns: item.learned_patterns,
       memory_statistics: item.memory_statistics,
     };
+  }
+
+  /**
+   * Get all memories for project analysis
+   */
+  async getAllMemories(): Promise<any[]> {
+    try {
+      const data = await this.readData(this.memoryFile);
+      return Object.values(data).filter((item: any) => item.SK === 'METADATA');
+    } catch (error) {
+      this.logger.error(`Failed to get all memories: ${error.message}`);
+      return [];
+    }
   }
 
   /**
