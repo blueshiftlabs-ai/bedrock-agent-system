@@ -6,6 +6,7 @@ import { DynamoDBStorageService } from '../services/dynamodb-storage.service';
 import { LocalStorageService } from '../services/local-storage.service';
 import { OpenSearchStorageService } from '../services/opensearch-storage.service';
 import { NeptuneGraphService } from '../services/neptune-graph.service';
+import { Neo4jGraphService } from '../services/neo4j-graph.service';
 import { MemoryConfigService } from '../config/memory-config.service';
 import { MemoryController } from './memory.controller';
 
@@ -29,6 +30,7 @@ import { MemoryController } from './memory.controller';
     },
     OpenSearchStorageService,
     NeptuneGraphService,
+    Neo4jGraphService,
     MemoryService,
   ],
   controllers: [MemoryController],

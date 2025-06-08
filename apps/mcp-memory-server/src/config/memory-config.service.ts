@@ -58,6 +58,16 @@ export class MemoryConfigService {
   }
 
   /**
+   * Dgraph Configuration
+   */
+  get dgraphConfig() {
+    return {
+      endpoint: this.configService.get<string>('DGRAPH_ENDPOINT', 'localhost'),
+      port: this.configService.get<number>('DGRAPH_PORT', 9080),
+    };
+  }
+
+  /**
    * Check if using local storage
    */
   get useLocalStorage(): boolean {
@@ -112,6 +122,17 @@ export class MemoryConfigService {
   }
 
   /**
+   * Neo4j Configuration
+   */
+  get neo4jConfig() {
+    return {
+      uri: this.configService.get<string>('NEO4J_URI', 'bolt://localhost:7687'),
+      username: this.configService.get<string>('NEO4J_USERNAME', 'neo4j'),
+      password: this.configService.get<string>('NEO4J_PASSWORD', 'password'),
+    };
+  }
+
+  /**
    * Bedrock Configuration
    */
   get bedrockConfig() {
@@ -145,6 +166,7 @@ export class MemoryConfigService {
       dynamoDb: this.dynamoDbConfig,
       openSearch: this.openSearchConfig,
       neptune: this.neptuneConfig,
+      neo4j: this.neo4jConfig,
       bedrock: this.bedrockConfig,
       memoryService: this.memoryServiceConfig,
     };
