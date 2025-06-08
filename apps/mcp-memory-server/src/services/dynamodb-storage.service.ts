@@ -1,6 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { DynamoDBClient, PutItemCommand, GetItemCommand, UpdateItemCommand, DeleteItemCommand, QueryCommand } from '@aws-sdk/client-dynamodb';
+import { DynamoDBClient, PutItemCommand, GetItemCommand, UpdateItemCommand, DeleteItemCommand, QueryCommand, ScanCommand } from '@aws-sdk/client-dynamodb';
 import { marshall, unmarshall } from '@aws-sdk/util-dynamodb';
 import { 
   DynamoDBMemoryItem, 
@@ -392,6 +392,36 @@ export class DynamoDBStorageService {
     } catch (error) {
       this.logger.error(`Failed to get agent profile: ${error.message}`);
       return null;
+    }
+  }
+
+  /**
+   * Get all memory metadata (for local retrieval)
+   */
+  async getAllMemoryMetadata(): Promise<any[]> {
+    try {
+      const command = new ScanCommand({
+        TableName: this.memoryTableName,
+        FilterExpression: 'SK = :sk',
+        ExpressionAttributeValues: marshall({
+          ':sk': 'METADATA',
+        }),
+      });
+
+      const response = await this.dynamoDbClient.send(command);
+      
+      return response.Items?.map((item: any) => {
+        const unmarshalled = unmarshall(item);
+        return {
+          ...unmarshalled,
+          created_at: new Date(unmarshalled.created_at),
+          updated_at: new Date(unmarshalled.updated_at),
+          last_accessed: new Date(unmarshalled.last_accessed),
+        };
+      }) || [];
+    } catch (error) {
+      this.logger.error(`Failed to get all memory metadata: ${error.message}`);
+      return [];
     }
   }
 

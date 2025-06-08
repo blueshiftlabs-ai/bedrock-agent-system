@@ -299,70 +299,45 @@ export class MemoryService {
    * Get all memories with optional filtering (for when no query is provided)
    */
   async getAllMemories(request: any): Promise<MemorySearchResult[]> {
+    const getContent = async (metadata: any): Promise<string> => {
+      try {
+        return await this.openSearchService.getMemoryContent(metadata.memory_id, metadata.content_type as any) || '';
+      } catch (error) {
+        this.logger.warn(`Failed to get content for ${metadata.memory_id}: ${error.message}`);
+        return `[Content not available - ${error.message}]`;
+      }
+    };
+
+    const createMemoryResult = async (metadata: any): Promise<MemorySearchResult | null> => {
+      try {
+        return {
+          memory: {
+            metadata,
+            content: await getContent(metadata)
+          },
+          similarity_score: 1.0,
+          related_memories: [],
+          graph_connections: []
+        };
+      } catch (error) {
+        this.logger.warn(`Failed to process memory ${metadata.memory_id}: ${error.message}`);
+        return null;
+      }
+    };
+
+    const applyFilters = (memories: any[]) => memories
+      .filter(m => !request.agent_id || m.agent_id === request.agent_id)
+      .filter(m => !request.session_id || m.session_id === request.session_id)
+      .filter(m => !request.project || m.project === request.project)
+      .filter(m => !request.type || m.type === request.type)
+      .filter(m => !request.content_type || m.content_type === request.content_type);
+
     try {
-      // Get all memories from local storage
       const allMetadata = await this.dynamoDbService.getAllMemoryMetadata();
+      const filteredMetadata = applyFilters(allMetadata).slice(0, request.limit || 10);
       
-      // Apply filters
-      let filteredMemories = allMetadata;
-      
-      if (request.agent_id) {
-        filteredMemories = filteredMemories.filter(m => m.agent_id === request.agent_id);
-      }
-      
-      if (request.session_id) {
-        filteredMemories = filteredMemories.filter(m => m.session_id === request.session_id);
-      }
-      
-      if (request.project) {
-        filteredMemories = filteredMemories.filter(m => m.project === request.project);
-      }
-      
-      if (request.type) {
-        filteredMemories = filteredMemories.filter(m => m.type === request.type);
-      }
-      
-      if (request.content_type) {
-        filteredMemories = filteredMemories.filter(m => m.content_type === request.content_type);
-      }
-      
-      // Apply limit
-      const limit = request.limit || 10;
-      const limitedMemories = filteredMemories.slice(0, limit);
-      
-      // Convert to MemorySearchResult format
-      const results: MemorySearchResult[] = [];
-      
-      for (const metadata of limitedMemories) {
-        try {
-          // Get content from OpenSearch or local storage
-          let content = '';
-          try {
-            const openSearchResult = await this.openSearchService.getMemoryContent(
-              metadata.memory_id,
-              metadata.content_type as any
-            );
-            content = openSearchResult || '';
-          } catch (error) {
-            this.logger.warn(`Failed to get content for ${metadata.memory_id}: ${error.message}`);
-            content = `[Content not available - ${error.message}]`;
-          }
-          
-          results.push({
-            memory: {
-              metadata,
-              content
-            },
-            similarity_score: 1.0, // No similarity scoring for "get all"
-            related_memories: [],
-            graph_connections: []
-          });
-        } catch (error) {
-          this.logger.warn(`Failed to process memory ${metadata.memory_id}: ${error.message}`);
-        }
-      }
-      
-      return results;
+      const results = await Promise.all(filteredMetadata.map(createMemoryResult));
+      return results.filter(Boolean) as MemorySearchResult[];
       
     } catch (error) {
       this.logger.error(`Failed to get all memories: ${error.message}`);
