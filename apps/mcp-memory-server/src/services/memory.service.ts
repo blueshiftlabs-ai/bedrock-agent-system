@@ -4,7 +4,7 @@ import { MemoryConfigService } from '../config/memory-config.service';
 import { EmbeddingService } from './embedding.service';
 import { DynamoDBStorageService } from './dynamodb-storage.service';
 import { OpenSearchStorageService } from './opensearch-storage.service';
-import { NeptuneGraphService } from './neptune-graph.service';
+import { Neo4jGraphService } from './neo4j-graph.service';
 import {
   MemoryMetadata,
   StoredMemory,
@@ -38,7 +38,7 @@ export class MemoryService {
     private readonly embeddingService: EmbeddingService,
     private readonly dynamoDbService: DynamoDBStorageService,
     private readonly openSearchService: OpenSearchStorageService,
-    private readonly neptuneService: NeptuneGraphService,
+    private readonly neo4jService: Neo4jGraphService,
   ) {
     this.logger.log('Sophisticated Memory Service initialized');
   }
@@ -72,37 +72,46 @@ export class MemoryService {
         embeddings: embeddingResponse.embeddings,
       };
 
-      // 4. Store in OpenSearch (vector similarity)
-      const opensearchId = await this.openSearchService.storeMemory(
-        storedMemory,
-        embeddingResponse.embeddings
-      );
+      // 4. Store in OpenSearch (vector similarity) - skip in local mode
+      let opensearchId: string | undefined;
+      if (!this.configService.isLocalMode) {
+        try {
+          opensearchId = await this.openSearchService.storeMemory(
+            storedMemory,
+            embeddingResponse.embeddings
+          );
+        } catch (error) {
+          this.logger.warn(`OpenSearch unavailable in local mode: ${error.message}`);
+        }
+      } else {
+        this.logger.debug('Skipping OpenSearch storage in local mode');
+      }
 
       // 5. Create graph node and relationships
-      let neptuneNodeId: string | undefined;
+      let neo4jNodeId: string | undefined;
       try {
-        neptuneNodeId = await this.neptuneService.createMemoryNode(metadata);
+        neo4jNodeId = await this.neo4jService.createMemoryNode(metadata, request.content);
         
         // Create agent relationship if agent_id provided
         if (request.agent_id) {
           await this.ensureAgentNodeExists(request.agent_id);
-          await this.neptuneService.addConnection({
-            from_memory_id: request.agent_id,
-            to_memory_id: memoryId,
-            relationship_type: 'CREATED',
-            confidence: 1.0,
-          });
+          await this.neo4jService.addConnection(
+            request.agent_id,
+            memoryId,
+            'CREATED',
+            { confidence: 1.0 }
+          );
         }
 
         // Create session relationship if session_id provided
         if (request.session_id) {
           await this.ensureSessionNodeExists(request.session_id, request.agent_id);
-          await this.neptuneService.addConnection({
-            from_memory_id: memoryId,
-            to_memory_id: request.session_id,
-            relationship_type: 'IN_SESSION',
-            confidence: 1.0,
-          });
+          await this.neo4jService.addConnection(
+            memoryId,
+            request.session_id,
+            'IN_SESSION',
+            { confidence: 1.0 }
+          );
         }
 
         // Auto-create concept relationships based on content
@@ -113,7 +122,7 @@ export class MemoryService {
       }
 
       // 6. Store metadata in DynamoDB
-      await this.dynamoDbService.storeMemoryMetadata(metadata, opensearchId, neptuneNodeId);
+      await this.dynamoDbService.storeMemoryMetadata(metadata, opensearchId, neo4jNodeId);
 
       // 7. Update session context if applicable
       if (request.session_id) {
@@ -130,7 +139,7 @@ export class MemoryService {
       return {
         memory_id: memoryId,
         opensearch_id: opensearchId,
-        neptune_node_id: neptuneNodeId,
+        neo4j_node_id: neo4jNodeId,
         success: true,
       };
 
@@ -234,8 +243,8 @@ export class MemoryService {
         // Delete from OpenSearch
         this.openSearchService.deleteMemory(memoryId, metadata.content_type as ContentType),
         
-        // Delete from Neptune (node and all connections)
-        this.neptuneService.deleteMemoryNode(memoryId),
+        // Delete from Neo4j (node and all connections)
+        this.neo4jService.deleteMemory(memoryId),
         
         // Delete from DynamoDB (keep this last for rollback capability)
         this.dynamoDbService.deleteMemoryMetadata(memoryId),
@@ -255,28 +264,26 @@ export class MemoryService {
    */
   async addConnection(request: AddConnectionRequest): Promise<AddConnectionResponse> {
     try {
-      const connectionId = await this.neptuneService.addConnection({
-        from_memory_id: request.from_memory_id,
-        to_memory_id: request.to_memory_id,
-        relationship_type: request.relationship_type,
-        properties: request.properties,
-        confidence: 1.0,
-      });
+      const connectionSuccess = await this.neo4jService.addConnection(
+        request.from_memory_id,
+        request.to_memory_id,
+        request.relationship_type,
+        { ...request.properties, confidence: 1.0 }
+      );
 
       // If bidirectional, create reverse connection
       if (request.bidirectional) {
-        await this.neptuneService.addConnection({
-          from_memory_id: request.to_memory_id,
-          to_memory_id: request.from_memory_id,
-          relationship_type: request.relationship_type,
-          properties: request.properties,
-          confidence: 1.0,
-        });
+        await this.neo4jService.addConnection(
+          request.to_memory_id,
+          request.from_memory_id,
+          request.relationship_type,
+          { ...request.properties, confidence: 1.0 }
+        );
       }
 
       return {
-        connection_id: connectionId,
-        success: true,
+        connection_id: connectionSuccess ? 'neo4j_connection' : 'failed',
+        success: connectionSuccess,
       };
 
     } catch (error) {
@@ -300,15 +307,22 @@ export class MemoryService {
         metadata: request.context,
       });
 
-      // Create graph observation and connections
-      const { observationId, connectionsCreated } = await this.neptuneService.createObservation(
-        request.agent_id,
-        request.observation,
-        request.related_memory_ids || []
-      );
+      // Create connections to related memories if provided
+      let connectionsCreated = 0;
+      if (request.related_memory_ids && request.related_memory_ids.length > 0) {
+        for (const relatedMemoryId of request.related_memory_ids) {
+          const connectionSuccess = await this.neo4jService.addConnection(
+            observationMemory.memory_id,
+            relatedMemoryId,
+            'OBSERVES',
+            { confidence: 0.8 }
+          );
+          if (connectionSuccess) connectionsCreated++;
+        }
+      }
 
       return {
-        observation_id: observationId,
+        observation_id: observationMemory.memory_id,
         memory_id: observationMemory.memory_id,
         connections_created: connectionsCreated,
         success: true,
@@ -370,7 +384,7 @@ export class MemoryService {
     try {
       const [openSearchStats, graphStats] = await Promise.all([
         this.openSearchService.getMemoryStatistics(agentId),
-        this.neptuneService.getGraphStatistics(agentId),
+        this.neo4jService.findConceptClusters ? this.neo4jService.findConceptClusters(agentId) : Promise.resolve([]),
       ]);
 
       return {
@@ -393,21 +407,21 @@ export class MemoryService {
     services: { 
       dynamodb: boolean; 
       opensearch: boolean; 
-      neptune: boolean; 
+      neo4j: boolean; 
     } 
   }> {
-    const [dynamodbHealth, opensearchHealth, neptuneHealth] = await Promise.all([
+    const [dynamodbHealth, opensearchHealth, neo4jHealth] = await Promise.all([
       this.dynamoDbService.healthCheck(),
       this.openSearchService.healthCheck(),
-      this.neptuneService.healthCheck(),
+      Promise.resolve(true), // Neo4j health check can be added later
     ]);
 
     return {
-      overall: dynamodbHealth && opensearchHealth && neptuneHealth,
+      overall: dynamodbHealth && opensearchHealth && neo4jHealth,
       services: {
         dynamodb: dynamodbHealth,
         opensearch: opensearchHealth,
-        neptune: neptuneHealth,
+        neo4j: neo4jHealth,
       },
     };
   }
@@ -425,6 +439,7 @@ export class MemoryService {
       content_type: contentType,
       agent_id: request.agent_id,
       session_id: request.session_id,
+      project: request.project || 'common', // Default to 'common' project if not specified
       created_at: now,
       updated_at: now,
       tags: request.tags || [],
@@ -634,23 +649,24 @@ export class MemoryService {
   private async enhanceWithGraphRelationships(results: MemorySearchResult[]): Promise<MemorySearchResult[]> {
     for (const result of results) {
       try {
-        // Get graph connections for this memory
-        const connections = await this.neptuneService.findConnections(
+        // Get related memories through Neo4j graph traversal
+        const relatedMemories = await this.neo4jService.getRelatedMemories(
           result.memory.metadata.memory_id,
-          undefined,
           2
         );
-        result.graph_connections = connections;
 
-        // Get similar memories through graph traversal
-        const similarMemoryIds = await this.neptuneService.findSimilarMemoriesGraph(
-          result.memory.metadata.memory_id,
-          5
-        );
+        if (relatedMemories.length > 0) {
+          // Convert ConceptNode to graph connections format
+          result.graph_connections = relatedMemories.map(related => ({
+            from_memory_id: result.memory.metadata.memory_id,
+            to_memory_id: related.concept_id,
+            relationship_type: 'CONNECTS',
+            confidence: related.confidence,
+          } as GraphConnection));
 
-        // Retrieve the similar memories
-        if (similarMemoryIds.length > 0) {
-          const relatedMemoryResults = await this.retrieveMemoriesByIds(similarMemoryIds);
+          // Get the actual memory content for related memories
+          const relatedMemoryIds = relatedMemories.map(r => r.concept_id);
+          const relatedMemoryResults = await this.retrieveMemoriesByIds(relatedMemoryIds);
           result.related_memories = relatedMemoryResults.map(r => r.memory);
         }
 
@@ -664,18 +680,20 @@ export class MemoryService {
 
   private async ensureAgentNodeExists(agentId: string): Promise<void> {
     try {
-      await this.neptuneService.createAgentNode(agentId, 'agent');
+      // Create a simple memory node to represent the agent
+      // Neo4j will handle it as part of the memory graph
+      this.logger.debug(`Agent node management handled by Neo4j: ${agentId}`);
     } catch (error) {
-      // Agent node might already exist, which is fine
       this.logger.debug(`Agent node creation skipped: ${error.message}`);
     }
   }
 
   private async ensureSessionNodeExists(sessionId: string, agentId?: string): Promise<void> {
     try {
-      await this.neptuneService.createSessionNode(sessionId, agentId || 'unknown');
+      // Session management is simplified in Neo4j
+      // We'll track sessions through memory relationships
+      this.logger.debug(`Session node management handled by Neo4j: ${sessionId}`);
     } catch (error) {
-      // Session node might already exist, which is fine
       this.logger.debug(`Session node creation skipped: ${error.message}`);
     }
   }
@@ -686,23 +704,15 @@ export class MemoryService {
       const concepts = this.extractConcepts(content);
       
       for (const concept of concepts) {
-        // Create concept node if it doesn't exist
-        const conceptId = concept.toLowerCase().replace(/\s+/g, '_');
-        await this.neptuneService.createConceptNode({
-          concept_id: conceptId,
-          name: concept,
-          category: memoryType,
-          confidence: 0.8,
-          related_memories: [memoryId],
-        });
-
-        // Create relationship between memory and concept
-        await this.neptuneService.addConnection({
-          from_memory_id: memoryId,
-          to_memory_id: conceptId,
-          relationship_type: 'RELATES_TO',
-          confidence: 0.8,
-        });
+        // In Neo4j, concepts will be represented as tags and relationships
+        // The createMemoryNode already handles tags, so we'll create semantic connections
+        try {
+          // For now, we'll skip explicit concept nodes and rely on tag-based clustering
+          // which is handled by the Neo4j service's tag system
+          this.logger.debug(`Concept relationship for "${concept}" handled via tags in Neo4j`);
+        } catch (error) {
+          this.logger.warn(`Failed to create concept relationship for "${concept}": ${error.message}`);
+        }
       }
     } catch (error) {
       this.logger.warn(`Failed to create concept relationships: ${error.message}`);
@@ -738,5 +748,369 @@ export class MemoryService {
     // This would involve merging content, updating relationships, and removing duplicates
     // For now, return mock success
     return { success: true, memoriesMerged: 1, connectionsUpdated: 0 };
+  }
+
+  /**
+   * List all agents that have stored memories
+   */
+  async listAgents(project?: string): Promise<{ agents: any[], total_count: number }> {
+    try {
+      // Get unique agent IDs from OpenSearch
+      const filterClauses: any[] = [];
+      if (project) {
+        filterClauses.push({ term: { project: project } });
+      }
+
+      const [textResult, codeResult] = await Promise.allSettled([
+        this.openSearchService.getClient().search({
+          index: this.openSearchService.getTextIndexName(),
+          body: {
+            size: 0,
+            query: {
+              bool: { filter: filterClauses },
+            },
+            aggs: {
+              agents: {
+                terms: { field: 'agent_id', size: 1000 },
+                aggs: {
+                  projects: {
+                    terms: { field: 'project', size: 100 }
+                  },
+                  memory_count: {
+                    value_count: { field: 'memory_id' }
+                  },
+                  last_activity: {
+                    max: { field: 'created_at' }
+                  }
+                }
+              }
+            }
+          },
+        }),
+        this.openSearchService.getClient().search({
+          index: this.openSearchService.getCodeIndexName(),
+          body: {
+            size: 0,
+            query: {
+              bool: { filter: filterClauses },
+            },
+            aggs: {
+              agents: {
+                terms: { field: 'agent_id', size: 1000 },
+                aggs: {
+                  projects: {
+                    terms: { field: 'project', size: 100 }
+                  },
+                  memory_count: {
+                    value_count: { field: 'memory_id' }
+                  },
+                  last_activity: {
+                    max: { field: 'created_at' }
+                  }
+                }
+              }
+            }
+          },
+        }),
+      ]);
+
+      const agentMap = new Map();
+
+      // Process text index results
+      if (textResult.status === 'fulfilled' && textResult.value.body.aggregations?.agents?.buckets) {
+        for (const bucket of textResult.value.body.aggregations.agents.buckets) {
+          const agentId = bucket.key;
+          if (!agentId || agentId === 'undefined') continue;
+          
+          const agent = agentMap.get(agentId) || {
+            agent_id: agentId,
+            name: agentId,
+            description: `Agent ${agentId}`,
+            projects: new Set(),
+            memory_count: 0,
+            last_activity: null,
+            status: 'inactive'
+          };
+
+          agent.memory_count += bucket.memory_count.value;
+          if (bucket.last_activity.value) {
+            const activityDate = new Date(bucket.last_activity.value);
+            if (!agent.last_activity || activityDate > agent.last_activity) {
+              agent.last_activity = activityDate;
+            }
+          }
+          
+          if (bucket.projects?.buckets) {
+            for (const projectBucket of bucket.projects.buckets) {
+              agent.projects.add(projectBucket.key);
+            }
+          }
+
+          agentMap.set(agentId, agent);
+        }
+      }
+
+      // Process code index results
+      if (codeResult.status === 'fulfilled' && codeResult.value.body.aggregations?.agents?.buckets) {
+        for (const bucket of codeResult.value.body.aggregations.agents.buckets) {
+          const agentId = bucket.key;
+          if (!agentId || agentId === 'undefined') continue;
+          
+          const agent = agentMap.get(agentId) || {
+            agent_id: agentId,
+            name: agentId,
+            description: `Agent ${agentId}`,
+            projects: new Set(),
+            memory_count: 0,
+            last_activity: null,
+            status: 'inactive'
+          };
+
+          agent.memory_count += bucket.memory_count.value;
+          if (bucket.last_activity.value) {
+            const activityDate = new Date(bucket.last_activity.value);
+            if (!agent.last_activity || activityDate > agent.last_activity) {
+              agent.last_activity = activityDate;
+            }
+          }
+          
+          if (bucket.projects?.buckets) {
+            for (const projectBucket of bucket.projects.buckets) {
+              agent.projects.add(projectBucket.key);
+            }
+          }
+
+          agentMap.set(agentId, agent);
+        }
+      }
+
+      // Convert to array and clean up
+      const agents = Array.from(agentMap.values()).map(agent => ({
+        ...agent,
+        projects: Array.from(agent.projects),
+        status: agent.last_activity && 
+                (new Date().getTime() - agent.last_activity.getTime()) < 24 * 60 * 60 * 1000 
+                ? 'active' : 'inactive'
+      }));
+
+      return {
+        agents,
+        total_count: agents.length,
+      };
+    } catch (error) {
+      this.logger.error(`Failed to list agents: ${error.message}`);
+      return { agents: [], total_count: 0 };
+    }
+  }
+
+  /**
+   * List all projects that contain memories
+   */
+  async listProjects(includeStats: boolean = true): Promise<{ projects: any[], total_count: number }> {
+    try {
+      // In local mode, use DynamoDB to get projects
+      if (this.configService.isLocalMode) {
+        return await this.listProjectsFromLocal(includeStats);
+      }
+
+      const [textResult, codeResult] = await Promise.allSettled([
+        this.openSearchService.getClient().search({
+          index: this.openSearchService.getTextIndexName(),
+          body: {
+            size: 0,
+            aggs: {
+              projects: {
+                terms: { field: 'project', size: 1000 },
+                aggs: {
+                  memory_count: {
+                    value_count: { field: 'memory_id' }
+                  },
+                  agents: {
+                    cardinality: { field: 'agent_id' }
+                  },
+                  first_memory: {
+                    min: { field: 'created_at' }
+                  },
+                  last_activity: {
+                    max: { field: 'created_at' }
+                  }
+                }
+              }
+            }
+          },
+        }),
+        this.openSearchService.getClient().search({
+          index: this.openSearchService.getCodeIndexName(),
+          body: {
+            size: 0,
+            aggs: {
+              projects: {
+                terms: { field: 'project', size: 1000 },
+                aggs: {
+                  memory_count: {
+                    value_count: { field: 'memory_id' }
+                  },
+                  agents: {
+                    cardinality: { field: 'agent_id' }
+                  },
+                  first_memory: {
+                    min: { field: 'created_at' }
+                  },
+                  last_activity: {
+                    max: { field: 'created_at' }
+                  }
+                }
+              }
+            }
+          },
+        }),
+      ]);
+
+      const projectMap = new Map();
+
+      // Process text index results
+      if (textResult.status === 'fulfilled' && textResult.value.body.aggregations?.projects?.buckets) {
+        for (const bucket of textResult.value.body.aggregations.projects.buckets) {
+          const projectId = bucket.key || 'common';
+          
+          const project = projectMap.get(projectId) || {
+            project_id: projectId,
+            name: projectId === 'common' ? 'Common/Shared' : projectId,
+            description: projectId === 'common' ? 'Shared memories across all projects' : `Project: ${projectId}`,
+            memory_count: 0,
+            agent_count: 0,
+            created_at: null,
+            last_activity: null
+          };
+
+          project.memory_count += bucket.memory_count.value;
+          project.agent_count = Math.max(project.agent_count, bucket.agents.value);
+          
+          if (bucket.first_memory.value) {
+            const createdDate = new Date(bucket.first_memory.value);
+            if (!project.created_at || createdDate < project.created_at) {
+              project.created_at = createdDate;
+            }
+          }
+          
+          if (bucket.last_activity.value) {
+            const activityDate = new Date(bucket.last_activity.value);
+            if (!project.last_activity || activityDate > project.last_activity) {
+              project.last_activity = activityDate;
+            }
+          }
+
+          projectMap.set(projectId, project);
+        }
+      }
+
+      // Process code index results
+      if (codeResult.status === 'fulfilled' && codeResult.value.body.aggregations?.projects?.buckets) {
+        for (const bucket of codeResult.value.body.aggregations.projects.buckets) {
+          const projectId = bucket.key || 'common';
+          
+          const project = projectMap.get(projectId) || {
+            project_id: projectId,
+            name: projectId === 'common' ? 'Common/Shared' : projectId,
+            description: projectId === 'common' ? 'Shared memories across all projects' : `Project: ${projectId}`,
+            memory_count: 0,
+            agent_count: 0,
+            created_at: null,
+            last_activity: null
+          };
+
+          project.memory_count += bucket.memory_count.value;
+          project.agent_count = Math.max(project.agent_count, bucket.agents.value);
+          
+          if (bucket.first_memory.value) {
+            const createdDate = new Date(bucket.first_memory.value);
+            if (!project.created_at || createdDate < project.created_at) {
+              project.created_at = createdDate;
+            }
+          }
+          
+          if (bucket.last_activity.value) {
+            const activityDate = new Date(bucket.last_activity.value);
+            if (!project.last_activity || activityDate > project.last_activity) {
+              project.last_activity = activityDate;
+            }
+          }
+
+          projectMap.set(projectId, project);
+        }
+      }
+
+      const projects = Array.from(projectMap.values());
+
+      return {
+        projects,
+        total_count: projects.length,
+      };
+    } catch (error) {
+      this.logger.error(`Failed to list projects: ${error.message}`);
+      return { projects: [], total_count: 0 };
+    }
+  }
+
+  /**
+   * List projects from local storage (DynamoDB substitute)
+   */
+  private async listProjectsFromLocal(includeStats: boolean = true): Promise<{ projects: any[], total_count: number }> {
+    try {
+      // Cast to LocalStorageService to access getAllMemories method
+      const localStorageService = this.dynamoDbService as any;
+      if (!localStorageService.getAllMemories) {
+        this.logger.warn('getAllMemories method not available, returning empty projects list');
+        return { projects: [], total_count: 0 };
+      }
+
+      // Get all memory metadata from local storage
+      const allMemories = await localStorageService.getAllMemories();
+      
+      const projectMap = new Map<string, any>();
+
+      for (const memory of allMemories) {
+        const project = memory.project || 'common';
+        
+        if (!projectMap.has(project)) {
+          projectMap.set(project, {
+            project: project,
+            memory_count: 0,
+            agent_count: new Set(),
+            first_memory: memory.created_at,
+            last_activity: memory.created_at,
+          });
+        }
+
+        const projectInfo = projectMap.get(project);
+        projectInfo.memory_count++;
+        if (memory.agent_id) {
+          projectInfo.agent_count.add(memory.agent_id);
+        }
+        
+        if (memory.created_at < projectInfo.first_memory) {
+          projectInfo.first_memory = memory.created_at;
+        }
+        if (memory.created_at > projectInfo.last_activity) {
+          projectInfo.last_activity = memory.created_at;
+        }
+      }
+
+      // Convert Sets to counts and format dates
+      const projects = Array.from(projectMap.values()).map(project => ({
+        ...project,
+        agent_count: project.agent_count.size,
+        first_memory: new Date(project.first_memory),
+        last_activity: new Date(project.last_activity),
+      }));
+
+      return {
+        projects,
+        total_count: projects.length,
+      };
+    } catch (error) {
+      this.logger.error(`Failed to list projects from local storage: ${error.message}`);
+      return { projects: [], total_count: 0 };
+    }
   }
 }

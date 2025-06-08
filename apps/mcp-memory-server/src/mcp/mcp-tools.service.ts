@@ -17,6 +17,7 @@ export class MCPToolsService {
       content: z.string().describe('Memory content to store'),
       agent_id: z.string().optional().describe('ID of the agent storing the memory'),
       session_id: z.string().optional().describe('Session ID for episodic memories'),
+      project: z.string().optional().describe('Project context for memory isolation (defaults to "common")'),
       type: z.enum(['episodic', 'semantic', 'procedural', 'working']).optional().describe('Memory type'),
       content_type: z.enum(['text', 'code']).optional().describe('Content type'),
       tags: z.array(z.string()).optional().describe('Tags for categorization'),
@@ -26,6 +27,7 @@ export class MCPToolsService {
     content: string;
     agent_id?: string;
     session_id?: string;
+    project?: string;
     type?: 'episodic' | 'semantic' | 'procedural' | 'working';
     content_type?: 'text' | 'code';
     tags?: string[];
@@ -41,6 +43,7 @@ export class MCPToolsService {
       memory_ids: z.array(z.string()).optional().describe('Specific memory IDs to retrieve'),
       agent_id: z.string().optional().describe('Filter by agent ID'),
       session_id: z.string().optional().describe('Filter by session ID'),
+      project: z.string().optional().describe('Filter by project context'),
       type: z.enum(['episodic', 'semantic', 'procedural', 'working']).optional().describe('Filter by memory type'),
       content_type: z.enum(['text', 'code']).optional().describe('Filter by content type'),
       limit: z.number().default(10).describe('Maximum number of memories to return'),
@@ -53,6 +56,7 @@ export class MCPToolsService {
     memory_ids?: string[];
     agent_id?: string;
     session_id?: string;
+    project?: string;
     type?: 'episodic' | 'semantic' | 'procedural' | 'working';
     content_type?: 'text' | 'code';
     limit?: number;
@@ -64,12 +68,11 @@ export class MCPToolsService {
     } else {
       const queryParams = {
         query: params.query || '',
-        filters: {
-          agent_id: params.agent_id,
-          session_id: params.session_id,
-          type: params.type,
-          content_type: params.content_type,
-        },
+        agent_id: params.agent_id,
+        session_id: params.session_id,
+        project: params.project,
+        type: params.type,
+        content_type: params.content_type,
         limit: params.limit || 10,
         threshold: params.threshold,
         include_related: params.include_related || false,
@@ -151,9 +154,32 @@ export class MCPToolsService {
     description: 'Get memory statistics and analytics',
     parameters: z.object({
       agent_id: z.string().optional().describe('Filter statistics by agent ID'),
+      project: z.string().optional().describe('Filter statistics by project'),
     }),
   })
-  async getMemoryStatistics(params: { agent_id?: string }) {
+  async getMemoryStatistics(params: { agent_id?: string; project?: string }) {
     return await this.memoryService.getMemoryStatistics(params.agent_id);
+  }
+
+  @Tool({
+    name: 'list-agents',
+    description: 'List all agents that have stored memories, with optional project filtering',
+    parameters: z.object({
+      project: z.string().optional().describe('Filter agents by project context'),
+    }),
+  })
+  async listAgents(params: { project?: string }) {
+    return await this.memoryService.listAgents(params.project);
+  }
+
+  @Tool({
+    name: 'list-projects',
+    description: 'List all projects that contain memories, with statistics',
+    parameters: z.object({
+      include_stats: z.boolean().default(true).describe('Include memory and agent statistics for each project'),
+    }),
+  })
+  async listProjects(params: { include_stats?: boolean }) {
+    return await this.memoryService.listProjects(params.include_stats !== false);
   }
 }

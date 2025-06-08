@@ -12,6 +12,7 @@ export interface BaseMemoryMetadata {
   content_type: ContentType;
   agent_id?: string;
   session_id?: string;
+  project?: string; // Project context for memory isolation
   created_at: Date;
   updated_at: Date;
   ttl?: Date; // For working memory
@@ -57,6 +58,7 @@ export interface MemoryQuery {
   content_type?: ContentType;
   agent_id?: string;
   session_id?: string;
+  project?: string; // Project context for filtering
   tags?: string[];
   limit?: number;
   threshold?: number; // Similarity threshold 0-1
@@ -117,6 +119,7 @@ export interface StoreMemoryRequest {
   content_type?: ContentType;
   agent_id?: string;
   session_id?: string;
+  project?: string; // Project context for memory isolation
   tags?: string[];
   metadata?: Record<string, any>;
 }
@@ -125,6 +128,7 @@ export interface StoreMemoryResponse {
   memory_id: string;
   opensearch_id?: string;
   neptune_node_id?: string;
+  neo4j_node_id?: string;
   success: boolean;
 }
 
@@ -179,6 +183,45 @@ export interface ConsolidateMemoriesResponse {
   success: boolean;
 }
 
+// New MCP Tool interfaces for project and agent management
+export interface ListAgentsRequest {
+  project?: string; // Filter agents by project
+}
+
+export interface ListAgentsResponse {
+  agents: AgentInfo[];
+  total_count: number;
+}
+
+export interface AgentInfo {
+  agent_id: string;
+  name?: string;
+  description?: string;
+  projects: string[];
+  memory_count: number;
+  last_activity?: Date;
+  status: 'active' | 'inactive';
+}
+
+export interface ListProjectsRequest {
+  include_stats?: boolean;
+}
+
+export interface ListProjectsResponse {
+  projects: ProjectInfo[];
+  total_count: number;
+}
+
+export interface ProjectInfo {
+  project_id: string;
+  name: string;
+  description?: string;
+  agent_count: number;
+  memory_count: number;
+  created_at?: Date;
+  last_activity?: Date;
+}
+
 // Storage layer interfaces
 export interface OpenSearchDocument {
   memory_id: string;
@@ -188,6 +231,7 @@ export interface OpenSearchDocument {
   type: MemoryType;
   agent_id?: string;
   session_id?: string;
+  project?: string;
   tags?: string[];
   created_at: string;
   
@@ -213,6 +257,7 @@ export interface DynamoDBMemoryItem {
   content_type: ContentType;
   agent_id?: string;
   session_id?: string;
+  project?: string; // Project context for memory isolation
   created_at: number;
   updated_at: number;
   ttl?: number;
