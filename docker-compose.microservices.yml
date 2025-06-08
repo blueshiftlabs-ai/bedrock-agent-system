@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   # MCP Memory Server - Sophisticated memory with DynamoDB + OpenSearch + S3
   mcp-memory-server:

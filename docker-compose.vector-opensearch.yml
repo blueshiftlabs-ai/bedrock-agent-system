@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   # OpenSearch for vector similarity search
   opensearch:
@@ -33,15 +31,22 @@ services:
     container_name: opensearch-mcp-server
     environment:
       - OPENSEARCH_ENDPOINT=${OPENSEARCH_ENDPOINT:-http://opensearch:9200}
-      - PORT=3000
+      - PORT=4201
     ports:
-      - "${VECTOR_MCP_PORT:-4201}:3000"
+      - "${VECTOR_MCP_PORT:-4201}:4201"
     depends_on:
       - opensearch
     networks:
       - mcp-network
     healthcheck:
-      test: ["CMD", "wget", "-q", "--spider", "http://localhost:3000/health"]
+      test: ["CMD", "wget", "-q", "--spider", "http://localhost:4201/opensearch/health"]
       interval: 30s
       timeout: 10s
       retries: 3
+
+volumes:
+  vector-data:
+
+networks:
+  mcp-network:
+    driver: bridge

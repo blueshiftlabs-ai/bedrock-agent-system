@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   # Neo4j for graph database
   neo4j:
@@ -43,6 +41,11 @@ services:
       retries: 3
 
 volumes:
+  graph-data:
   neo4j-logs:
   neo4j-import:
   neo4j-plugins:
+
+networks:
+  mcp-network:
+    driver: bridge

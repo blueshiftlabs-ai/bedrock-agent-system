@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   # Qdrant for vector similarity search
   qdrant:
