@@ -2044,14 +2044,14 @@ COPY tsconfig*.json ./
 COPY nest-cli.json ./
 
 # Install dependencies
-RUN npm ci --include=dev
+RUN ppnpm install --include=dev
 
 # Copy source code
 COPY src/ ./src/
 COPY infrastructure/ ./infrastructure/
 
 # Build the application
-RUN npm run build
+RUN pnpm run build
 
 # Production stage
 FROM node:20-slim AS production
@@ -2069,7 +2069,7 @@ RUN groupadd -r appuser && useradd -r -g appuser appuser
 
 # Copy package files and install production dependencies
 COPY package*.json ./
-RUN npm ci --only=production && npm cache clean --force
+RUN ppnpm install --only=production && npm cache clean --force
 
 # Copy built application from builder stage
 COPY --from=builder --chown=appuser:appuser /app/dist ./dist
@@ -2183,7 +2183,7 @@ COPY tsconfig*.json ./
 COPY nest-cli.json ./
 
 # Install all dependencies including dev
-RUN npm ci
+RUN ppnpm install
 
 # Copy source code
 COPY src/ ./src/
@@ -2200,7 +2200,7 @@ HEALTHCHECK --interval=30s --timeout=3s --start-period=30s --retries=3 \
   CMD curl -f http://localhost:3000/api/v1/health || exit 1
 
 # Start in development mode with debugging
-CMD ["npm", "run", "start:debug"]
+CMD ["pnpm", "run", "start:debug"]
 EOF
 
 echo -e "${GREEN}🚀 Creating enhanced deployment scripts...${NC}"
@@ -2249,16 +2249,16 @@ fi
 # Check if CDK is installed
 if ! command -v cdk &> /dev/null; then
     echo -e "${YELLOW}⚠️  CDK not found. Installing...${NC}"
-    npm install -g aws-cdk
+    pnpm install -g aws-cdk
 fi
 
 # Install dependencies
 echo -e "${YELLOW}📦 Installing dependencies...${NC}"
-npm ci
+ppnpm install
 
 # Build the application
 echo -e "${YELLOW}🔨 Building application...${NC}"
-npm run build
+pnpm run build
 
 # Run tests
 echo -e "${YELLOW}🧪 Running tests...${NC}"
@@ -2515,7 +2515,7 @@ A sophisticated Model Context Protocol (MCP) server that combines the enterprise
 1. **Clone and setup**:
    ```bash
    # Project is already created in current directory
-   npm install
+   pnpm install
    ```
 
 2. **Configure environment**:
@@ -2526,7 +2526,7 @@ A sophisticated Model Context Protocol (MCP) server that combines the enterprise
 
 3. **Start development server**:
    ```bash
-   npm run start:dev
+   pnpm run start:dev
    ```
 
 4. **Access the application**:
@@ -2596,7 +2596,7 @@ curl -X POST http://localhost:3000/api/v1/workflows/code-analysis \
 ### Development Environment
 
 ```bash
-npm run deploy:dev
+pnpm run deploy:dev
 ```
 
 ### Production Environment
@@ -2607,7 +2607,7 @@ export DOMAIN_NAME=mcp.yourdomain.com
 export CERTIFICATE_ARN=arn:aws:acm:region:account:certificate/cert-id
 
 # Deploy to production
-npm run deploy:prod
+pnpm run deploy:prod
 ```
 
 ### Infrastructure Features
@@ -2640,27 +2640,27 @@ npm run deploy:prod
 
 ```bash
 # Development
-npm run start:dev          # Start with hot reload
-npm run start:debug        # Start with debugging enabled
+pnpm run start:dev          # Start with hot reload
+pnpm run start:debug        # Start with debugging enabled
 
 # Building
-npm run build              # Build for production
-npm run format             # Format code with Prettier
+pnpm run build              # Build for production
+pnpm run format             # Format code with Prettier
 
 # Testing
-npm run test               # Run unit tests
-npm run test:watch         # Run tests in watch mode
-npm run test:cov           # Run tests with coverage
-npm run test:e2e           # Run end-to-end tests
+pnpm run test               # Run unit tests
+pnpm run test:watch         # Run tests in watch mode
+pnpm run test:cov           # Run tests with coverage
+pnpm run test:e2e           # Run end-to-end tests
 
 # Infrastructure
-npm run cdk:synth          # Synthesize CloudFormation
-npm run cdk:deploy         # Deploy infrastructure
-npm run cdk:destroy        # Destroy infrastructure
+pnpm run cdk:synth          # Synthesize CloudFormation
+pnpm run cdk:deploy         # Deploy infrastructure
+pnpm run cdk:destroy        # Destroy infrastructure
 
 # Docker
-npm run docker:build       # Build Docker image
-npm run docker:run         # Run Docker container
+pnpm run docker:build       # Build Docker image
+pnpm run docker:run         # Run Docker container
 ```
 
 ### Code Structure
@@ -2745,11 +2745,11 @@ echo -e "${YELLOW}🔧 Next steps:${NC}"
 echo -e "${CYAN}   1. cd $PROJECT_NAME${NC}"
 echo -e "${CYAN}   2. cp .env.example .env${NC}"
 echo -e "${CYAN}   3. Edit .env with your AWS credentials${NC}"
-echo -e "${CYAN}   4. npm install${NC}"
-echo -e "${CYAN}   5. npm run start:dev${NC}"
+echo -e "${CYAN}   4. pnpm install${NC}"
+echo -e "${CYAN}   5. pnpm run start:dev${NC}"
 echo -e ""
 echo -e "${YELLOW}🚀 For production deployment:${NC}"
-echo -e "${CYAN}   npm run deploy:prod${NC}"
+echo -e "${CYAN}   pnpm run deploy:prod${NC}"
 echo -e ""
 echo -e "${YELLOW}🐳 For local development with Docker:${NC}"
 echo -e "${CYAN}   docker-compose -f docker/docker-compose.dev.yml up${NC}"
@@ -4127,7 +4127,7 @@ command -v docker-compose >/dev/null 2>&1 || { echo "❌ Docker Compose is requi
 
 # Install dependencies
 echo "📦 Installing dependencies..."
-npm ci
+ppnpm install
 
 # Set up environment file
 if [ ! -f .env ]; then
@@ -4160,7 +4160,7 @@ aws --endpoint-url=http://localhost:4566 dynamodb create-table \
     --billing-mode PAY_PER_REQUEST || true
 
 echo "✅ Local development environment is ready!"
-echo "🚀 You can now run: npm run start:dev"
+echo "🚀 You can now run: pnpm run start:dev"
 EOF
 
 chmod +x scripts/setup-local-dev.sh
@@ -4220,13 +4220,13 @@ cat >> README.md << 'EOF'
 
 ```bash
 # Development with LocalStack
-npm run start:dev
+pnpm run start:dev
 
 # Production mode
-npm run start:prod
+pnpm run start:prod
 
 # Debug mode
-npm run start:debug
+pnpm run start:debug
 ```
 
 ## 🏗️ Project Structure Details
@@ -4313,13 +4313,13 @@ curl http://localhost:3000/api/v1/tools/metrics/analyze-code-file
 
 1. **Build and test**:
    ```bash
-   npm run build
+   pnpm run build
    npm test
    ```
 
 2. **Deploy infrastructure**:
    ```bash
-   npm run deploy:prod
+   pnpm run deploy:prod
    ```
 
 3. **Verify deployment**:
@@ -4377,7 +4377,7 @@ Enable debug mode for detailed logging:
 
 ```bash
 export LOG_LEVEL=debug
-npm run start:dev
+pnpm run start:dev
 ```
 
 ## 📞 Support Channels
@@ -4407,7 +4407,7 @@ echo -e ""
 echo -e "${YELLOW}🚀 Quick Start:${NC}"
 echo -e "${CYAN}   1. cd $PROJECT_NAME${NC}"
 echo -e "${CYAN}   2. ./scripts/setup-local-dev.sh${NC}"
-echo -e "${CYAN}   3. npm run start:dev${NC}"
+echo -e "${CYAN}   3. pnpm run start:dev${NC}"
 echo -e "${CYAN}   4. Visit http://localhost:3000/api/docs${NC}"
 echo -e ""
 echo -e "${YELLOW}🌟 Key Features Implemented:${NC}"
@@ -4421,7 +4421,7 @@ echo -e "${CYAN}   ✅ AWS Bedrock integration with tool chaining${NC}"
 echo -e "${CYAN}   ✅ Knowledge graph construction and analysis${NC}"
 echo -e ""
 echo -e "${PURPLE}🎯 Production Deployment:${NC}"
-echo -e "${CYAN}   npm run deploy:prod${NC}"
+echo -e "${CYAN}   pnpm run deploy:prod${NC}"
 echo -e ""
 echo -e "${PURPLE}🔧 Development Tools:${NC}"
 echo -e "${CYAN}   • Hot reload development server${NC}"

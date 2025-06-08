@@ -40,7 +40,7 @@ fi
 # Check if CDK is installed
 if ! command -v cdk &> /dev/null; then
     echo -e "${YELLOW}⚠️  CDK not found. Installing...${NC}"
-    npm install -g aws-cdk
+    pnpm add -g aws-cdk
 fi
 
 # Install dependencies

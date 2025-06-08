@@ -11,7 +11,7 @@ command -v docker-compose >/dev/null 2>&1 || { echo "❌ Docker Compose is requi
 
 # Install dependencies
 echo "📦 Installing dependencies..."
-npm ci
+pnpm install
 
 # Set up environment file
 if [ ! -f .env ]; then
@@ -44,4 +44,4 @@ aws --endpoint-url=http://localhost:4566 dynamodb create-table \
     --billing-mode PAY_PER_REQUEST || true
 
 echo "✅ Local development environment is ready!"
-echo "🚀 You can now run: npm run start:dev"
+echo "🚀 You can now run: pnpm run start:dev"
