@@ -162,5 +162,898 @@
       "Serverless",
       "This"
     ]
+  },
+  "MEMORY#mem_1749240211468_5ccc083e": {
+    "PK": "MEMORY#mem_1749240211468_5ccc083e",
+    "SK": "METADATA",
+    "memory_id": "mem_1749240211468_5ccc083e",
+    "type": "procedural",
+    "content_type": "text",
+    "created_at": 1749240211469,
+    "updated_at": 1749240211469,
+    "opensearch_index": "memory-text",
+    "opensearch_id": "c54be0cf-7cde-4d6b-8dca-e423d339081c",
+    "tags": [
+      "distributed-mcp",
+      "namespacing",
+      "implementation",
+      "endpoints"
+    ],
+    "access_count": 0,
+    "last_accessed": 1749240211469,
+    "language": "en",
+    "topics": [
+      "endpoints",
+      "orchestrator",
+      "uses",
+      "prefix",
+      "port"
+    ],
+    "sentiment": "neutral",
+    "entities": [
+      "Successfully",
+      "Memory Orchestrator",
+      "All"
+    ]
+  },
+  "MEMORY#mem_1749240225536_b7881395": {
+    "PK": "MEMORY#mem_1749240225536_b7881395",
+    "SK": "METADATA",
+    "memory_id": "mem_1749240225536_b7881395",
+    "type": "semantic",
+    "content_type": "text",
+    "created_at": 1749240225536,
+    "updated_at": 1749240225536,
+    "opensearch_index": "memory-text",
+    "opensearch_id": "e331ed55-5652-4884-b2d9-fae5c1953804",
+    "tags": [
+      "namespacing",
+      "requirements",
+      "architecture",
+      "best-practices"
+    ],
+    "access_count": 0,
+    "last_accessed": 1749240225536,
+    "language": "en",
+    "topics": [
+      "health",
+      "namespace",
+      "endpoint",
+      "namespacing",
+      "strategy"
+    ],
+    "sentiment": "neutral",
+    "entities": [
+      "User",
+      "Implementation",
+      "Health",
+      "Controller",
+      "Docker"
+    ]
+  },
+  "MEMORY#mem_1749241212397_23ae2403": {
+    "PK": "MEMORY#mem_1749241212397_23ae2403",
+    "SK": "METADATA",
+    "memory_id": "mem_1749241212397_23ae2403",
+    "type": "procedural",
+    "content_type": "text",
+    "created_at": 1749241212398,
+    "updated_at": 1749241212398,
+    "opensearch_index": "memory-text",
+    "opensearch_id": "242126cf-b79f-46fc-a1b5-d73850e5b21f",
+    "tags": [
+      "distributed-mcp",
+      "namespacing",
+      "implementation",
+      "endpoints",
+      "architecture"
+    ],
+    "access_count": 0,
+    "last_accessed": 1749241212398,
+    "language": "en",
+    "topics": [
+      "endpoints",
+      "namespacing",
+      "orchestrator",
+      "uses",
+      "port"
+    ],
+    "sentiment": "neutral",
+    "entities": [
+      "Successfully",
+      "Memory Orchestrator",
+      "Used",
+      "Updated"
+    ]
+  },
+  "MEMORY#mem_1749241227754_ddf3b23d": {
+    "PK": "MEMORY#mem_1749241227754_ddf3b23d",
+    "SK": "METADATA",
+    "memory_id": "mem_1749241227754_ddf3b23d",
+    "type": "procedural",
+    "content_type": "text",
+    "agent_id": "claude-code",
+    "created_at": 1749241227754,
+    "updated_at": 1749241227754,
+    "opensearch_index": "memory-text",
+    "opensearch_id": "d12f736e-2a8c-490f-b06a-b72ffdb480ec",
+    "tags": [
+      "distributed-mcp",
+      "namespacing",
+      "implementation",
+      "endpoints",
+      "architecture"
+    ],
+    "access_count": 0,
+    "last_accessed": 1749241227754,
+    "language": "en",
+    "topics": [
+      "endpoints",
+      "namespacing",
+      "orchestrator",
+      "uses",
+      "port"
+    ],
+    "sentiment": "neutral",
+    "entities": [
+      "Successfully",
+      "Memory Orchestrator",
+      "Used",
+      "Updated"
+    ]
+  },
+  "MEMORY#mem_1749249853488_8c9827a3": {
+    "PK": "MEMORY#mem_1749249853488_8c9827a3",
+    "SK": "METADATA",
+    "memory_id": "mem_1749249853488_8c9827a3",
+    "type": "episodic",
+    "content_type": "text",
+    "agent_id": "claude-code",
+    "created_at": 1749249853488,
+    "updated_at": 1749249853488,
+    "opensearch_index": "memory-text",
+    "opensearch_id": "e62d0f36-c3cf-409e-8af1-c92874b75777",
+    "tags": [
+      "test",
+      "parameter-format"
+    ],
+    "access_count": 0,
+    "last_accessed": 1749249853488,
+    "language": "en",
+    "topics": [
+      "test",
+      "parameter",
+      "format",
+      "investigation",
+      "memory"
+    ],
+    "sentiment": "neutral",
+    "entities": [
+      "Parameter"
+    ]
+  },
+  "MEMORY#mem_1749249883429_246cd821": {
+    "PK": "MEMORY#mem_1749249883429_246cd821",
+    "SK": "METADATA",
+    "memory_id": "mem_1749249883429_246cd821",
+    "type": "procedural",
+    "content_type": "text",
+    "agent_id": "claude-code",
+    "session_id": "distributed-mcp-implementation",
+    "created_at": 1749249883429,
+    "updated_at": 1749249883429,
+    "opensearch_index": "memory-text",
+    "opensearch_id": "f74244e3-63a6-44b9-9555-f9f8fcc6b09a",
+    "tags": [
+      "namespacing",
+      "completed",
+      "architecture",
+      "mcp-endpoints"
+    ],
+    "access_count": 0,
+    "last_accessed": 1749249883429,
+    "language": "en",
+    "topics": [
+      "endpoints",
+      "orchestrator",
+      "opensearch",
+      "port",
+      "4200"
+    ],
+    "sentiment": "neutral",
+    "entities": [
+      "All",
+      "Memory Orchestrator",
+      "No",
+      "Ready",
+      "Inspector"
+    ]
+  },
+  "MEMORY#mem_1749250310252_eb59a6e3": {
+    "PK": "MEMORY#mem_1749250310252_eb59a6e3",
+    "SK": "METADATA",
+    "memory_id": "mem_1749250310252_eb59a6e3",
+    "type": "procedural",
+    "content_type": "text",
+    "agent_id": "claude-code",
+    "session_id": "distributed-mcp-implementation",
+    "created_at": 1749250310252,
+    "updated_at": 1749250310252,
+    "opensearch_index": "memory-text",
+    "opensearch_id": "9c620b44-0eeb-4e8a-9f5c-1d721b489091",
+    "tags": [
+      "gremlin",
+      "graph-connections",
+      "port-fix",
+      "configuration"
+    ],
+    "access_count": 0,
+    "last_accessed": 1749250310252,
+    "language": "en",
+    "topics": [
+      "5104",
+      "graph",
+      "connections",
+      "memory",
+      "port"
+    ],
+    "sentiment": "neutral",
+    "entities": [
+      "Updated",
+      "Gremlin",
+      "Port",
+      "Dashboards",
+      "Now"
+    ]
+  },
+  "MEMORY#mem_1749250414323_66abc2d7": {
+    "PK": "MEMORY#mem_1749250414323_66abc2d7",
+    "SK": "METADATA",
+    "memory_id": "mem_1749250414323_66abc2d7",
+    "type": "semantic",
+    "content_type": "text",
+    "agent_id": "claude-code",
+    "session_id": "distributed-mcp-implementation",
+    "created_at": 1749250414323,
+    "updated_at": 1749250414323,
+    "opensearch_index": "memory-text",
+    "opensearch_id": "8da42355-7570-4fb9-80b4-20f0f9d614f8",
+    "tags": [
+      "memory-system",
+      "status",
+      "working",
+      "graph-disabled",
+      "mvp-ready"
+    ],
+    "access_count": 0,
+    "last_accessed": 1749250414323,
+    "language": "en",
+    "topics": [
+      "memory",
+      "server",
+      "4100",
+      "system",
+      "status"
+    ],
+    "sentiment": "neutral",
+    "entities": [
+      "Core",
+      "Memory",
+      "Graph",
+      "Gremlin",
+      "Can",
+      "Will"
+    ]
+  },
+  "MEMORY#mem_1749251413493_a2902949": {
+    "PK": "MEMORY#mem_1749251413493_a2902949",
+    "SK": "METADATA",
+    "memory_id": "mem_1749251413493_a2902949",
+    "type": "episodic",
+    "content_type": "text",
+    "agent_id": "claude-code",
+    "session_id": "distributed-mcp-implementation",
+    "created_at": 1749251413493,
+    "updated_at": 1749251413493,
+    "opensearch_index": "memory-text",
+    "opensearch_id": "6b45f139-f5cd-4069-882f-1a2205b775fc",
+    "tags": [
+      "graph-testing",
+      "gremlin",
+      "connections",
+      "runtime-test"
+    ],
+    "access_count": 0,
+    "last_accessed": 1749251413493,
+    "language": "en",
+    "topics": [
+      "graph",
+      "connection",
+      "testing",
+      "5105",
+      "attempting"
+    ],
+    "sentiment": "neutral",
+    "entities": [
+      "Attempting",
+      "Gremlin",
+      "The Neptune Graph Service",
+      "Now"
+    ]
+  },
+  "MEMORY#mem_1749251430760_ff62dbff": {
+    "PK": "MEMORY#mem_1749251430760_ff62dbff",
+    "SK": "METADATA",
+    "memory_id": "mem_1749251430760_ff62dbff",
+    "type": "episodic",
+    "content_type": "text",
+    "agent_id": "claude-code",
+    "session_id": "distributed-mcp-implementation",
+    "created_at": 1749251430760,
+    "updated_at": 1749251430760,
+    "opensearch_index": "memory-text",
+    "opensearch_id": "e6662a73-5891-48e0-a42b-2897e2650413",
+    "tags": [
+      "graph-testing",
+      "gremlin",
+      "connections",
+      "runtime-test"
+    ],
+    "access_count": 0,
+    "last_accessed": 1749251430760,
+    "language": "en",
+    "topics": [
+      "graph",
+      "connection",
+      "testing",
+      "5105",
+      "attempting"
+    ],
+    "sentiment": "neutral",
+    "entities": [
+      "Attempting",
+      "Gremlin",
+      "The Neptune Graph Service",
+      "Now"
+    ]
+  },
+  "MEMORY#mem_1749251886029_8ca3cd17": {
+    "PK": "MEMORY#mem_1749251886029_8ca3cd17",
+    "SK": "METADATA",
+    "memory_id": "mem_1749251886029_8ca3cd17",
+    "type": "procedural",
+    "content_type": "text",
+    "agent_id": "claude-code",
+    "session_id": "distributed-mcp-implementation",
+    "created_at": 1749251886029,
+    "updated_at": 1749251886029,
+    "opensearch_index": "memory-text",
+    "opensearch_id": "1549c583-6f64-40b8-865d-229262083e36",
+    "tags": [
+      "gremlin",
+      "websocket-error",
+      "debugging",
+      "deferred",
+      "graph-connections"
+    ],
+    "access_count": 0,
+    "last_accessed": 1749251886029,
+    "language": "en",
+    "topics": [
+      "websocket",
+      "gremlin",
+      "connection",
+      "issue",
+      "server"
+    ],
+    "sentiment": "negative",
+    "entities": [
+      "Gremlin",
+      "Likely",
+      "Need",
+      "Alternative",
+      "Dgraph"
+    ]
+  },
+  "MEMORY#mem_1749251902732_38510633": {
+    "PK": "MEMORY#mem_1749251902732_38510633",
+    "SK": "METADATA",
+    "memory_id": "mem_1749251902732_38510633",
+    "type": "semantic",
+    "content_type": "text",
+    "agent_id": "claude-code",
+    "session_id": "distributed-mcp-implementation",
+    "created_at": 1749251902732,
+    "updated_at": 1749251902732,
+    "opensearch_index": "memory-text",
+    "opensearch_id": "b475a3bc-4e71-49e0-818e-adc604acbcc5",
+    "tags": [
+      "dgraph",
+      "implementation",
+      "graph-backend",
+      "architecture",
+      "alternative"
+    ],
+    "access_count": 0,
+    "last_accessed": 1749251902732,
+    "language": "en",
+    "topics": [
+      "dgraph",
+      "graph",
+      "implementation",
+      "plan",
+      "adding"
+    ],
+    "sentiment": "neutral",
+    "entities": [
+      "Adding Dgraph",
+      "Will",
+      "Dgraph",
+      "Gremlin",
+      "This"
+    ]
+  },
+  "MEMORY#mem_1749252173537_30c13537": {
+    "PK": "MEMORY#mem_1749252173537_30c13537",
+    "SK": "METADATA",
+    "memory_id": "mem_1749252173537_30c13537",
+    "type": "procedural",
+    "content_type": "text",
+    "agent_id": "claude-code",
+    "session_id": "distributed-mcp-implementation",
+    "created_at": 1749252173537,
+    "updated_at": 1749252173537,
+    "opensearch_index": "memory-text",
+    "opensearch_id": "f92a8b3f-cc48-4067-acf1-86cff3a25042",
+    "tags": [
+      "dgraph",
+      "implementation",
+      "success",
+      "graph-backend",
+      "integration"
+    ],
+    "access_count": 0,
+    "last_accessed": 1749252173537,
+    "language": "en",
+    "topics": [
+      "dgraph",
+      "service",
+      "implemented",
+      "successfully",
+      "created"
+    ],
+    "sentiment": "neutral",
+    "entities": [
+      "Successfully",
+      "Compilation",
+      "Next",
+      "Dgraph",
+      "Gremlin"
+    ]
+  },
+  "MEMORY#mem_1749252225905_aff73b66": {
+    "PK": "MEMORY#mem_1749252225905_aff73b66",
+    "SK": "METADATA",
+    "memory_id": "mem_1749252225905_aff73b66",
+    "type": "semantic",
+    "content_type": "text",
+    "agent_id": "claude-code",
+    "session_id": "distributed-mcp-implementation",
+    "created_at": 1749252225905,
+    "updated_at": 1749252225905,
+    "opensearch_index": "memory-text",
+    "opensearch_id": "7b340c2c-5cbe-42fc-b27f-d96de24e3c08",
+    "tags": [
+      "dgraph",
+      "mcp-server",
+      "discovery",
+      "pivot",
+      "official"
+    ],
+    "access_count": 0,
+    "last_accessed": 1749252225905,
+    "language": "en",
+    "topics": [
+      "dgraph",
+      "server",
+      "custom",
+      "9080",
+      "discovery"
+    ],
+    "sentiment": "neutral",
+    "entities": [
+      "Found",
+      "Dgraph",
+      "This",
+      "Configuration",
+      "Will"
+    ]
+  },
+  "MEMORY#mem_1749252498103_796dc6f6": {
+    "PK": "MEMORY#mem_1749252498103_796dc6f6",
+    "SK": "METADATA",
+    "memory_id": "mem_1749252498103_796dc6f6",
+    "type": "episodic",
+    "content_type": "text",
+    "agent_id": "claude-code",
+    "session_id": "distributed-mcp-implementation",
+    "created_at": 1749252498103,
+    "updated_at": 1749252498103,
+    "opensearch_index": "memory-text",
+    "opensearch_id": "3b6663b8-f19f-4fbe-aae6-00e75098829a",
+    "tags": [
+      "dgraph",
+      "deployment",
+      "status",
+      "v24",
+      "mcp-future"
+    ],
+    "access_count": 0,
+    "last_accessed": 1749252498103,
+    "language": "en",
+    "topics": [
+      "dgraph",
+      "alpha",
+      "server",
+      "8080",
+      "setup"
+    ],
+    "sentiment": "neutral",
+    "entities": [
+      "Successfully",
+      "Dgraph",
+      "Zero",
+      "Alpha",
+      "Dgraph Alpha",
+      "Options",
+      "Use",
+      "Wait",
+      "Focus"
+    ]
+  },
+  "MEMORY#mem_1749261388289_be596f1a": {
+    "PK": "MEMORY#mem_1749261388289_be596f1a",
+    "SK": "METADATA",
+    "memory_id": "mem_1749261388289_be596f1a",
+    "type": "procedural",
+    "content_type": "text",
+    "agent_id": "claude-code",
+    "session_id": "distributed-mcp-implementation",
+    "created_at": 1749261388289,
+    "updated_at": 1749261388289,
+    "opensearch_index": "memory-text",
+    "opensearch_id": "7da737a9-7251-416f-9239-389b56c76a37",
+    "tags": [
+      "neo4j",
+      "knowledge-graph",
+      "integration",
+      "priority",
+      "memory-server"
+    ],
+    "access_count": 0,
+    "last_accessed": 1749261388289,
+    "language": "en",
+    "topics": [
+      "graph",
+      "knowledge",
+      "memory",
+      "neo4j",
+      "integration"
+    ],
+    "sentiment": "positive",
+    "entities": [
+      "User",
+      "Will",
+      "Gremlin",
+      "Neptune",
+      "Node",
+      "This"
+    ]
+  },
+  "MEMORY#mem_1749262622367_94705b26": {
+    "PK": "MEMORY#mem_1749262622367_94705b26",
+    "SK": "METADATA",
+    "memory_id": "mem_1749262622367_94705b26",
+    "type": "episodic",
+    "content_type": "text",
+    "created_at": 1749262622368,
+    "updated_at": 1749262622368,
+    "opensearch_index": "memory-text",
+    "opensearch_id": "b63685bd-7e0d-4038-89d2-c99d64a19044",
+    "tags": [
+      "neo4j",
+      "test",
+      "knowledge-graph"
+    ],
+    "access_count": 0,
+    "last_accessed": 1749262622368,
+    "language": "en",
+    "topics": [
+      "testing",
+      "neo4j",
+      "integration",
+      "memory",
+      "server"
+    ],
+    "sentiment": "neutral",
+    "entities": [
+      "Testing"
+    ]
+  },
+  "MEMORY#mem_1749290386151_65fbc25f": {
+    "PK": "MEMORY#mem_1749290386151_65fbc25f",
+    "SK": "METADATA",
+    "memory_id": "mem_1749290386151_65fbc25f",
+    "type": "episodic",
+    "content_type": "text",
+    "created_at": 1749290386152,
+    "updated_at": 1749290386152,
+    "opensearch_index": "memory-text",
+    "opensearch_id": "d1b6a2aa-996b-4c75-8c85-839388d50479",
+    "neptune_node_id": "mem_1749290386151_65fbc25f",
+    "tags": [
+      "neo4j",
+      "success",
+      "integration-test"
+    ],
+    "access_count": 0,
+    "last_accessed": 1749290386152,
+    "language": "en",
+    "topics": [
+      "neo4j",
+      "knowledge",
+      "graph",
+      "integration",
+      "test"
+    ],
+    "sentiment": "neutral",
+    "entities": []
+  },
+  "MEMORY#mem_1749290440747_d0e2c23f": {
+    "PK": "MEMORY#mem_1749290440747_d0e2c23f",
+    "SK": "METADATA",
+    "memory_id": "mem_1749290440747_d0e2c23f",
+    "type": "semantic",
+    "content_type": "text",
+    "created_at": 1749290440747,
+    "updated_at": 1749290440747,
+    "opensearch_index": "memory-text",
+    "opensearch_id": "936b6e8e-612d-47e9-b175-553101938e4a",
+    "neptune_node_id": "mem_1749290440747_d0e2c23f",
+    "tags": [
+      "relationship-test",
+      "connected"
+    ],
+    "access_count": 0,
+    "last_accessed": 1749290440747,
+    "language": "en",
+    "topics": [
+      "related",
+      "memory",
+      "testing",
+      "knowledge",
+      "graph"
+    ],
+    "sentiment": "neutral",
+    "entities": [
+      "Related"
+    ]
+  },
+  "MEMORY#mem_1749409294907_8e845c53": {
+    "PK": "MEMORY#mem_1749409294907_8e845c53",
+    "SK": "METADATA",
+    "memory_id": "mem_1749409294907_8e845c53",
+    "type": "episodic",
+    "content_type": "text",
+    "agent_id": "test-agent-001",
+    "created_at": 1749409294907,
+    "updated_at": 1749409294907,
+    "opensearch_index": "memory-text",
+    "neptune_node_id": null,
+    "tags": [
+      "testing",
+      "mcp",
+      "memory-server"
+    ],
+    "access_count": 0,
+    "last_accessed": 1749409294907,
+    "language": "en",
+    "topics": [
+      "list",
+      "successfully",
+      "tested",
+      "memory",
+      "server"
+    ],
+    "sentiment": "neutral",
+    "entities": [
+      "Successfully"
+    ]
+  },
+  "MEMORY#mem_1749409320281_63d9ba33": {
+    "PK": "MEMORY#mem_1749409320281_63d9ba33",
+    "SK": "METADATA",
+    "memory_id": "mem_1749409320281_63d9ba33",
+    "type": "semantic",
+    "content_type": "text",
+    "agent_id": "test-agent-002",
+    "created_at": 1749409320281,
+    "updated_at": 1749409320281,
+    "opensearch_index": "memory-text",
+    "neptune_node_id": null,
+    "tags": [
+      "testing",
+      "project-isolation",
+      "different-project"
+    ],
+    "access_count": 0,
+    "last_accessed": 1749409320281,
+    "language": "en",
+    "topics": [
+      "project",
+      "test",
+      "memory",
+      "different",
+      "verify"
+    ],
+    "sentiment": "neutral",
+    "entities": [
+      "This"
+    ]
+  },
+  "MEMORY#mem_1749409409412_1ed29c17": {
+    "PK": "MEMORY#mem_1749409409412_1ed29c17",
+    "SK": "METADATA",
+    "memory_id": "mem_1749409409412_1ed29c17",
+    "type": "semantic",
+    "content_type": "text",
+    "agent_id": "test-agent-003",
+    "created_at": 1749409409412,
+    "updated_at": 1749409409412,
+    "opensearch_index": "memory-text",
+    "neptune_node_id": null,
+    "tags": [
+      "bug-fix",
+      "project-field",
+      "testing"
+    ],
+    "access_count": 0,
+    "last_accessed": 1749409409412,
+    "language": "en",
+    "topics": [
+      "memory",
+      "should",
+      "include",
+      "project",
+      "field"
+    ],
+    "sentiment": "neutral",
+    "entities": [
+      "This"
+    ]
+  },
+  "MEMORY#mem_1749409429005_8757a2ee": {
+    "PK": "MEMORY#mem_1749409429005_8757a2ee",
+    "SK": "METADATA",
+    "memory_id": "mem_1749409429005_8757a2ee",
+    "type": "semantic",
+    "content_type": "text",
+    "agent_id": "test-agent-004",
+    "created_at": 1749409429005,
+    "updated_at": 1749409429005,
+    "opensearch_index": "memory-text",
+    "neptune_node_id": null,
+    "tags": [
+      "test-project",
+      "project-field",
+      "testing"
+    ],
+    "access_count": 0,
+    "last_accessed": 1749409429005,
+    "language": "en",
+    "topics": [
+      "project",
+      "memory",
+      "test",
+      "should",
+      "include"
+    ],
+    "sentiment": "neutral",
+    "entities": [
+      "This"
+    ]
+  },
+  "MEMORY#mem_1749409650673_367d1d7b": {
+    "PK": "MEMORY#mem_1749409650673_367d1d7b",
+    "SK": "METADATA",
+    "memory_id": "mem_1749409650673_367d1d7b",
+    "type": "semantic",
+    "content_type": "text",
+    "agent_id": "test-agent-005",
+    "created_at": 1749409650673,
+    "updated_at": 1749409650673,
+    "opensearch_index": "memory-text",
+    "neptune_node_id": null,
+    "tags": [
+      "interface-fix",
+      "project-field",
+      "testing"
+    ],
+    "access_count": 0,
+    "last_accessed": 1749409650673,
+    "language": "en",
+    "topics": [
+      "testing",
+      "project",
+      "field",
+      "storage",
+      "fixing"
+    ],
+    "sentiment": "neutral",
+    "entities": [
+      "Testing"
+    ]
+  },
+  "MEMORY#mem_1749409867990_a94cb696": {
+    "PK": "MEMORY#mem_1749409867990_a94cb696",
+    "SK": "METADATA",
+    "memory_id": "mem_1749409867990_a94cb696",
+    "type": "semantic",
+    "content_type": "text",
+    "agent_id": "test-agent-006",
+    "created_at": 1749409867990,
+    "updated_at": 1749409867990,
+    "opensearch_index": "memory-text",
+    "neptune_node_id": null,
+    "tags": [
+      "final-test",
+      "project-field",
+      "compilation-fix"
+    ],
+    "access_count": 0,
+    "last_accessed": 1749409867990,
+    "language": "en",
+    "topics": [
+      "final",
+      "test",
+      "memory",
+      "project",
+      "field"
+    ],
+    "sentiment": "neutral",
+    "entities": [
+      "Final"
+    ]
+  },
+  "MEMORY#mem_1749409887277_c6aafed2": {
+    "PK": "MEMORY#mem_1749409887277_c6aafed2",
+    "SK": "METADATA",
+    "memory_id": "mem_1749409887277_c6aafed2",
+    "type": "semantic",
+    "content_type": "text",
+    "agent_id": "test-agent-007",
+    "created_at": 1749409887277,
+    "updated_at": 1749409887277,
+    "opensearch_index": "memory-text",
+    "neptune_node_id": null,
+    "tags": [
+      "test-project",
+      "second-memory",
+      "isolation"
+    ],
+    "access_count": 0,
+    "last_accessed": 1749409887277,
+    "language": "en",
+    "topics": [
+      "project",
+      "testing",
+      "second",
+      "memory",
+      "test"
+    ],
+    "sentiment": "neutral",
+    "entities": [
+      "Testing"
+    ]
   }
 }

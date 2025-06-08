@@ -71,15 +71,14 @@ services:
     networks:
       - memory-network
 
-  # Gremlin Server (Neptune local alternative)
+  # Gremlin Server (Neptune local alternative) - In-memory TinkerGraph
   gremlin-server:
     image: tinkerpop/gremlin-server:latest
     container_name: gremlin-server
     ports:
       - "5105:8182"
-    volumes:
-      - ./gremlin-config:/opt/gremlin-server/conf
-      - gremlin-data:/opt/gremlin-server/data
+    environment:
+      - JAVA_OPTIONS=-Xms256m -Xmx512m
     networks:
       - memory-network
 
