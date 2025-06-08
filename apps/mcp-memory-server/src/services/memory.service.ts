@@ -155,25 +155,31 @@ export class MemoryService {
   async retrieveMemories(request: RetrieveMemoriesRequest): Promise<RetrieveMemoriesResponse> {
     const startTime = Date.now();
 
+    const getMemoryResults = async (): Promise<MemorySearchResult[]> => {
+      // Use a lookup table for retrieval strategies
+      const strategies = {
+        byIds: () => request.memory_ids?.length > 0,
+        byQuery: () => Boolean(request.query?.query),
+        getAll: () => true // fallback
+      };
+
+      const retrievalActions = {
+        byIds: () => this.retrieveMemoriesByIds(request.memory_ids!),
+        byQuery: () => this.searchMemories(request.query!),
+        getAll: () => this.getAllMemories(request.query || {})
+      };
+
+      const strategy = Object.keys(strategies).find(key => strategies[key]()) as keyof typeof retrievalActions;
+      return retrievalActions[strategy]();
+    };
+
+    const enhanceWithRelationships = (results: MemorySearchResult[]) => 
+      request.query?.include_related 
+        ? this.enhanceWithGraphRelationships(results)
+        : Promise.resolve(results);
+
     try {
-      let results: MemorySearchResult[] = [];
-
-      if (request.memory_ids && request.memory_ids.length > 0) {
-        // Direct retrieval by IDs
-        results = await this.retrieveMemoriesByIds(request.memory_ids);
-      } else if (request.query) {
-        // Search using query
-        results = await this.searchMemories(request.query);
-      } else {
-        // Return all memories (with optional filters)
-        results = await this.getAllMemories(request);
-      }
-
-      // Enhance results with graph relationships if requested
-      if (request.query?.include_related) {
-        results = await this.enhanceWithGraphRelationships(results);
-      }
-
+      const results = await getMemoryResults().then(enhanceWithRelationships);
       const duration = Date.now() - startTime;
       
       return {

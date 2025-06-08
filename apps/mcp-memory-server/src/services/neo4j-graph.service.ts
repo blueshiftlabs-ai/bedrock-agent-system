@@ -284,7 +284,7 @@ export class Neo4jGraphService implements OnModuleDestroy {
         concept_id: `concept_${record.get('concept_name')}`,
         name: record.get('concept_name'),
         category: 'tag_cluster',
-        confidence: Math.min(1.0, record.get('memory_count') * 0.1),
+        confidence: Math.min(1.0, Number(record.get('memory_count')) * 0.1),
         related_memories: record.get('sample_memories'),
       }));
 

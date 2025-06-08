@@ -67,7 +67,7 @@ export class MCPToolsService {
       return await this.memoryService.retrieveMemories({ memory_ids: params.memory_ids });
     } else {
       const queryParams = {
-        query: params.query || '',
+        query: params.query, // Don't default to empty string
         agent_id: params.agent_id,
         session_id: params.session_id,
         project: params.project,
