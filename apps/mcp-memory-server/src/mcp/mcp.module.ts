@@ -28,10 +28,9 @@ import { MemoryModule } from '../memory/memory.module';
       },
       // Instructions for using this MCP server
       instructions: 'MCP Memory Server provides sophisticated memory storage and retrieval capabilities including semantic search, graph connections, and multi-modal memory types.',
-      // Support multiple transports for different use cases
+      // Use only HTTP transport since SSE has session management issues
       transport: [
-        McpTransportType.STREAMABLE_HTTP,  // For HTTP clients and Fargate
-        McpTransportType.SSE,              // For Claude Code and browsers
+        McpTransportType.STREAMABLE_HTTP,  // For HTTP clients, Claude Code, and all MCP clients
       ],
       streamableHttp: {
         // Enable JSON responses for non-streaming requests (good for testing)
@@ -39,11 +38,7 @@ import { MemoryModule } from '../memory/memory.module';
         // Use stateless mode for better scalability in Fargate
         statelessMode: true,
       },
-      sse: {
-        // SSE configuration for Claude Code compatibility
-        pingEnabled: true,
-        pingIntervalMs: 30000,
-      },
+      // SSE configuration removed - using only HTTP transport
     }),
   ],
   providers: [MCPToolsService],
