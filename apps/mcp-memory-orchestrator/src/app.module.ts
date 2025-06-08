@@ -16,6 +16,11 @@ import { HealthModule } from './health/health.module';
       name: 'memory-orchestrator',
       version: '1.0.0',
       
+      // Custom endpoint paths for namespaced MCP endpoints
+      mcpEndpoint: 'orchestrator/mcp',
+      sseEndpoint: 'orchestrator/sse',
+      messagesEndpoint: 'orchestrator/messages',
+      
       // MCP server capabilities
       capabilities: {
         tools: {

@@ -19,21 +19,21 @@ export class MCPClientService {
         name: 'opensearch',
         endpoint: this.configService.get('OPENSEARCH_MCP_ENDPOINT'),
         capabilities: ['vector-search', 'document-indexing', 'similarity-search'],
-        health_endpoint: '/health',
+        health_endpoint: '/opensearch/health',
         timeout: 30000,
       },
       {
         name: 'database',
         endpoint: this.configService.get('DATABASE_MCP_ENDPOINT'),
         capabilities: ['document-storage', 'sql-queries', 'metadata-management'],
-        health_endpoint: '/health',
+        health_endpoint: '/database/health',
         timeout: 15000,
       },
       {
         name: 'graph',
         endpoint: this.configService.get('GRAPH_MCP_ENDPOINT'),
         capabilities: ['graph-storage', 'relationships', 'cypher-queries'],
-        health_endpoint: '/health',
+        health_endpoint: '/graph/health',
         timeout: 20000,
       },
     ];
@@ -108,7 +108,12 @@ export class MCPClientService {
 
       this.logger.debug(`Calling MCP tool [${serverName}]: ${toolName}`, parameters);
 
-      const response = await client.post('', mcpRequest);
+      // Use the namespaced MCP endpoint
+      const mcpPath = serverName === 'opensearch' ? '/opensearch/mcp' : 
+                      serverName === 'database' ? '/database/mcp' : 
+                      serverName === 'graph' ? '/graph/mcp' : '/mcp';
+      
+      const response = await client.post(mcpPath, mcpRequest);
       const mcpResponse: MCPClientResponse<T> = response.data;
 
       if (mcpResponse.error) {
@@ -137,7 +142,12 @@ export class MCPClientService {
         params: {},
       };
 
-      const response = await client.post('', mcpRequest);
+      // Use the namespaced MCP endpoint
+      const mcpPath = serverName === 'opensearch' ? '/opensearch/mcp' : 
+                      serverName === 'database' ? '/database/mcp' : 
+                      serverName === 'graph' ? '/graph/mcp' : '/mcp';
+      
+      const response = await client.post(mcpPath, mcpRequest);
       const mcpResponse: MCPClientResponse = response.data;
 
       if (mcpResponse.error) {
