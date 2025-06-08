@@ -357,6 +357,134 @@ export class Neo4jGraphService implements OnModuleDestroy {
   }
 
   /**
+   * Get connections between memories
+   */
+  async getConnections(memoryId?: string, relationshipType?: string, limit: number = 50): Promise<any[]> {
+    if (!this.driver) {
+      return [];
+    }
+
+    const session = this.driver.session();
+    
+    try {
+      let query = `
+        MATCH (a)-[r]->(b)
+        WHERE 1=1
+      `;
+      const params: any = { limit };
+
+      if (memoryId) {
+        query += ` AND (a.memory_id = $memory_id OR b.memory_id = $memory_id)`;
+        params.memory_id = memoryId;
+      }
+
+      if (relationshipType) {
+        query += ` AND type(r) = $relationship_type`;
+        params.relationship_type = relationshipType;
+      }
+
+      query += `
+        RETURN 
+          a.memory_id as from_memory_id,
+          b.memory_id as to_memory_id,
+          type(r) as relationship_type,
+          r.confidence as confidence,
+          properties(r) as properties
+        LIMIT $limit
+      `;
+
+      const result = await session.run(query, params);
+      
+      return result.records.map(record => ({
+        from_memory_id: record.get('from_memory_id'),
+        to_memory_id: record.get('to_memory_id'),
+        relationship_type: record.get('relationship_type'),
+        confidence: record.get('confidence'),
+        properties: record.get('properties')
+      }));
+    } catch (error) {
+      this.logger.error(`Failed to get connections: ${error.message}`);
+      return [];
+    } finally {
+      await session.close();
+    }
+  }
+
+  /**
+   * Get all connections for a specific entity
+   */
+  async getEntityConnections(entityId: string, entityType: 'memory' | 'agent' | 'session', limit: number = 50): Promise<any[]> {
+    if (!this.driver) {
+      return [];
+    }
+
+    const session = this.driver.session();
+    
+    try {
+      let query = '';
+      const params: any = { entity_id: entityId, limit };
+
+      switch (entityType) {
+        case 'memory':
+          query = `
+            MATCH (m:Memory {memory_id: $entity_id})-[r]-(connected)
+            RETURN 
+              m.memory_id as entity_id,
+              connected.memory_id as connected_id,
+              type(r) as relationship_type,
+              r.confidence as confidence,
+              properties(r) as properties,
+              labels(connected)[0] as connected_type
+            LIMIT $limit
+          `;
+          break;
+        case 'agent':
+          query = `
+            MATCH (a:Agent {agent_id: $entity_id})-[r]-(connected)
+            RETURN 
+              a.agent_id as entity_id,
+              connected.memory_id as connected_id,
+              type(r) as relationship_type,
+              r.confidence as confidence,
+              properties(r) as properties,
+              labels(connected)[0] as connected_type
+            LIMIT $limit
+          `;
+          break;
+        case 'session':
+          query = `
+            MATCH (s:Session {session_id: $entity_id})-[r]-(connected)
+            RETURN 
+              s.session_id as entity_id,
+              connected.memory_id as connected_id,
+              type(r) as relationship_type,
+              r.confidence as confidence,
+              properties(r) as properties,
+              labels(connected)[0] as connected_type
+            LIMIT $limit
+          `;
+          break;
+      }
+
+      const result = await session.run(query, params);
+      
+      return result.records.map(record => ({
+        entity_id: record.get('entity_id'),
+        connected_id: record.get('connected_id'),
+        relationship_type: record.get('relationship_type'),
+        confidence: record.get('confidence'),
+        properties: record.get('properties'),
+        connected_type: record.get('connected_type')
+      }));
+    } catch (error) {
+      this.logger.error(`Failed to get entity connections: ${error.message}`);
+      return [];
+    } finally {
+      await session.close();
+    }
+  }
+
+  /**
    * Clean up connections
    */
   async onModuleDestroy() {

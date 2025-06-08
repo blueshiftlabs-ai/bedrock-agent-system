@@ -456,6 +456,34 @@ export class OpenSearchStorageService {
   }
 
   /**
+   * Get memory content by memory ID
+   */
+  async getMemoryContent(memoryId: string, contentType: ContentType): Promise<string | null> {
+    const indexName = contentType === 'text' ? this.textIndexName : this.codeIndexName;
+
+    try {
+      const { body: searchResult } = await this.opensearchClient.search({
+        index: indexName,
+        body: {
+          query: {
+            term: { memory_id: memoryId },
+          },
+        },
+      });
+
+      if (searchResult.hits.total.value > 0) {
+        const document = searchResult.hits.hits[0]._source as OpenSearchDocument;
+        return document.content || null;
+      }
+      
+      return null;
+    } catch (error) {
+      this.logger.error(`Failed to get memory content for ${memoryId}: ${error.message}`);
+      throw error;
+    }
+  }
+
+  /**
    * Delete memory from OpenSearch
    */
   async deleteMemory(memoryId: string, contentType: ContentType): Promise<void> {

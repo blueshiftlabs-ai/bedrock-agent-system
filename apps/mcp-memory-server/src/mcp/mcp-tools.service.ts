@@ -182,4 +182,30 @@ export class MCPToolsService {
   async listProjects(params: { include_stats?: boolean }) {
     return await this.memoryService.listProjects(params.include_stats !== false);
   }
+
+  @Tool({
+    name: 'retrieve-connections',
+    description: 'Retrieve graph connections between memories',
+    parameters: z.object({
+      memory_id: z.string().optional().describe('Get connections for specific memory ID'),
+      relationship_type: z.string().optional().describe('Filter by relationship type'),
+      limit: z.number().default(50).describe('Maximum number of connections to return'),
+    }),
+  })
+  async retrieveConnections(params: { memory_id?: string; relationship_type?: string; limit?: number }) {
+    return await this.memoryService.retrieveConnections(params);
+  }
+
+  @Tool({
+    name: 'connections-by-entity',
+    description: 'Get all connections for a specific entity (memory, agent, or session)',
+    parameters: z.object({
+      entity_id: z.string().describe('Entity ID (memory_id, agent_id, or session_id)'),
+      entity_type: z.enum(['memory', 'agent', 'session']).describe('Type of entity'),
+      limit: z.number().default(50).describe('Maximum number of connections to return'),
+    }),
+  })
+  async connectionsByEntity(params: { entity_id: string; entity_type: 'memory' | 'agent' | 'session'; limit?: number }) {
+    return await this.memoryService.connectionsByEntity(params);
+  }
 }

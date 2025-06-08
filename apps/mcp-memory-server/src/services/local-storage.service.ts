@@ -142,6 +142,19 @@ export class LocalStorageService {
   }
 
   /**
+   * Get all memory metadata (for local retrieval)
+   */
+  async getAllMemoryMetadata(): Promise<any[]> {
+    const data = await this.readData(this.memoryFile);
+    return Object.values(data).map(item => ({
+      ...item,
+      created_at: new Date(item.created_at),
+      updated_at: new Date(item.updated_at),
+      last_accessed: new Date(item.last_accessed),
+    }));
+  }
+
+  /**
    * Store session context
    */
   async storeSessionContext(context: SessionContext): Promise<void> {

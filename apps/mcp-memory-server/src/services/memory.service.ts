@@ -164,6 +164,9 @@ export class MemoryService {
       } else if (request.query) {
         // Search using query
         results = await this.searchMemories(request.query);
+      } else {
+        // Return all memories (with optional filters)
+        results = await this.getAllMemories(request);
       }
 
       // Enhance results with graph relationships if requested
@@ -289,6 +292,81 @@ export class MemoryService {
     } catch (error) {
       this.logger.error(`Failed to add connection: ${error.message}`);
       throw error;
+    }
+  }
+
+  /**
+   * Get all memories with optional filtering (for when no query is provided)
+   */
+  async getAllMemories(request: any): Promise<MemorySearchResult[]> {
+    try {
+      // Get all memories from local storage
+      const allMetadata = await this.dynamoDbService.getAllMemoryMetadata();
+      
+      // Apply filters
+      let filteredMemories = allMetadata;
+      
+      if (request.agent_id) {
+        filteredMemories = filteredMemories.filter(m => m.agent_id === request.agent_id);
+      }
+      
+      if (request.session_id) {
+        filteredMemories = filteredMemories.filter(m => m.session_id === request.session_id);
+      }
+      
+      if (request.project) {
+        filteredMemories = filteredMemories.filter(m => m.project === request.project);
+      }
+      
+      if (request.type) {
+        filteredMemories = filteredMemories.filter(m => m.type === request.type);
+      }
+      
+      if (request.content_type) {
+        filteredMemories = filteredMemories.filter(m => m.content_type === request.content_type);
+      }
+      
+      // Apply limit
+      const limit = request.limit || 10;
+      const limitedMemories = filteredMemories.slice(0, limit);
+      
+      // Convert to MemorySearchResult format
+      const results: MemorySearchResult[] = [];
+      
+      for (const metadata of limitedMemories) {
+        try {
+          // Get content from OpenSearch or local storage
+          let content = '';
+          try {
+            const openSearchResult = await this.openSearchService.getMemoryContent(
+              metadata.memory_id,
+              metadata.content_type as any
+            );
+            content = openSearchResult || '';
+          } catch (error) {
+            this.logger.warn(`Failed to get content for ${metadata.memory_id}: ${error.message}`);
+            content = `[Content not available - ${error.message}]`;
+          }
+          
+          results.push({
+            memory: {
+              metadata,
+              content
+            },
+            similarity_score: 1.0, // No similarity scoring for "get all"
+            related_memories: [],
+            graph_connections: []
+          });
+        } catch (error) {
+          this.logger.warn(`Failed to process memory ${metadata.memory_id}: ${error.message}`);
+        }
+      }
+      
+      return results;
+      
+    } catch (error) {
+      this.logger.error(`Failed to get all memories: ${error.message}`);
+      return [];
     }
   }
 
@@ -1111,6 +1189,42 @@ export class MemoryService {
     } catch (error) {
       this.logger.error(`Failed to list projects from local storage: ${error.message}`);
       return { projects: [], total_count: 0 };
+    }
+  }
+
+  /**
+   * Retrieve graph connections between memories
+   */
+  async retrieveConnections(params: { memory_id?: string; relationship_type?: string; limit?: number }) {
+    try {
+      // This would use Neo4j service to get connections
+      const connections = await this.neo4jService.getConnections(params.memory_id, params.relationship_type, params.limit || 50);
+      return {
+        connections,
+        total_count: connections.length
+      };
+    } catch (error) {
+      this.logger.error(`Failed to retrieve connections: ${error.message}`);
+      return { connections: [], total_count: 0 };
+    }
+  }
+
+  /**
+   * Get all connections for a specific entity
+   */
+  async connectionsByEntity(params: { entity_id: string; entity_type: 'memory' | 'agent' | 'session'; limit?: number }) {
+    try {
+      // This would use Neo4j service to get entity connections
+      const connections = await this.neo4jService.getEntityConnections(params.entity_id, params.entity_type, params.limit || 50);
+      return {
+        entity_id: params.entity_id,
+        entity_type: params.entity_type,
+        connections,
+        total_count: connections.length
+      };
+    } catch (error) {
+      this.logger.error(`Failed to get connections by entity: ${error.message}`);
+      return { entity_id: params.entity_id, entity_type: params.entity_type, connections: [], total_count: 0 };
     }
   }
 }
