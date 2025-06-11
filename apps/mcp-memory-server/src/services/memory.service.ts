@@ -147,27 +147,29 @@ export class MemoryService {
   }
 
   /**
-   * Retrieve memories using sophisticated search
+   * Retrieve memories using sophisticated search with functional patterns
    */
   async retrieveMemories(request: RetrieveMemoriesRequest): Promise<RetrieveMemoriesResponse> {
     const startTime = Date.now();
 
-    const getMemoryResults = async (): Promise<MemorySearchResult[]> => {
-      // Use a lookup table for retrieval strategies
-      const strategies = {
-        byIds: () => request.memory_ids?.length > 0,
-        byQuery: () => Boolean(request.query?.query),
-        getAll: () => true // fallback
-      };
+    const retrievalStrategies = [
+      {
+        predicate: () => Boolean(request.memory_ids?.length),
+        action: () => this.retrieveMemoriesByIds(request.memory_ids!)
+      },
+      {
+        predicate: () => Boolean(request.query?.query),
+        action: () => this.searchMemories(request.query!)
+      },
+      {
+        predicate: () => true,
+        action: () => this.getAllMemories(request.query || {})
+      }
+    ];
 
-      const retrievalActions = {
-        byIds: () => this.retrieveMemoriesByIds(request.memory_ids!),
-        byQuery: () => this.searchMemories(request.query!),
-        getAll: () => this.getAllMemories(request.query || {})
-      };
-
-      const strategy = Object.keys(strategies).find(key => strategies[key]()) as keyof typeof retrievalActions;
-      return retrievalActions[strategy]();
+    const executeStrategy = () => {
+      const strategy = retrievalStrategies.find(s => s.predicate());
+      return strategy?.action() || Promise.resolve([]);
     };
 
     const enhanceWithRelationships = (results: MemorySearchResult[]) => 
@@ -176,7 +178,7 @@ export class MemoryService {
         : Promise.resolve(results);
 
     try {
-      const results = await getMemoryResults().then(enhanceWithRelationships);
+      const results = await executeStrategy().then(enhanceWithRelationships);
       const duration = Date.now() - startTime;
       
       return {
@@ -192,38 +194,44 @@ export class MemoryService {
   }
 
   /**
-   * Search memories using vector similarity and filters
+   * Search memories using vector similarity and filters with functional patterns
    */
   async searchMemories(query: MemoryQuery): Promise<MemorySearchResult[]> {
+    const enhanceWithMetadata = async (result: MemorySearchResult): Promise<MemorySearchResult> => {
+      try {
+        const metadata = await this.dynamoDbService.getMemoryMetadata(
+          result.memory.metadata.memory_id
+        );
+        
+        return metadata ? {
+          ...result,
+          memory: {
+            ...result.memory,
+            metadata: {
+              ...result.memory.metadata,
+              access_count: metadata.access_count,
+              last_accessed: new Date(metadata.last_accessed)
+            }
+          }
+        } : result;
+      } catch (error) {
+        this.logger.warn(`Failed to get metadata for ${result.memory.metadata.memory_id}`);
+        return result;
+      }
+    };
+
     try {
-      // Generate query embeddings
       const embeddingResponse = await this.embeddingService.generateEmbedding({
         text: query.query,
         content_type: query.content_type || 'text',
       });
 
-      // Search OpenSearch with vector similarity
       const searchResults = await this.openSearchService.searchMemories(
         query,
         embeddingResponse.embeddings
       );
 
-      // Enhance with metadata from DynamoDB
-      for (const result of searchResults) {
-        try {
-          const metadata = await this.dynamoDbService.getMemoryMetadata(
-            result.memory.metadata.memory_id
-          );
-          if (metadata) {
-            result.memory.metadata.access_count = metadata.access_count;
-            result.memory.metadata.last_accessed = new Date(metadata.last_accessed);
-          }
-        } catch (error) {
-          this.logger.warn(`Failed to get metadata for ${result.memory.metadata.memory_id}`);
-        }
-      }
-
-      return searchResults;
+      return Promise.all(searchResults.map(enhanceWithMetadata));
 
     } catch (error) {
       this.logger.error(`Failed to search memories: ${error.message}`);
@@ -299,12 +307,13 @@ export class MemoryService {
   }
 
   /**
-   * Get all memories with optional filtering (for when no query is provided)
+   * Get all memories with optional filtering using functional patterns
    */
   async getAllMemories(request: any): Promise<MemorySearchResult[]> {
-    const getContent = async (metadata: any): Promise<string> => {
+    const safeGetContent = async (metadata: any): Promise<string> => {
       try {
-        return await this.openSearchService.getMemoryContent(metadata.memory_id, metadata.content_type as any) || '';
+        const content = await this.openSearchService.getMemoryContent(metadata.memory_id, metadata.content_type as any);
+        return content || '';
       } catch (error) {
         this.logger.warn(`Failed to get content for ${metadata.memory_id}: ${error.message}`);
         return `[Content not available - ${error.message}]`;
@@ -313,11 +322,9 @@ export class MemoryService {
 
     const createMemoryResult = async (metadata: any): Promise<MemorySearchResult | null> => {
       try {
+        const content = await safeGetContent(metadata);
         return {
-          memory: {
-            metadata,
-            content: await getContent(metadata)
-          },
+          memory: { metadata, content },
           similarity_score: 1.0,
           related_memories: [],
           graph_connections: []
@@ -328,16 +335,20 @@ export class MemoryService {
       }
     };
 
-    const applyFilters = (memories: any[]) => memories
-      .filter(m => !request.agent_id || m.agent_id === request.agent_id)
-      .filter(m => !request.session_id || m.session_id === request.session_id)
-      .filter(m => !request.project || m.project === request.project)
-      .filter(m => !request.type || m.type === request.type)
-      .filter(m => !request.content_type || m.content_type === request.content_type);
+    const filterPredicates = [
+      (m: any) => !request.agent_id || m.agent_id === request.agent_id,
+      (m: any) => !request.session_id || m.session_id === request.session_id,
+      (m: any) => !request.project || m.project === request.project,
+      (m: any) => !request.type || m.type === request.type,
+      (m: any) => !request.content_type || m.content_type === request.content_type
+    ];
+
+    const applyAllFilters = (memories: any[]) => 
+      filterPredicates.reduce((filtered, predicate) => filtered.filter(predicate), memories);
 
     try {
       const allMetadata = await this.dynamoDbService.getAllMemoryMetadata();
-      const filteredMetadata = applyFilters(allMetadata).slice(0, request.limit || 10);
+      const filteredMetadata = applyAllFilters(allMetadata).slice(0, request.limit || 10);
       
       const results = await Promise.all(filteredMetadata.map(createMemoryResult));
       return results.filter(Boolean) as MemorySearchResult[];
@@ -349,11 +360,24 @@ export class MemoryService {
   }
 
   /**
-   * Create an observation and link it to related memories
+   * Create an observation and link it to related memories using functional patterns
    */
   async createObservation(request: CreateObservationRequest): Promise<CreateObservationResponse> {
+    const createConnection = async (relatedMemoryId: string) => {
+      try {
+        return await this.neo4jService.addConnection(
+          request.observation, // Will be updated with actual memory_id
+          relatedMemoryId,
+          'OBSERVES',
+          { confidence: 0.8 }
+        );
+      } catch (error) {
+        this.logger.warn(`Failed to create connection to ${relatedMemoryId}: ${error.message}`);
+        return false;
+      }
+    };
+
     try {
-      // Store observation as a memory first
       const observationMemory = await this.storeMemory({
         content: request.observation,
         type: 'semantic',
@@ -363,19 +387,22 @@ export class MemoryService {
         metadata: request.context,
       });
 
-      // Create connections to related memories if provided
-      let connectionsCreated = 0;
-      if (request.related_memory_ids && request.related_memory_ids.length > 0) {
-        for (const relatedMemoryId of request.related_memory_ids) {
-          const connectionSuccess = await this.neo4jService.addConnection(
+      const relatedMemoryIds = request.related_memory_ids || [];
+      const connectionResults = await Promise.all(
+        relatedMemoryIds.map(async (memoryId) => 
+          this.neo4jService.addConnection(
             observationMemory.memory_id,
-            relatedMemoryId,
+            memoryId,
             'OBSERVES',
             { confidence: 0.8 }
-          );
-          if (connectionSuccess) connectionsCreated++;
-        }
-      }
+          ).catch((error) => {
+            this.logger.warn(`Failed to create connection to ${memoryId}: ${error.message}`);
+            return false;
+          })
+        )
+      );
+
+      const connectionsCreated = connectionResults.filter(Boolean).length;
 
       return {
         observation_id: observationMemory.memory_id,
@@ -391,39 +418,43 @@ export class MemoryService {
   }
 
   /**
-   * Consolidate similar memories to reduce redundancy
+   * Consolidate similar memories to reduce redundancy using functional patterns
    */
   async consolidateMemories(request: ConsolidateMemoriesRequest): Promise<ConsolidateMemoriesResponse> {
+    const consolidatePair = async (candidatePair: any) => {
+      try {
+        const result = await this.consolidateMemoryPair(candidatePair.memory1, candidatePair.memory2);
+        return result.success ? result : { success: false, memoriesMerged: 0, connectionsUpdated: 0 };
+      } catch (error) {
+        this.logger.warn(`Failed to consolidate memory pair: ${error.message}`);
+        return { success: false, memoriesMerged: 0, connectionsUpdated: 0 };
+      }
+    };
+
+    const aggregateResults = (results: any[]) => 
+      results.reduce(
+        (acc, result) => ({
+          consolidationsPerformed: acc.consolidationsPerformed + (result.success ? 1 : 0),
+          memoriesMerged: acc.memoriesMerged + result.memoriesMerged,
+          connectionsUpdated: acc.connectionsUpdated + result.connectionsUpdated
+        }),
+        { consolidationsPerformed: 0, memoriesMerged: 0, connectionsUpdated: 0 }
+      );
+
     try {
       const threshold = request.similarity_threshold || this.configService.memoryServiceConfig.memoryConsolidationThreshold;
       const maxConsolidations = request.max_consolidations || 50;
 
-      let consolidationsPerformed = 0;
-      let memoriesMerged = 0;
-      let connectionsUpdated = 0;
-
-      // Get candidate memories for consolidation
       const candidates = await this.findConsolidationCandidates(request.agent_id, threshold);
-
-      for (const candidatePair of candidates.slice(0, maxConsolidations)) {
-        try {
-          const result = await this.consolidateMemoryPair(candidatePair.memory1, candidatePair.memory2);
-          
-          if (result.success) {
-            consolidationsPerformed++;
-            memoriesMerged += result.memoriesMerged;
-            connectionsUpdated += result.connectionsUpdated;
-          }
-
-        } catch (error) {
-          this.logger.warn(`Failed to consolidate memory pair: ${error.message}`);
-        }
-      }
+      const limitedCandidates = candidates.slice(0, maxConsolidations);
+      
+      const results = await Promise.all(limitedCandidates.map(consolidatePair));
+      const aggregatedResults = aggregateResults(results);
 
       return {
-        consolidations_performed: consolidationsPerformed,
-        memories_merged: memoriesMerged,
-        connections_updated: connectionsUpdated,
+        consolidations_performed: aggregatedResults.consolidationsPerformed,
+        memories_merged: aggregatedResults.memoriesMerged,
+        connections_updated: aggregatedResults.connectionsUpdated,
         success: true,
       };
 
@@ -434,7 +465,7 @@ export class MemoryService {
   }
 
   /**
-   * Get memory statistics and analytics
+   * Get memory statistics and analytics using functional patterns
    */
   async getMemoryStatistics(agentId?: string): Promise<any> {
     const calculateLocalStats = async () => {
@@ -443,34 +474,36 @@ export class MemoryService {
         ? allMemories.filter(m => m.agent_id === agentId)
         : allMemories;
 
-      const aggregateBy = (field: string) => 
-        Object.fromEntries(
-          Object.entries(
-            filteredMemories.reduce((acc, memory) => {
-              const value = memory[field] || 'unknown';
-              acc[value] = (acc[value] || 0) + 1;
-              return acc;
-            }, {} as Record<string, number>)
-          ).map(([key, count]) => [key, { count }])
+      const aggregateByField = (field: string) => {
+        const counts = filteredMemories
+          .map(memory => memory[field] || 'unknown')
+          .reduce((acc, value) => ({ ...acc, [value]: (acc[value] || 0) + 1 }), {} as Record<string, number>);
+        
+        return Object.fromEntries(
+          Object.entries(counts).map(([key, count]) => [key, { count }])
         );
+      };
+
+      const getRecentActivity = () => 
+        filteredMemories
+          .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
+          .slice(0, 10)
+          .map(({ memory_id, type, agent_id, created_at }) => ({ memory_id, type, agent_id, created_at }));
+
+      const contentTypeCounts = {
+        text: filteredMemories.filter(m => m.content_type === 'text').length,
+        code: filteredMemories.filter(m => m.content_type === 'code').length
+      };
 
       return {
         total_memories: filteredMemories.length,
-        text_memories: filteredMemories.filter(m => m.content_type === 'text').length,
-        code_memories: filteredMemories.filter(m => m.content_type === 'code').length,
-        by_type: aggregateBy('type'),
-        by_content_type: aggregateBy('content_type'),
-        by_agent: aggregateBy('agent_id'),
-        by_project: aggregateBy('project'),
-        recent_activity: filteredMemories
-          .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
-          .slice(0, 10)
-          .map(m => ({
-            memory_id: m.memory_id,
-            type: m.type,
-            agent_id: m.agent_id,
-            created_at: m.created_at
-          }))
+        text_memories: contentTypeCounts.text,
+        code_memories: contentTypeCounts.code,
+        by_type: aggregateByField('type'),
+        by_content_type: aggregateByField('content_type'),
+        by_agent: aggregateByField('agent_id'),
+        by_project: aggregateByField('project'),
+        recent_activity: getRecentActivity()
       };
     };
 
@@ -537,7 +570,7 @@ export class MemoryService {
       content_type: contentType,
       agent_id: request.agent_id,
       session_id: request.session_id,
-      project: request.project || 'common', // Default to 'common' project if not specified
+      project: request.project || 'common',
       created_at: now,
       updated_at: now,
       tags: request.tags || [],
@@ -545,30 +578,30 @@ export class MemoryService {
       last_accessed: now,
     };
 
-    if (contentType === 'code') {
-      return {
+    const contentTypeSpecificMetadata = {
+      code: () => ({
         ...baseMetadata,
-        content_type: 'code',
+        content_type: 'code' as const,
         programming_language: this.detectProgrammingLanguage(request.content),
         functions: this.extractFunctions(request.content),
         imports: this.extractImports(request.content),
         patterns: this.extractCodePatterns(request.content),
         complexity: this.assessCodeComplexity(request.content),
-      };
-    } else {
-      return {
+      }),
+      text: () => ({
         ...baseMetadata,
-        content_type: 'text',
-        language: 'en', // TODO: Add language detection
+        content_type: 'text' as const,
+        language: 'en',
         topics: this.extractTopics(request.content),
         sentiment: this.analyzeSentiment(request.content),
         entities: this.extractEntities(request.content),
-      };
-    }
+      })
+    };
+
+    return contentTypeSpecificMetadata[contentType]();
   }
 
   private detectContentType(content: string): ContentType {
-    // Simple heuristics for content type detection
     const codeIndicators = [
       /function\s+\w+\s*\(/,
       /class\s+\w+/,
@@ -583,23 +616,15 @@ export class MemoryService {
   }
 
   private detectMemoryType(content: string, contentType: ContentType): MemoryType {
-    // Heuristics for memory type detection
-    if (contentType === 'code') {
-      return 'procedural';
-    }
+    const memoryTypeDetectors = [
+      { type: 'procedural' as const, predicate: () => contentType === 'code' },
+      { type: 'episodic' as const, predicate: () => /\b(user|said|asked|told|conversation|yesterday|today)\b/i.test(content) },
+      { type: 'working' as const, predicate: () => /\b(current|temporary|now|working on|in progress)\b/i.test(content) },
+      { type: 'semantic' as const, predicate: () => true } // Default fallback
+    ];
 
-    // Check for episodic indicators (conversation, events)
-    if (/\b(user|said|asked|told|conversation|yesterday|today)\b/i.test(content)) {
-      return 'episodic';
-    }
-
-    // Check for working memory indicators (temporary, current)
-    if (/\b(current|temporary|now|working on|in progress)\b/i.test(content)) {
-      return 'working';
-    }
-
-    // Default to semantic memory
-    return 'semantic';
+    const detectedType = memoryTypeDetectors.find(detector => detector.predicate());
+    return detectedType?.type || 'semantic';
   }
 
   private detectProgrammingLanguage(content: string): string {
@@ -612,13 +637,10 @@ export class MemoryService {
       csharp: /using\s+System|namespace\s+\w+/,
     };
 
-    for (const [lang, pattern] of Object.entries(languagePatterns)) {
-      if (pattern.test(content)) {
-        return lang;
-      }
-    }
+    const detectedLanguage = Object.entries(languagePatterns)
+      .find(([_, pattern]) => pattern.test(content));
 
-    return 'unknown';
+    return detectedLanguage?.[0] || 'unknown';
   }
 
   private extractFunctions(content: string): string[] {
@@ -627,15 +649,17 @@ export class MemoryService {
       /(?:const|let|var)\s+(\w+)\s*=\s*(?:async\s+)?\(/g,
     ];
 
-    const functions: string[] = [];
-    for (const pattern of functionPatterns) {
+    const extractMatches = (pattern: RegExp) => {
+      const matches: string[] = [];
       let match;
       while ((match = pattern.exec(content)) !== null) {
-        functions.push(match[1]);
+        matches.push(match[1]);
       }
-    }
+      return matches;
+    };
 
-    return [...new Set(functions)];
+    const allMatches = functionPatterns.flatMap(extractMatches);
+    return [...new Set(allMatches)];
   }
 
   private extractImports(content: string): string[] {
@@ -646,15 +670,17 @@ export class MemoryService {
       /using\s+([^;]+);/g,
     ];
 
-    const imports: string[] = [];
-    for (const pattern of importPatterns) {
+    const extractMatches = (pattern: RegExp) => {
+      const matches: string[] = [];
       let match;
       while ((match = pattern.exec(content)) !== null) {
-        imports.push(match[1]);
+        matches.push(match[1]);
       }
-    }
+      return matches;
+    };
 
-    return [...new Set(imports)];
+    const allMatches = importPatterns.flatMap(extractMatches);
+    return [...new Set(allMatches)];
   }
 
   private extractCodePatterns(content: string): string[] {
@@ -679,35 +705,32 @@ export class MemoryService {
   }
 
   private extractTopics(content: string): string[] {
-    // Simple keyword extraction for topics
     const words = content.toLowerCase().match(/\b\w{4,}\b/g) || [];
     const commonWords = new Set(['that', 'this', 'with', 'have', 'will', 'from', 'they', 'been', 'have', 'their', 'said', 'each', 'which', 'what', 'were', 'when', 'where', 'more', 'some', 'like', 'into', 'time', 'very', 'only', 'could', 'other', 'after', 'first', 'well', 'many']);
     
-    const topics = words
+    const wordCounts = words
       .filter(word => !commonWords.has(word))
-      .reduce((acc, word) => {
-        acc[word] = (acc[word] || 0) + 1;
-        return acc;
-      }, {} as Record<string, number>);
+      .reduce((acc, word) => ({ ...acc, [word]: (acc[word] || 0) + 1 }), {} as Record<string, number>);
 
-    return Object.entries(topics)
+    return Object.entries(wordCounts)
       .sort(([,a], [,b]) => b - a)
       .slice(0, 5)
       .map(([word]) => word);
   }
 
   private analyzeSentiment(content: string): 'positive' | 'negative' | 'neutral' {
-    // Simple sentiment analysis
     const positiveWords = ['good', 'great', 'excellent', 'amazing', 'wonderful', 'perfect', 'love', 'like'];
     const negativeWords = ['bad', 'terrible', 'awful', 'hate', 'dislike', 'problem', 'error', 'issue'];
 
     const words = content.toLowerCase().split(/\W+/);
-    const positiveCount = words.filter(word => positiveWords.includes(word)).length;
-    const negativeCount = words.filter(word => negativeWords.includes(word)).length;
+    const [positiveCount, negativeCount] = [
+      words.filter(word => positiveWords.includes(word)).length,
+      words.filter(word => negativeWords.includes(word)).length
+    ];
 
-    if (positiveCount > negativeCount) return 'positive';
-    if (negativeCount > positiveCount) return 'negative';
-    return 'neutral';
+    return positiveCount > negativeCount ? 'positive' 
+         : negativeCount > positiveCount ? 'negative' 
+         : 'neutral';
   }
 
   private extractEntities(content: string): string[] {
@@ -717,63 +740,64 @@ export class MemoryService {
   }
 
   private async retrieveMemoriesByIds(memoryIds: string[]): Promise<MemorySearchResult[]> {
-    const results: MemorySearchResult[] = [];
-
-    for (const memoryId of memoryIds) {
+    const retrieveMemory = async (memoryId: string): Promise<MemorySearchResult | null> => {
       try {
         const metadata = await this.dynamoDbService.getMemoryMetadata(memoryId);
-        if (metadata) {
-          // Get content from OpenSearch
-          const indexName = metadata.content_type === 'text' ? 'memory-text' : 'memory-code';
-          const memory = await this.openSearchService.getMemoryByDocumentId(indexName, metadata.opensearch_id);
-          
-          if (memory) {
-            results.push({
-              memory,
-              similarity_score: 1.0, // Direct retrieval
-              related_memories: [],
-              graph_connections: [],
-            });
-          }
-        }
+        
+        if (!metadata) return null;
+
+        const indexName = metadata.content_type === 'text' ? 'memory-text' : 'memory-code';
+        const memory = await this.openSearchService.getMemoryByDocumentId(indexName, metadata.opensearch_id);
+        
+        return memory ? {
+          memory,
+          similarity_score: 1.0,
+          related_memories: [],
+          graph_connections: [],
+        } : null;
       } catch (error) {
         this.logger.warn(`Failed to retrieve memory ${memoryId}: ${error.message}`);
+        return null;
       }
-    }
+    };
 
-    return results;
+    const results = await Promise.all(memoryIds.map(retrieveMemory));
+    return results.filter(Boolean) as MemorySearchResult[];
   }
 
   private async enhanceWithGraphRelationships(results: MemorySearchResult[]): Promise<MemorySearchResult[]> {
-    for (const result of results) {
+    const enhanceResult = async (result: MemorySearchResult): Promise<MemorySearchResult> => {
       try {
-        // Get related memories through Neo4j graph traversal
         const relatedMemories = await this.neo4jService.getRelatedMemories(
           result.memory.metadata.memory_id,
           2
         );
 
-        if (relatedMemories.length > 0) {
-          // Convert ConceptNode to graph connections format
-          result.graph_connections = relatedMemories.map(related => ({
-            from_memory_id: result.memory.metadata.memory_id,
-            to_memory_id: related.concept_id,
-            relationship_type: 'CONNECTS',
-            confidence: related.confidence,
-          } as GraphConnection));
+        if (relatedMemories.length === 0) return result;
 
-          // Get the actual memory content for related memories
-          const relatedMemoryIds = relatedMemories.map(r => r.concept_id);
-          const relatedMemoryResults = await this.retrieveMemoriesByIds(relatedMemoryIds);
-          result.related_memories = relatedMemoryResults.map(r => r.memory);
-        }
+        const graphConnections = relatedMemories.map(related => ({
+          from_memory_id: result.memory.metadata.memory_id,
+          to_memory_id: related.concept_id,
+          relationship_type: 'CONNECTS',
+          confidence: related.confidence,
+        } as GraphConnection));
 
+        const relatedMemoryIds = relatedMemories.map(r => r.concept_id);
+        const relatedMemoryResults = await this.retrieveMemoriesByIds(relatedMemoryIds);
+        const relatedMemoryContents = relatedMemoryResults.map(r => r.memory);
+
+        return {
+          ...result,
+          graph_connections: graphConnections,
+          related_memories: relatedMemoryContents
+        };
       } catch (error) {
         this.logger.warn(`Failed to enhance with graph relationships: ${error.message}`);
+        return result;
       }
-    }
+    };
 
-    return results;
+    return Promise.all(results.map(enhanceResult));
   }
 
   private async ensureAgentNodeExists(agentId: string): Promise<void> {
@@ -849,152 +873,97 @@ export class MemoryService {
   }
 
   /**
-   * List all agents that have stored memories
+   * List all agents that have stored memories using functional patterns
    */
   async listAgents(project?: string): Promise<{ agents: any[], total_count: number }> {
-    try {
-      // Get unique agent IDs from OpenSearch
-      const filterClauses: any[] = [];
-      if (project) {
-        filterClauses.push({ term: { project: project } });
+    const createFilterClauses = () => project ? [{ term: { project } }] : [];
+    
+    const createSearchQuery = (indexName: string) => ({
+      index: indexName,
+      body: {
+        size: 0,
+        query: { bool: { filter: createFilterClauses() } },
+        aggs: {
+          agents: {
+            terms: { field: 'agent_id', size: 1000 },
+            aggs: {
+              projects: { terms: { field: 'project', size: 100 } },
+              memory_count: { value_count: { field: 'memory_id' } },
+              last_activity: { max: { field: 'created_at' } }
+            }
+          }
+        }
+      },
+    });
+
+    const processAgentBucket = (agentMap: Map<string, any>) => (bucket: any) => {
+      const agentId = bucket.key;
+      if (!agentId || agentId === 'undefined') return;
+      
+      const existingAgent = agentMap.get(agentId) || {
+        agent_id: agentId,
+        name: agentId,
+        description: `Agent ${agentId}`,
+        projects: new Set(),
+        memory_count: 0,
+        last_activity: null,
+        status: 'inactive'
+      };
+
+      const updatedAgent = {
+        ...existingAgent,
+        memory_count: existingAgent.memory_count + bucket.memory_count.value,
+        last_activity: bucket.last_activity.value 
+          ? (() => {
+              const activityDate = new Date(bucket.last_activity.value);
+              return !existingAgent.last_activity || activityDate > existingAgent.last_activity 
+                ? activityDate 
+                : existingAgent.last_activity;
+            })()
+          : existingAgent.last_activity
+      };
+
+      // Add projects from bucket
+      if (bucket.projects?.buckets) {
+        bucket.projects.buckets.forEach((projectBucket: any) => 
+          updatedAgent.projects.add(projectBucket.key)
+        );
       }
 
+      agentMap.set(agentId, updatedAgent);
+    };
+
+    const processSearchResults = (agentMap: Map<string, any>) => (results: PromiseSettledResult<any>[]) => {
+      const fulfilliedResults = results.filter(
+        (result): result is PromiseFulfilledResult<any> => result.status === 'fulfilled'
+      );
+      
+      fulfilliedResults.forEach(result => {
+        const buckets = result.value.body.aggregations?.agents?.buckets || [];
+        buckets.forEach(processAgentBucket(agentMap));
+      });
+    };
+
+    const formatAgent = (agent: any) => ({
+      ...agent,
+      projects: Array.from(agent.projects),
+      status: agent.last_activity && 
+              (new Date().getTime() - agent.last_activity.getTime()) < 24 * 60 * 60 * 1000 
+              ? 'active' : 'inactive'
+    });
+
+    try {
       const [textResult, codeResult] = await Promise.allSettled([
-        this.openSearchService.getClient().search({
-          index: this.openSearchService.getTextIndexName(),
-          body: {
-            size: 0,
-            query: {
-              bool: { filter: filterClauses },
-            },
-            aggs: {
-              agents: {
-                terms: { field: 'agent_id', size: 1000 },
-                aggs: {
-                  projects: {
-                    terms: { field: 'project', size: 100 }
-                  },
-                  memory_count: {
-                    value_count: { field: 'memory_id' }
-                  },
-                  last_activity: {
-                    max: { field: 'created_at' }
-                  }
-                }
-              }
-            }
-          },
-        }),
-        this.openSearchService.getClient().search({
-          index: this.openSearchService.getCodeIndexName(),
-          body: {
-            size: 0,
-            query: {
-              bool: { filter: filterClauses },
-            },
-            aggs: {
-              agents: {
-                terms: { field: 'agent_id', size: 1000 },
-                aggs: {
-                  projects: {
-                    terms: { field: 'project', size: 100 }
-                  },
-                  memory_count: {
-                    value_count: { field: 'memory_id' }
-                  },
-                  last_activity: {
-                    max: { field: 'created_at' }
-                  }
-                }
-              }
-            }
-          },
-        }),
+        this.openSearchService.getClient().search(createSearchQuery(this.openSearchService.getTextIndexName())),
+        this.openSearchService.getClient().search(createSearchQuery(this.openSearchService.getCodeIndexName()))
       ]);
 
       const agentMap = new Map();
+      processSearchResults(agentMap)([textResult, codeResult]);
+      
+      const agents = Array.from(agentMap.values()).map(formatAgent);
 
-      // Process text index results
-      if (textResult.status === 'fulfilled' && textResult.value.body.aggregations?.agents?.buckets) {
-        for (const bucket of textResult.value.body.aggregations.agents.buckets) {
-          const agentId = bucket.key;
-          if (!agentId || agentId === 'undefined') continue;
-          
-          const agent = agentMap.get(agentId) || {
-            agent_id: agentId,
-            name: agentId,
-            description: `Agent ${agentId}`,
-            projects: new Set(),
-            memory_count: 0,
-            last_activity: null,
-            status: 'inactive'
-          };
-
-          agent.memory_count += bucket.memory_count.value;
-          if (bucket.last_activity.value) {
-            const activityDate = new Date(bucket.last_activity.value);
-            if (!agent.last_activity || activityDate > agent.last_activity) {
-              agent.last_activity = activityDate;
-            }
-          }
-          
-          if (bucket.projects?.buckets) {
-            for (const projectBucket of bucket.projects.buckets) {
-              agent.projects.add(projectBucket.key);
-            }
-          }
-
-          agentMap.set(agentId, agent);
-        }
-      }
-
-      // Process code index results
-      if (codeResult.status === 'fulfilled' && codeResult.value.body.aggregations?.agents?.buckets) {
-        for (const bucket of codeResult.value.body.aggregations.agents.buckets) {
-          const agentId = bucket.key;
-          if (!agentId || agentId === 'undefined') continue;
-          
-          const agent = agentMap.get(agentId) || {
-            agent_id: agentId,
-            name: agentId,
-            description: `Agent ${agentId}`,
-            projects: new Set(),
-            memory_count: 0,
-            last_activity: null,
-            status: 'inactive'
-          };
-
-          agent.memory_count += bucket.memory_count.value;
-          if (bucket.last_activity.value) {
-            const activityDate = new Date(bucket.last_activity.value);
-            if (!agent.last_activity || activityDate > agent.last_activity) {
-              agent.last_activity = activityDate;
-            }
-          }
-          
-          if (bucket.projects?.buckets) {
-            for (const projectBucket of bucket.projects.buckets) {
-              agent.projects.add(projectBucket.key);
-            }
-          }
-
-          agentMap.set(agentId, agent);
-        }
-      }
-
-      // Convert to array and clean up
-      const agents = Array.from(agentMap.values()).map(agent => ({
-        ...agent,
-        projects: Array.from(agent.projects),
-        status: agent.last_activity && 
-                (new Date().getTime() - agent.last_activity.getTime()) < 24 * 60 * 60 * 1000 
-                ? 'active' : 'inactive'
-      }));
-
-      return {
-        agents,
-        total_count: agents.length,
-      };
+      return { agents, total_count: agents.length };
     } catch (error) {
       this.logger.error(`Failed to list agents: ${error.message}`);
       return { agents: [], total_count: 0 };
@@ -1151,61 +1120,60 @@ export class MemoryService {
   }
 
   /**
-   * List projects from local storage (DynamoDB substitute)
+   * List projects from local storage using functional patterns
    */
   private async listProjectsFromLocal(includeStats: boolean = true): Promise<{ projects: any[], total_count: number }> {
+    const processMemory = (projectMap: Map<string, any>) => (memory: any) => {
+      const project = memory.project || 'common';
+      
+      const existingProject = projectMap.get(project) || {
+        project,
+        memory_count: 0,
+        agent_count: new Set(),
+        first_memory: memory.created_at,
+        last_activity: memory.created_at,
+      };
+
+      const updatedProject = {
+        ...existingProject,
+        memory_count: existingProject.memory_count + 1,
+        first_memory: memory.created_at < existingProject.first_memory 
+          ? memory.created_at 
+          : existingProject.first_memory,
+        last_activity: memory.created_at > existingProject.last_activity 
+          ? memory.created_at 
+          : existingProject.last_activity
+      };
+
+      if (memory.agent_id) {
+        updatedProject.agent_count.add(memory.agent_id);
+      }
+
+      projectMap.set(project, updatedProject);
+    };
+
+    const formatProject = (project: any) => ({
+      ...project,
+      agent_count: project.agent_count.size,
+      first_memory: new Date(project.first_memory),
+      last_activity: new Date(project.last_activity),
+    });
+
     try {
-      // Cast to LocalStorageService to access getAllMemories method
       const localStorageService = this.dynamoDbService as any;
       if (!localStorageService.getAllMemories) {
         this.logger.warn('getAllMemories method not available, returning empty projects list');
         return { projects: [], total_count: 0 };
       }
 
-      // Get all memory metadata from local storage
       const allMemories = await localStorageService.getAllMemories();
-      
       const projectMap = new Map<string, any>();
+      
+      allMemories.forEach(processMemory(projectMap));
+      
+      const projects = Array.from(projectMap.values()).map(formatProject);
 
-      for (const memory of allMemories) {
-        const project = memory.project || 'common';
-        
-        if (!projectMap.has(project)) {
-          projectMap.set(project, {
-            project: project,
-            memory_count: 0,
-            agent_count: new Set(),
-            first_memory: memory.created_at,
-            last_activity: memory.created_at,
-          });
-        }
-
-        const projectInfo = projectMap.get(project);
-        projectInfo.memory_count++;
-        if (memory.agent_id) {
-          projectInfo.agent_count.add(memory.agent_id);
-        }
-        
-        if (memory.created_at < projectInfo.first_memory) {
-          projectInfo.first_memory = memory.created_at;
-        }
-        if (memory.created_at > projectInfo.last_activity) {
-          projectInfo.last_activity = memory.created_at;
-        }
-      }
-
-      // Convert Sets to counts and format dates
-      const projects = Array.from(projectMap.values()).map(project => ({
-        ...project,
-        agent_count: project.agent_count.size,
-        first_memory: new Date(project.first_memory),
-        last_activity: new Date(project.last_activity),
-      }));
-
-      return {
-        projects,
-        total_count: projects.length,
-      };
+      return { projects, total_count: projects.length };
     } catch (error) {
       this.logger.error(`Failed to list projects from local storage: ${error.message}`);
       return { projects: [], total_count: 0 };
