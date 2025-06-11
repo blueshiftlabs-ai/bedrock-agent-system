@@ -72,19 +72,16 @@ export class MemoryService {
         embeddings: embeddingResponse.embeddings,
       };
 
-      // 4. Store in OpenSearch (vector similarity) - skip in local mode
+      // 4. Store in OpenSearch (vector similarity) - enabled in all modes for development
       let opensearchId: string | undefined;
-      if (!this.configService.isLocalMode) {
-        try {
-          opensearchId = await this.openSearchService.storeMemory(
-            storedMemory,
-            embeddingResponse.embeddings
-          );
-        } catch (error) {
-          this.logger.warn(`OpenSearch unavailable in local mode: ${error.message}`);
-        }
-      } else {
-        this.logger.debug('Skipping OpenSearch storage in local mode');
+      try {
+        opensearchId = await this.openSearchService.storeMemory(
+          storedMemory,
+          embeddingResponse.embeddings
+        );
+        this.logger.debug('OpenSearch storage successful');
+      } catch (error) {
+        this.logger.warn(`OpenSearch storage failed: ${error.message}`);
       }
 
       // 5. Create graph node and relationships
@@ -440,14 +437,56 @@ export class MemoryService {
    * Get memory statistics and analytics
    */
   async getMemoryStatistics(agentId?: string): Promise<any> {
+    const calculateLocalStats = async () => {
+      const allMemories = await this.dynamoDbService.getAllMemoryMetadata();
+      const filteredMemories = agentId 
+        ? allMemories.filter(m => m.agent_id === agentId)
+        : allMemories;
+
+      const aggregateBy = (field: string) => 
+        Object.fromEntries(
+          Object.entries(
+            filteredMemories.reduce((acc, memory) => {
+              const value = memory[field] || 'unknown';
+              acc[value] = (acc[value] || 0) + 1;
+              return acc;
+            }, {} as Record<string, number>)
+          ).map(([key, count]) => [key, { count }])
+        );
+
+      return {
+        total_memories: filteredMemories.length,
+        text_memories: filteredMemories.filter(m => m.content_type === 'text').length,
+        code_memories: filteredMemories.filter(m => m.content_type === 'code').length,
+        by_type: aggregateBy('type'),
+        by_content_type: aggregateBy('content_type'),
+        by_agent: aggregateBy('agent_id'),
+        by_project: aggregateBy('project'),
+        recent_activity: filteredMemories
+          .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
+          .slice(0, 10)
+          .map(m => ({
+            memory_id: m.memory_id,
+            type: m.type,
+            agent_id: m.agent_id,
+            created_at: m.created_at
+          }))
+      };
+    };
+
+    const getGraphStats = () => 
+      this.neo4jService.findConceptClusters 
+        ? this.neo4jService.findConceptClusters(agentId) 
+        : Promise.resolve([]);
+
     try {
-      const [openSearchStats, graphStats] = await Promise.all([
-        this.openSearchService.getMemoryStatistics(agentId),
-        this.neo4jService.findConceptClusters ? this.neo4jService.findConceptClusters(agentId) : Promise.resolve([]),
+      const [localStats, graphStats] = await Promise.all([
+        calculateLocalStats(),
+        getGraphStats()
       ]);
 
       return {
-        opensearch: openSearchStats,
+        storage: localStats,
         graph: graphStats,
         timestamp: new Date().toISOString(),
       };

@@ -28,8 +28,15 @@ export class Neo4jGraphService implements OnModuleDestroy {
     try {
       const { uri, username, password } = this.configService.neo4jConfig;
       
-      // Create Neo4j driver
-      this.driver = neo4j.driver(uri, neo4j.auth.basic(username, password));
+      // Create Neo4j driver with proper encryption settings
+      this.driver = neo4j.driver(
+        uri, 
+        neo4j.auth.basic(username, password),
+        { 
+          encrypted: false, // Disable encryption for local development
+          trust: 'TRUST_ALL_CERTIFICATES' // Trust self-signed certificates
+        }
+      );
 
       // Verify connectivity
       await this.driver.verifyConnectivity();
