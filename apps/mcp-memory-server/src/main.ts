@@ -28,6 +28,7 @@ async function bootstrap() {
   console.log(`🧠 MCP Memory Server running on port ${port}`);
   console.log(`\n🔗 MCP Endpoint:`);
   console.log(`   HTTP/Stream: http://localhost:${port}/memory/mcp (use this for all MCP clients)`);
+  console.log(`   HTTP/Stream: http://localhost:${port}/memory/sse (use this for all MCP SSE only clients)`);
   console.log(`\n❤️  Health check: http://localhost:${port}/memory/health`);
   console.log(`\n📚 MCP Tools Available (use MCP protocol only):`);
   console.log(`   - store-memory: Store memories with semantic understanding`);

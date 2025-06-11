@@ -68,10 +68,11 @@ export class MemoryConfigService {
   }
 
   /**
-   * Check if using local storage
+   * @deprecated Local storage is now automatic fallback, not a configuration option
+   * JSON storage is used automatically when primary storage (DynamoDB) fails
    */
   get useLocalStorage(): boolean {
-    return this.configService.get<string>('USE_LOCAL_STORAGE', 'true') === 'true';
+    return false; // Always use primary storage with automatic JSON fallback
   }
 
   /**

@@ -31,6 +31,7 @@ import { MemoryModule } from '../memory/memory.module';
       // Use only HTTP transport since SSE has session management issues
       transport: [
         McpTransportType.STREAMABLE_HTTP,  // For HTTP clients, Claude Code, and all MCP clients
+        McpTransportType.SSE
       ],
       streamableHttp: {
         // Enable JSON responses for non-streaming requests (good for testing)
