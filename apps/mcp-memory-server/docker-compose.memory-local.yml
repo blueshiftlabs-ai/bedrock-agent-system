@@ -1,7 +1,5 @@
-version: '3.8'
-
 services:
-  # DynamoDB Local for development
+  # DynamoDB Local for development  
   dynamodb-local:
     image: amazon/dynamodb-local:latest
     container_name: dynamodb-local
@@ -9,7 +7,7 @@ services:
       - "5100:8000"
     command: ["-jar", "DynamoDBLocal.jar", "-sharedDb", "-dbPath", "./data"]
     volumes:
-      - dynamodb-data:/home/dynamodblocal/data
+      - "./docker/dynamodb:/home/dynamodblocal/data"
     working_dir: /home/dynamodblocal
     networks:
       - memory-network
@@ -71,21 +69,34 @@ services:
     networks:
       - memory-network
 
-  # Gremlin Server (Neptune local alternative) - In-memory TinkerGraph
-  gremlin-server:
-    image: tinkerpop/gremlin-server:latest
-    container_name: gremlin-server
-    ports:
-      - "5105:8182"
+  # Neo4j for graph database
+  neo4j:
+    image: neo4j:${NEO4J_VERSION:-5-community}
+    container_name: mcp-neo4j
     environment:
-      - JAVA_OPTIONS=-Xms256m -Xmx512m
+      - NEO4J_AUTH=${NEO4J_USERNAME:-neo4j}/${NEO4J_PASSWORD:-password}
+      - NEO4J_apoc_export_file_enabled=true
+      - NEO4J_apoc_import_file_enabled=true
+      - NEO4J_apoc_import_file_use__neo4j__config=true
+      - NEO4J_PLUGINS=["apoc"]
+    ports:
+      - "7474:7474"  # HTTP
+      - "7687:7687"  # Bolt
+    volumes:
+      - neo4j-data:/data
+      - neo4j-logs:/logs
+      - neo4j-import:/var/lib/neo4j/import
+      - neo4j-plugins:/plugins
     networks:
       - memory-network
 
 volumes:
   dynamodb-data:
   opensearch-data01:
-  gremlin-data:
+  neo4j-data:
+  neo4j-logs:
+  neo4j-import:
+  neo4j-plugins:
 
 networks:
   memory-network:
