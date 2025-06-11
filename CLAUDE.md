@@ -533,9 +533,39 @@ docker-compose -f docker-compose.distributed-mcp.yml exec memory-orchestrator cu
 3. **Memory System Dogfooding**: Use available memory tools to store implementation context and decisions
 4. **Documentation Updates**: Update implementation progress documents as features are completed
 
+### MCP Server Configuration & Backup Strategy
+
+**Critical Issue**: Claude Code occasionally loses MCP server configurations during crashes/restarts.
+
+**Backup System**:
+- **Auto-backup script**: `scripts/backup-claude-config.sh` 
+- **Manual backup**: Run script before major changes
+- **Restore command**: `cp .mcp-backups/claude-config-TIMESTAMP.json ~/.claude.json`
+
+**Global MCP Servers** (user-level, available in all projects):
+- `memory-local`: http://localhost:4100/memory/sse (SSE transport)
+- `sequential-thinking`: npx -y @modelcontextprotocol/server-sequential-thinking
+- `filesystem`: npx -y @modelcontextprotocol/server-filesystem /home/acoose/projects
+- `time`: npx -y @modelcontextprotocol/server-time
+- `github`: npx -y @modelcontextprotocol/server-github
+- `puppeteer`: npx -y @modelcontextprotocol/server-puppeteer
+- `awslabs-core`: uvx awslabs.core-mcp-server@latest
+- `context7`: npx -y @upstash/context7-mcp
+
+**Quick Recovery**:
+```bash
+# If MCP servers disappear again, run:
+claude mcp add "memory-local" "http://localhost:4100/memory/sse" -t sse -s user
+claude mcp add "sequential-thinking" "npx" -s user -- "-y" "@modelcontextprotocol/server-sequential-thinking"
+claude mcp add "filesystem" "npx" -s user -- "-y" "@modelcontextprotocol/server-filesystem" "/home/acoose/projects"
+claude mcp add "github" "npx" -s user -- "-y" "@modelcontextprotocol/server-github"
+# (etc. - see backup files for complete list)
+```
+
 ### Important Notes for Claude Code
 
-- **Always use the memory tools available** - The memory server at 4100 is registered and working
+- **Always use the memory tools available** - The memory server at 4100 is registered and working globally
 - **Follow port strategy strictly** - 4100=core, 4200=distributed, avoid lazy +1 incrementing
 - **Commit frequently with conventional commits** - Prevent context loss and maintain clear history
 - **Update CLAUDE.md regularly** - Keep implementation status current to prevent confusion
+- **Backup before major changes** - Run `scripts/backup-claude-config.sh` before risky operations
