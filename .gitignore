@@ -54,3 +54,7 @@ temp/
 # OS files
 Thumbs.db
 .mcp-backups/*
+
+# Database files
+*.db
+.local-memory-db/
