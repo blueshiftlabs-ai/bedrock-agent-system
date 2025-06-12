@@ -87,10 +87,10 @@ export function MemoryOverview() {
               const activityItem = stats?.storage.recent_activity.find(a => a.memory_id === id)
               
               // Safely handle memory content - check nested structure
-              const memoryContent = memory.value?.content || memory.content || memory.text || 'No content available'
-              const firstLine = memoryContent.split('\n')[0] || memoryContent
+              const memoryContent = memory?.value?.content || memory?.content || memory?.text || 'No content available'
+              const firstLine = String(memoryContent).split('\n')[0] || String(memoryContent)
               const title = firstLine.slice(0, 60) + (firstLine.length > 60 ? '...' : '')
-              const preview = memoryContent.slice(0, 120) + (memoryContent.length > 120 ? '...' : '')
+              const preview = String(memoryContent).slice(0, 120) + (String(memoryContent).length > 120 ? '...' : '')
               
               const enhancedItem = {
                 memory_id: id,

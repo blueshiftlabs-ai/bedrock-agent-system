@@ -88,10 +88,20 @@ export function GraphVisualization() {
 
       if (response.ok) {
         const data = await response.json()
-        if (data.result?.content?.[0]?.text) {
-          const result = JSON.parse(data.result.content[0].text)
-          processGraphData(result.connections || [])
+        if (data?.result?.content?.[0]?.text) {
+          try {
+            const result = JSON.parse(data.result.content[0].text)
+            processGraphData(result?.connections || [])
+          } catch (parseError) {
+            console.error('Failed to parse connections data:', parseError)
+            processGraphData([])
+          }
+        } else {
+          processGraphData([])
         }
+      } else {
+        console.error('Failed to load connections:', response.status)
+        processGraphData([])
       }
     } catch (error) {
       console.error('Failed to load connections:', error)
