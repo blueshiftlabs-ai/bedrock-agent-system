@@ -1055,5 +1055,434 @@
     "entities": [
       "Testing"
     ]
+  },
+  "MEMORY#mem_1749411881726_776e93ea": {
+    "PK": "MEMORY#mem_1749411881726_776e93ea",
+    "SK": "METADATA",
+    "memory_id": "mem_1749411881726_776e93ea",
+    "type": "procedural",
+    "content_type": "text",
+    "agent_id": "claude-code",
+    "project": "common",
+    "created_at": 1749411881726,
+    "updated_at": 1749411881726,
+    "opensearch_index": "memory-text",
+    "neptune_node_id": "mem_1749411881726_776e93ea",
+    "tags": [
+      "code-style",
+      "guidelines",
+      "functional-programming",
+      "best-practices"
+    ],
+    "access_count": 0,
+    "last_accessed": 1749411881726,
+    "language": "en",
+    "topics": [
+      "statements",
+      "array",
+      "prefer",
+      "expressions",
+      "switch"
+    ],
+    "sentiment": "positive",
+    "entities": [
+      "Code Style Guidelines",
+      "Always",
+      "Array",
+      "Avoid",
+      "Prefer",
+      "Use",
+      "Prioritize",
+      "Keep"
+    ]
+  },
+  "MEMORY#mem_1749411888743_27da692c": {
+    "PK": "MEMORY#mem_1749411888743_27da692c",
+    "SK": "METADATA",
+    "memory_id": "mem_1749411888743_27da692c",
+    "type": "procedural",
+    "content_type": "text",
+    "agent_id": "claude-code",
+    "project": "common",
+    "created_at": 1749411888743,
+    "updated_at": 1749411888743,
+    "opensearch_index": "memory-text",
+    "neptune_node_id": "mem_1749411888743_27da692c",
+    "tags": [
+      "code-style",
+      "guidelines",
+      "functional-programming",
+      "best-practices"
+    ],
+    "access_count": 0,
+    "last_accessed": 1749411888743,
+    "language": "en",
+    "topics": [
+      "statements",
+      "array",
+      "prefer",
+      "expressions",
+      "switch"
+    ],
+    "sentiment": "positive",
+    "entities": [
+      "Code Style Guidelines",
+      "Always",
+      "Array",
+      "Avoid",
+      "Prefer",
+      "Use",
+      "Prioritize",
+      "Keep"
+    ]
+  },
+  "MEMORY#mem_1749412097486_2d9ab38d": {
+    "PK": "MEMORY#mem_1749412097486_2d9ab38d",
+    "SK": "METADATA",
+    "memory_id": "mem_1749412097486_2d9ab38d",
+    "type": "procedural",
+    "content_type": "text",
+    "agent_id": "claude-code",
+    "project": "common",
+    "created_at": 1749412097486,
+    "updated_at": 1749412097486,
+    "opensearch_index": "memory-text",
+    "neptune_node_id": "mem_1749412097486_2d9ab38d",
+    "tags": [
+      "code-style",
+      "guidelines"
+    ],
+    "access_count": 0,
+    "last_accessed": 1749412097486,
+    "language": "en",
+    "topics": [
+      "statements",
+      "code",
+      "style",
+      "guidelines",
+      "bedrock"
+    ],
+    "sentiment": "neutral",
+    "entities": [
+      "Code Style Guidelines",
+      "Always",
+      "Array"
+    ]
+  },
+  "MEMORY#mem_1749415829824_a78ed29c": {
+    "PK": "MEMORY#mem_1749415829824_a78ed29c",
+    "SK": "METADATA",
+    "memory_id": "mem_1749415829824_a78ed29c",
+    "type": "semantic",
+    "content_type": "text",
+    "agent_id": "claude-code",
+    "session_id": "mcp-ecosystem-pivot",
+    "project": "bedrock-agent-system",
+    "created_at": 1749415829824,
+    "updated_at": 1749415829824,
+    "opensearch_index": "memory-text",
+    "neptune_node_id": "mem_1749415829824_a78ed29c",
+    "tags": [
+      "architecture-assessment",
+      "mcp-ecosystem",
+      "current-state",
+      "next-steps"
+    ],
+    "access_count": 0,
+    "last_accessed": 1749415829824,
+    "language": "en",
+    "topics": [
+      "memory",
+      "local",
+      "json",
+      "memories",
+      "using"
+    ],
+    "sentiment": "neutral",
+    "entities": [
+      "Memory Server Architecture Assessment",
+      "Currently",
+      "All",
+      "Using",
+      "Next",
+      "Replace",
+      "Toolbox"
+    ]
+  },
+  "MEMORY#mem_1749415906300_c4e4a417": {
+    "PK": "MEMORY#mem_1749415906300_c4e4a417",
+    "SK": "METADATA",
+    "memory_id": "mem_1749415906300_c4e4a417",
+    "type": "procedural",
+    "content_type": "text",
+    "agent_id": "claude-code",
+    "session_id": "mcp-ecosystem-pivot",
+    "project": "bedrock-agent-system",
+    "created_at": 1749415906300,
+    "updated_at": 1749415906300,
+    "opensearch_index": "memory-text",
+    "neptune_node_id": "mem_1749415906300_c4e4a417",
+    "tags": [
+      "implementation-plan",
+      "mcp-ecosystem",
+      "3-phase-approach",
+      "documentation-complete"
+    ],
+    "access_count": 0,
+    "last_accessed": 1749415906300,
+    "language": "en",
+    "topics": [
+      "phase",
+      "implementation",
+      "current",
+      "working",
+      "created"
+    ],
+    "sentiment": "neutral",
+    "entities": [
+      "Created",
+      "Ecosystem Pivot Implementation Plan",
+      "Phase",
+      "Stability",
+      "Integration",
+      "Toolbox",
+      "Orchestration",
+      "Docker",
+      "Current",
+      "Documented"
+    ]
+  },
+  "MEMORY#mem_1749416043704_82b7c93f": {
+    "PK": "MEMORY#mem_1749416043704_82b7c93f",
+    "SK": "METADATA",
+    "memory_id": "mem_1749416043704_82b7c93f",
+    "type": "procedural",
+    "content_type": "text",
+    "agent_id": "claude-code",
+    "session_id": "documentation-update",
+    "project": "bedrock-agent-system",
+    "created_at": 1749416043704,
+    "updated_at": 1749416043704,
+    "opensearch_index": "memory-text",
+    "neptune_node_id": "mem_1749416043704_82b7c93f",
+    "tags": [
+      "documentation",
+      "readme",
+      "memory-types",
+      "mcp-tools",
+      "production-ready"
+    ],
+    "access_count": 0,
+    "last_accessed": 1749416043704,
+    "language": "en",
+    "topics": [
+      "memory",
+      "neo4j",
+      "updated",
+      "server",
+      "readme"
+    ],
+    "sentiment": "neutral",
+    "entities": [
+      "Updated",
+      "Memory Server",
+      "Documents",
+      "Includes",
+      "Toolbox"
+    ]
+  },
+  "MEMORY#mem_1749416844581_76361a90": {
+    "PK": "MEMORY#mem_1749416844581_76361a90",
+    "SK": "METADATA",
+    "memory_id": "mem_1749416844581_76361a90",
+    "type": "procedural",
+    "content_type": "text",
+    "agent_id": "claude-code",
+    "session_id": "docker-compose-updates",
+    "project": "bedrock-agent-system",
+    "created_at": 1749416844582,
+    "updated_at": 1749416844582,
+    "opensearch_index": "memory-text",
+    "neptune_node_id": null,
+    "tags": [
+      "docker-compose",
+      "neo4j",
+      "dynamodb",
+      "sse",
+      "fallback-strategy"
+    ],
+    "access_count": 0,
+    "last_accessed": 1749416844582,
+    "language": "en",
+    "topics": [
+      "memory",
+      "compose",
+      "local",
+      "neo4j",
+      "docker"
+    ],
+    "sentiment": "neutral",
+    "entities": [
+      "Fixed Docker",
+      "Memory Server",
+      "Updated",
+      "Gremlin",
+      "Local"
+    ]
+  },
+  "MEMORY#mem_1749418030681_8e2d04b3": {
+    "PK": "MEMORY#mem_1749418030681_8e2d04b3",
+    "SK": "METADATA",
+    "memory_id": "mem_1749418030681_8e2d04b3",
+    "type": "procedural",
+    "content_type": "text",
+    "agent_id": "claude-code",
+    "session_id": "docker-compose-alignment",
+    "project": "bedrock-agent-system",
+    "created_at": 1749418030681,
+    "updated_at": 1749418030681,
+    "opensearch_index": "memory-text",
+    "neptune_node_id": null,
+    "tags": [
+      "docker-compose",
+      "neo4j-alignment",
+      "working-pattern",
+      "sse-enabled",
+      "infrastructure"
+    ],
+    "access_count": 0,
+    "last_accessed": 1749418030681,
+    "language": "en",
+    "topics": [
+      "compose",
+      "memory",
+      "neo4j",
+      "docker",
+      "local"
+    ],
+    "sentiment": "neutral",
+    "entities": [
+      "Successfully",
+      "Memory Server",
+      "Now",
+      "Updated",
+      "Both"
+    ]
+  },
+  "MEMORY#mem_1749418662399_4e4fa5bf": {
+    "PK": "MEMORY#mem_1749418662399_4e4fa5bf",
+    "SK": "METADATA",
+    "memory_id": "mem_1749418662399_4e4fa5bf",
+    "type": "procedural",
+    "content_type": "text",
+    "agent_id": "claude-code",
+    "session_id": "neo4j-password-fix",
+    "project": "bedrock-agent-system",
+    "created_at": 1749418662399,
+    "updated_at": 1749418662399,
+    "opensearch_index": "memory-text",
+    "neptune_node_id": null,
+    "tags": [
+      "neo4j",
+      "password-fix",
+      "minimum-length",
+      "connection-resolved"
+    ],
+    "access_count": 0,
+    "last_accessed": 1749418662399,
+    "language": "en",
+    "topics": [
+      "neo4j",
+      "connection",
+      "issue",
+      "resolved",
+      "password"
+    ],
+    "sentiment": "negative",
+    "entities": [
+      "Password",
+      "Changed"
+    ]
+  },
+  "MEMORY#mem_1749419532385_2b232e71": {
+    "PK": "MEMORY#mem_1749419532385_2b232e71",
+    "SK": "METADATA",
+    "memory_id": "mem_1749419532385_2b232e71",
+    "type": "procedural",
+    "content_type": "text",
+    "agent_id": "claude-code",
+    "session_id": "neo4j-env-watch-fix",
+    "project": "bedrock-agent-system",
+    "created_at": 1749419532386,
+    "updated_at": 1749419532386,
+    "opensearch_index": "memory-text",
+    "neptune_node_id": "mem_1749419532385_2b232e71",
+    "tags": [
+      "neo4j-fix",
+      "env-precedence",
+      "nodemon",
+      "auto-restart",
+      "development-workflow"
+    ],
+    "access_count": 0,
+    "last_accessed": 1749419532386,
+    "language": "en",
+    "topics": [
+      "watch",
+      "local",
+      "files",
+      "password",
+      "added"
+    ],
+    "sentiment": "negative",
+    "entities": [
+      "Fixed",
+      "Root",
+      "Also",
+      "Added"
+    ]
+  },
+  "MEMORY#mem_1749419920773_aee93e3a": {
+    "PK": "MEMORY#mem_1749419920773_aee93e3a",
+    "SK": "METADATA",
+    "memory_id": "mem_1749419920773_aee93e3a",
+    "type": "procedural",
+    "content_type": "text",
+    "agent_id": "claude-code",
+    "session_id": "opensearch-monitoring-fix",
+    "project": "bedrock-agent-system",
+    "created_at": 1749419920774,
+    "updated_at": 1749419920774,
+    "opensearch_index": "memory-text",
+    "opensearch_id": "cfa62f88-a9ed-4162-b525-509f4c85cac9",
+    "neptune_node_id": "mem_1749419920773_aee93e3a",
+    "tags": [
+      "opensearch-fix",
+      "monitoring",
+      "local-development",
+      "multi-layer-storage"
+    ],
+    "access_count": 0,
+    "last_accessed": 1749419920774,
+    "language": "en",
+    "topics": [
+      "opensearch",
+      "local",
+      "storage",
+      "mode",
+      "dynamodb"
+    ],
+    "sentiment": "neutral",
+    "entities": [
+      "Fixed",
+      "Removed",
+      "Now",
+      "Local",
+      "Added",
+      "Admin",
+      "Dashboards",
+      "Browser",
+      "Includes Cypher"
+    ]
   }
 }
