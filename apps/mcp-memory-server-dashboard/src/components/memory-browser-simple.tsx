@@ -51,15 +51,22 @@ export function MemoryBrowserSimple() {
           try {
             const result = JSON.parse(data.result.content[0].text)
             const memoriesData = result?.memories || []
-            const normalizedMemories = memoriesData.map((memory: any) => ({
-              id: memory?.id || memory?.memory_id || `temp-${Date.now()}`,
-              content: memory?.content || memory?.text || 'No content available',
-              type: memory?.type || 'unknown',
-              project: memory?.project || 'unknown',
-              timestamp: memory?.timestamp || memory?.created_at,
-              created_at: memory?.created_at || memory?.timestamp,
-              tags: Array.isArray(memory?.tags) ? memory.tags : []
-            }))
+            const normalizedMemories = memoriesData.map((memoryData: any) => {
+              // Handle the new nested structure: memory.memory.content vs old memory.content
+              const memory = memoryData?.memory || memoryData
+              const metadata = memory?.metadata || memory
+              const content = memory?.content || memory?.text || 'No content available'
+              
+              return {
+                id: metadata?.memory_id || memoryData?.memory_id || memoryData?.id || `temp-${Date.now()}`,
+                content,
+                type: metadata?.type || 'unknown',
+                project: metadata?.project || 'unknown',
+                timestamp: metadata?.created_at || metadata?.timestamp,
+                created_at: metadata?.created_at || metadata?.timestamp,
+                tags: Array.isArray(metadata?.tags) ? metadata.tags : []
+              }
+            })
             setMemories(normalizedMemories)
           } catch (parseError) {
             console.error('Failed to parse memories:', parseError)

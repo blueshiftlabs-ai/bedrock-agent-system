@@ -83,20 +83,25 @@ export function MemoryOverview() {
             const memories = parsedData.memories || (parsedData.memory_id ? [parsedData] : null)
             
             if (memories && memories.length > 0) {
-              const memory = memories[0]
+              const memoryData = memories[0]
               const activityItem = stats?.storage.recent_activity.find(a => a.memory_id === id)
               
-              // Safely handle memory content - check nested structure
-              const memoryContent = memory?.value?.content || memory?.content || memory?.text || 'No content available'
+              // Handle the new nested structure: memory.memory.content vs old memory.content
+              const memory = memoryData?.memory || memoryData
+              const metadata = memory?.metadata || memory
+              const memoryContent = memory?.content || memory?.text || 'No content available'
+              
+              console.log(`Memory structure for ${id}:`, { memoryData, memory, metadata, content: memoryContent })
+              
               const firstLine = String(memoryContent).split('\n')[0] || String(memoryContent)
               const title = firstLine.slice(0, 60) + (firstLine.length > 60 ? '...' : '')
               const preview = String(memoryContent).slice(0, 120) + (String(memoryContent).length > 120 ? '...' : '')
               
               const enhancedItem = {
                 memory_id: id,
-                type: memory.type || activityItem?.type || 'unknown',
-                agent_id: memory.agent_id || activityItem?.agent_id,
-                created_at: memory.created_at || activityItem?.created_at || '',
+                type: metadata?.type || activityItem?.type || 'unknown',
+                agent_id: metadata?.agent_id || activityItem?.agent_id,
+                created_at: metadata?.created_at || activityItem?.created_at || '',
                 title,
                 content_preview: preview
               }
