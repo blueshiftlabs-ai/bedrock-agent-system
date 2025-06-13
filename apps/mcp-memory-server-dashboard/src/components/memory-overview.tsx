@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import { useRouter } from 'next/navigation'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts'
 import { Brain, Database, Network, TrendingUp, FileText, Code, MessageSquare, Cog } from 'lucide-react'
@@ -41,6 +42,7 @@ interface EnhancedMemoryActivity {
 }
 
 export function MemoryOverview() {
+  const router = useRouter()
   const [stats, setStats] = useState<MemoryStats | null>(null)
   const [enhancedActivities, setEnhancedActivities] = useState<EnhancedMemoryActivity[]>([])
   const [loading, setLoading] = useState(true)
@@ -242,7 +244,10 @@ export function MemoryOverview() {
     <div className="space-y-6">
       {/* Key Metrics */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <Card className="relative overflow-hidden bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-950 dark:to-blue-900 border-blue-200 dark:border-blue-800">
+        <Card 
+          className="relative overflow-hidden bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-950 dark:to-blue-900 border-blue-200 dark:border-blue-800 cursor-pointer transition-all hover:scale-105 hover:shadow-lg"
+          onClick={() => router.push('/memories')}
+        >
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium text-blue-700 dark:text-blue-300">Total Memories</CardTitle>
             <div className="h-8 w-8 rounded-full bg-blue-500 flex items-center justify-center">
@@ -257,7 +262,10 @@ export function MemoryOverview() {
           </CardContent>
         </Card>
 
-        <Card className="relative overflow-hidden bg-gradient-to-br from-emerald-50 to-emerald-100 dark:from-emerald-950 dark:to-emerald-900 border-emerald-200 dark:border-emerald-800">
+        <Card 
+          className="relative overflow-hidden bg-gradient-to-br from-emerald-50 to-emerald-100 dark:from-emerald-950 dark:to-emerald-900 border-emerald-200 dark:border-emerald-800 cursor-pointer transition-all hover:scale-105 hover:shadow-lg"
+          onClick={() => router.push('/graph')}
+        >
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium text-emerald-700 dark:text-emerald-300">Graph Concepts</CardTitle>
             <div className="h-8 w-8 rounded-full bg-emerald-500 flex items-center justify-center">
@@ -272,7 +280,10 @@ export function MemoryOverview() {
           </CardContent>
         </Card>
 
-        <Card className="relative overflow-hidden bg-gradient-to-br from-amber-50 to-amber-100 dark:from-amber-950 dark:to-amber-900 border-amber-200 dark:border-amber-800">
+        <Card 
+          className="relative overflow-hidden bg-gradient-to-br from-amber-50 to-amber-100 dark:from-amber-950 dark:to-amber-900 border-amber-200 dark:border-amber-800 cursor-pointer transition-all hover:scale-105 hover:shadow-lg"
+          onClick={() => router.push('/agents')}
+        >
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium text-amber-700 dark:text-amber-300">Active Agents</CardTitle>
             <div className="h-8 w-8 rounded-full bg-amber-500 flex items-center justify-center">
@@ -287,7 +298,13 @@ export function MemoryOverview() {
           </CardContent>
         </Card>
 
-        <Card className="relative overflow-hidden bg-gradient-to-br from-purple-50 to-purple-100 dark:from-purple-950 dark:to-purple-900 border-purple-200 dark:border-purple-800">
+        <Card 
+          className="relative overflow-hidden bg-gradient-to-br from-purple-50 to-purple-100 dark:from-purple-950 dark:to-purple-900 border-purple-200 dark:border-purple-800 cursor-pointer transition-all hover:scale-105 hover:shadow-lg"
+          onClick={() => {
+            const element = document.getElementById('recent-activity-section')
+            element?.scrollIntoView({ behavior: 'smooth' })
+          }}
+        >
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium text-purple-700 dark:text-purple-300">Recent Activity</CardTitle>
             <div className="h-8 w-8 rounded-full bg-purple-500 flex items-center justify-center">
@@ -353,7 +370,7 @@ export function MemoryOverview() {
       </div>
 
       {/* Recent Activity */}
-      <Card>
+      <Card id="recent-activity-section">
         <CardHeader>
           <CardTitle className="flex items-center space-x-2">
             <TrendingUp className="h-5 w-5" />
@@ -367,6 +384,7 @@ export function MemoryOverview() {
               <div 
                 key={activity.memory_id} 
                 className="group p-4 border rounded-lg hover:shadow-md transition-all duration-200 cursor-pointer bg-gradient-to-r from-background to-muted/20"
+                onClick={() => router.push(`/memory/${activity.memory_id}`)}
               >
                 <div className="flex items-start justify-between">
                   <div className="flex items-start space-x-3 flex-1">
@@ -402,7 +420,8 @@ export function MemoryOverview() {
             )) : stats.storage.recent_activity.map((activity) => (
               <div 
                 key={activity.memory_id} 
-                className="flex items-center justify-between p-3 border rounded-lg"
+                className="flex items-center justify-between p-3 border rounded-lg hover:shadow-sm transition-all cursor-pointer"
+                onClick={() => router.push(`/memory/${activity.memory_id}`)}
               >
                 <div className="flex items-center space-x-3">
                   <div className={`h-2 w-2 rounded-full ${getMemoryTypeColor(activity.type)}`} />

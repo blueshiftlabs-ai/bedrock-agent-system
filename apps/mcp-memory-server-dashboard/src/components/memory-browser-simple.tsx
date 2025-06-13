@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import { useRouter } from 'next/navigation'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -18,6 +19,7 @@ interface Memory {
 }
 
 export function MemoryBrowserSimple() {
+  const router = useRouter()
   const [memories, setMemories] = useState<Memory[]>([])
   const [loading, setLoading] = useState(false)
   const [query, setQuery] = useState('')
@@ -142,7 +144,8 @@ export function MemoryBrowserSimple() {
               {memories.map((memory) => (
                 <div
                   key={memory.id}
-                  className="p-4 border rounded-lg hover:border-primary/50 transition-colors"
+                  className="p-4 border rounded-lg hover:border-primary/50 transition-colors cursor-pointer"
+                  onClick={() => router.push(`/memory/${memory.id}`)}
                 >
                   <div className="flex items-start justify-between">
                     <div className="flex-1">
