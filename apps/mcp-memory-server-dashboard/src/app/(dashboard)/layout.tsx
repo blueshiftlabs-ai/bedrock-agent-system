@@ -12,7 +12,8 @@ import {
   RefreshCw,
   Search,
   BarChart3,
-  Settings
+  Settings,
+  Users
 } from 'lucide-react'
 
 export default function DashboardLayout({
@@ -54,6 +55,7 @@ export default function DashboardLayout({
     { href: '/overview', label: 'Overview', icon: BarChart3 },
     { href: '/storage', label: 'Storage', icon: Database },
     { href: '/memories', label: 'Memories', icon: Search },
+    { href: '/agents', label: 'Agents', icon: Users },
     { href: '/graph', label: 'Graph', icon: Network },
     { href: '/logs', label: 'Logs', icon: Activity },
     { href: '/admin', label: 'Admin', icon: Settings },
