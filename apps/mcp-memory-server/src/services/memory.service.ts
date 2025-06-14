@@ -590,26 +590,27 @@ export class MemoryService {
     const contentType = request.content_type || this.detectContentType(request.content);
     const memoryType = request.type || this.detectMemoryType(request.content, contentType);
 
-    // Use git context to auto-detect agent_id and project if not provided
+    // Use enhanced context service with proper priority:
+    // ENV vars > explicit params > git context > defaults
     let agentId = request.agent_id;
     let project = request.project;
 
-    if (!agentId || !project) {
-      try {
-        const gitContext = await this.gitContextService.getGitContext();
-        if (!agentId) {
-          agentId = gitContext.agentId;
-          this.logger.debug(`Auto-detected agent_id from git context: ${agentId}`);
-        }
-        if (!project) {
-          project = gitContext.projectName;
-          this.logger.debug(`Auto-detected project from git context: ${project}`);
-        }
-      } catch (error) {
-        this.logger.debug(`Failed to get git context, using defaults: ${error.message}`);
-        agentId = agentId || 'claude-code';
-        project = project || 'common';
-      }
+    try {
+      const context = await this.gitContextService.getGitContext(
+        undefined, // working directory (use current)
+        project,   // explicit project from request
+        agentId    // explicit agent from request
+      );
+      
+      // Always use the result from context service (it handles priority internally)
+      agentId = context.agentId;
+      project = context.projectName;
+      
+      this.logger.debug(`Using context: agent=${agentId}, project=${project}`);
+    } catch (error) {
+      this.logger.debug(`Failed to get context, using fallback defaults: ${error.message}`);
+      agentId = agentId || 'claude-code';
+      project = project || 'common';
     }
 
     const baseMetadata = {

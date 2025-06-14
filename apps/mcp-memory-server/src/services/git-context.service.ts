@@ -17,8 +17,10 @@ export interface GitContext {
 }
 
 /**
- * Service to detect git repository context and provide project/agent information
- * for automatic memory attribution instead of "Anonymous • unknown"
+ * Service to provide project and agent information for memory attribution.
+ * Priority: ENV vars > explicit params > git context > defaults
+ * 
+ * NOTE: Git context is only useful in development - production should use ENV vars
  */
 @Injectable()
 export class GitContextService {
@@ -28,21 +30,44 @@ export class GitContextService {
   private readonly CACHE_DURATION = 30000; // 30 seconds
 
   /**
-   * Get git context with caching to avoid repeated git operations
+   * Get project context with proper priority order:
+   * 1. Environment variables (production/docker)
+   * 2. Explicit parameters (user-provided)
+   * 3. Git context (development fallback)
+   * 4. Defaults
    */
-  async getGitContext(workingDir?: string): Promise<GitContext> {
+  async getGitContext(workingDir?: string, explicitProject?: string, explicitAgent?: string): Promise<GitContext> {
     const now = Date.now();
     
-    // Return cached result if still valid
+    // Return cached result if still valid (but allow ENV var overrides)
     if (this.cachedContext && (now - this.cacheTime) < this.CACHE_DURATION) {
-      return this.cachedContext;
+      return this.applyEnvironmentOverrides(this.cachedContext, explicitProject, explicitAgent);
     }
 
     const context = await this.detectGitContext(workingDir);
-    this.cachedContext = context;
+    const finalContext = this.applyEnvironmentOverrides(context, explicitProject, explicitAgent);
+    
+    this.cachedContext = finalContext;
     this.cacheTime = now;
     
-    return context;
+    return finalContext;
+  }
+
+  /**
+   * Apply environment variables and explicit parameters with proper priority
+   */
+  private applyEnvironmentOverrides(context: GitContext, explicitProject?: string, explicitAgent?: string): GitContext {
+    // Priority: ENV vars > explicit params > context values > defaults
+    const projectName = process.env.MEMORY_PROJECT_NAME || explicitProject || context.projectName || 'common';
+    const agentId = process.env.MEMORY_AGENT_ID || explicitAgent || context.agentId || 'claude-code';
+
+    this.logger.debug(`Final context: project=${projectName}, agent=${agentId} (ENV=${!!process.env.MEMORY_PROJECT_NAME}, explicit=${!!explicitProject}, git=${context.projectName})`);
+
+    return {
+      ...context,
+      projectName,
+      agentId
+    };
   }
 
   /**
@@ -143,13 +168,13 @@ export class GitContextService {
 
   private async getRemoteUrl(execOptions: any): Promise<string | undefined> {
     try {
-      const { stdout } = await execAsync('git remote get-url origin', execOptions);
-      return stdout.trim();
+      const { stdout } = await execAsync('git remote get-url origin', { ...execOptions, encoding: 'utf8' });
+      return stdout.toString().trim();
     } catch (error) {
       // Try alternative approach
       try {
-        const { stdout } = await execAsync('git config --get remote.origin.url', execOptions);
-        return stdout.trim();
+        const { stdout } = await execAsync('git config --get remote.origin.url', { ...execOptions, encoding: 'utf8' });
+        return stdout.toString().trim();
       } catch (fallbackError) {
         this.logger.debug('No remote origin found');
         return undefined;
@@ -159,13 +184,13 @@ export class GitContextService {
 
   private async getCurrentBranch(execOptions: any): Promise<string | undefined> {
     try {
-      const { stdout } = await execAsync('git branch --show-current', execOptions);
-      return stdout.trim();
+      const { stdout } = await execAsync('git branch --show-current', { ...execOptions, encoding: 'utf8' });
+      return stdout.toString().trim();
     } catch (error) {
       // Fallback for older git versions
       try {
-        const { stdout } = await execAsync('git rev-parse --abbrev-ref HEAD', execOptions);
-        return stdout.trim();
+        const { stdout } = await execAsync('git rev-parse --abbrev-ref HEAD', { ...execOptions, encoding: 'utf8' });
+        return stdout.toString().trim();
       } catch (fallbackError) {
         this.logger.debug('Could not determine current branch');
         return undefined;
@@ -175,8 +200,8 @@ export class GitContextService {
 
   private async getWorkingTreeStatus(execOptions: any): Promise<boolean | undefined> {
     try {
-      const { stdout } = await execAsync('git status --porcelain', execOptions);
-      return stdout.trim().length === 0;
+      const { stdout } = await execAsync('git status --porcelain', { ...execOptions, encoding: 'utf8' });
+      return stdout.toString().trim().length === 0;
     } catch (error) {
       this.logger.debug('Could not determine working tree status');
       return undefined;
