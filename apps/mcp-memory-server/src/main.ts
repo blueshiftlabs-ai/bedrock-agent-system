@@ -1,9 +1,16 @@
 import { NestFactory } from '@nestjs/core';
-import { ValidationPipe } from '@nestjs/common';
+import { ValidationPipe, Logger } from '@nestjs/common';
 import { AppModule } from './app.module';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const isDevelopment = process.env.NODE_ENV === 'development';
+  const logger = new Logger('Bootstrap');
+  
+  const app = await NestFactory.create(AppModule, {
+    logger: isDevelopment 
+      ? ['error', 'warn', 'log', 'debug', 'verbose'] 
+      : ['error', 'warn', 'log'],
+  });
   
   // Enable validation pipes
   app.useGlobalPipes(new ValidationPipe({

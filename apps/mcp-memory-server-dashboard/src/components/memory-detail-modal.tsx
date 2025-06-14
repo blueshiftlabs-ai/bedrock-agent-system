@@ -173,8 +173,10 @@ export function MemoryDetailModal({ memoryId, onClose, isModal = true }: MemoryD
     
     setSaving(true)
     try {
-      // For now, we'll store the updated memory as a new memory with a reference to the old one
-      // In a real implementation, you'd want an update-memory tool
+      // Create an updated version of the memory
+      const updateContent = `UPDATED: ${content}`
+      const updateTags = [...(tags || []), 'memory-update', `original-${memoryId}`]
+      
       const response = await fetch('/api/memory/mcp', {
         method: 'POST',
         headers: {
@@ -188,19 +190,54 @@ export function MemoryDetailModal({ memoryId, onClose, isModal = true }: MemoryD
           params: {
             name: 'store-memory',
             arguments: {
-              content: `[UPDATED from ${memoryId}] ${content}`,
+              content: updateContent,
               type,
               project,
               agent_id: agentId || undefined,
-              tags: [...tags, 'updated', `updated-from-${memoryId}`]
+              tags: updateTags
             }
           }
         })
       })
 
       if (response.ok) {
+        const data = await response.json()
+        if (data?.result?.content?.[0]?.text) {
+          const result = JSON.parse(data.result.content[0].text)
+          const newMemoryId = result.memory_id
+          
+          // Create connection between original and updated memory
+          if (newMemoryId) {
+            await fetch('/api/memory/mcp', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json, text/event-stream'
+              },
+              body: JSON.stringify({
+                jsonrpc: '2.0',
+                id: Date.now(),
+                method: 'tools/call',
+                params: {
+                  name: 'add-connection',
+                  arguments: {
+                    from_memory_id: memoryId,
+                    to_memory_id: newMemoryId,
+                    relationship_type: 'UPDATED_TO',
+                    properties: {
+                      update_timestamp: new Date().toISOString(),
+                      update_reason: 'Manual edit via dashboard'
+                    }
+                  }
+                }
+              })
+            })
+          }
+        }
+        
         setEditing(false)
         await fetchMemoryDetails()
+        await fetchConnections()
       }
     } catch (error) {
       console.error('Failed to save memory:', error)
@@ -284,7 +321,7 @@ export function MemoryDetailModal({ memoryId, onClose, isModal = true }: MemoryD
 
   return (
     <div className={isModal ? "fixed inset-0 z-50 flex items-center justify-center p-4 bg-background/80 backdrop-blur-sm" : ""}>
-      <Card className={isModal ? "w-full max-w-4xl max-h-[90vh] overflow-hidden flex flex-col" : ""}>
+      <Card className={isModal ? "w-full max-w-4xl max-h-[90vh] overflow-hidden flex flex-col" : ""} data-testid="memory-detail">
         <CardHeader className="flex flex-row items-start justify-between space-y-0 pb-4">
           <div>
             <CardTitle className="text-2xl flex items-center gap-2">

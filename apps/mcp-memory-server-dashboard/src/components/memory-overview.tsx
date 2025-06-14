@@ -5,6 +5,8 @@ import { useRouter } from 'next/navigation'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts'
 import { Brain, Database, Network, TrendingUp, FileText, Code, MessageSquare, Cog } from 'lucide-react'
+import { getMemoryTypeIcon, getMemoryTypeColor } from '@/lib/memory-utils'
+import { RecentMemoryActivity } from './recent-memory-activity'
 
 interface MemoryStats {
   storage: {
@@ -210,35 +212,6 @@ export function MemoryOverview() {
 
   const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884D8']
 
-  const getMemoryTypeIcon = (type: string) => {
-    switch (type) {
-      case 'episodic':
-        return <MessageSquare className="h-4 w-4" />
-      case 'semantic':
-        return <Brain className="h-4 w-4" />
-      case 'procedural':
-        return <Cog className="h-4 w-4" />
-      case 'working':
-        return <FileText className="h-4 w-4" />
-      default:
-        return <FileText className="h-4 w-4" />
-    }
-  }
-
-  const getMemoryTypeColor = (type: string) => {
-    switch (type) {
-      case 'episodic':
-        return 'bg-blue-500'
-      case 'semantic':
-        return 'bg-green-500'
-      case 'procedural':
-        return 'bg-yellow-500'
-      case 'working':
-        return 'bg-purple-500'
-      default:
-        return 'bg-gray-500'
-    }
-  }
 
   return (
     <div className="space-y-6">
@@ -369,83 +342,8 @@ export function MemoryOverview() {
         </Card>
       </div>
 
-      {/* Recent Activity */}
-      <Card id="recent-activity-section">
-        <CardHeader>
-          <CardTitle className="flex items-center space-x-2">
-            <TrendingUp className="h-5 w-5" />
-            <span>Recent Memory Activity</span>
-          </CardTitle>
-          <CardDescription>Latest memory operations with content previews</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-3">
-            {enhancedActivities.length > 0 ? enhancedActivities.map((activity) => (
-              <div 
-                key={activity.memory_id} 
-                className="group p-4 border rounded-lg hover:shadow-md transition-all duration-200 cursor-pointer bg-gradient-to-r from-background to-muted/20"
-                onClick={() => router.push(`/memory/${activity.memory_id}`)}
-              >
-                <div className="flex items-start justify-between">
-                  <div className="flex items-start space-x-3 flex-1">
-                    <div className="flex-shrink-0 mt-1">
-                      <div className={`h-8 w-8 rounded-full flex items-center justify-center ${getMemoryTypeColor(activity.type)} text-white`}>
-                        {getMemoryTypeIcon(activity.type)}
-                      </div>
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <p className="text-sm font-semibold text-foreground group-hover:text-primary transition-colors">
-                        {activity.title}
-                      </p>
-                      <p className="text-xs text-muted-foreground mt-1 line-clamp-2">
-                        {activity.content_preview}
-                      </p>
-                      <div className="flex items-center space-x-2 mt-2">
-                        <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${getMemoryTypeColor(activity.type)} text-white`}>
-                          {activity.type}
-                        </span>
-                        <span className="text-xs text-muted-foreground">
-                          by {activity.agent_id || 'Anonymous'}
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-                  <div className="text-xs text-muted-foreground text-right flex-shrink-0 ml-4">
-                    {new Date(activity.created_at).toLocaleDateString()}
-                    <br />
-                    {new Date(activity.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                  </div>
-                </div>
-              </div>
-            )) : stats.storage.recent_activity.map((activity) => (
-              <div 
-                key={activity.memory_id} 
-                className="flex items-center justify-between p-3 border rounded-lg hover:shadow-sm transition-all cursor-pointer"
-                onClick={() => router.push(`/memory/${activity.memory_id}`)}
-              >
-                <div className="flex items-center space-x-3">
-                  <div className={`h-2 w-2 rounded-full ${getMemoryTypeColor(activity.type)}`} />
-                  <div>
-                    <p className="text-sm font-medium">{activity.memory_id}</p>
-                    <p className="text-xs text-muted-foreground">
-                      {activity.type} • {activity.agent_id || 'Anonymous'}
-                    </p>
-                  </div>
-                </div>
-                <div className="text-xs text-muted-foreground">
-                  {new Date(activity.created_at).toLocaleString()}
-                </div>
-              </div>
-            ))}
-            {stats.storage.recent_activity.length === 0 && (
-              <div className="text-center py-8 text-muted-foreground">
-                <Brain className="h-12 w-12 mx-auto mb-3 opacity-50" />
-                <p>No recent memory activity</p>
-              </div>
-            )}
-          </div>
-        </CardContent>
-      </Card>
+      {/* Recent Activity - New Infinite Scroll Component */}
+      <RecentMemoryActivity />
     </div>
   )
 }

@@ -18,11 +18,11 @@ interface LogSource {
 
 // Available log sources
 const LOG_SOURCES: LogSource[] = [
-  { id: 'memory-server', name: 'MCP Memory Server', type: 'process', command: 'pnpm --filter @apps/mcp-memory-server' },
-  { id: 'opensearch', name: 'OpenSearch', type: 'docker', container: 'opensearch-node01' },
-  { id: 'dynamodb', name: 'DynamoDB Local', type: 'docker', container: 'dynamodb-local' },
-  { id: 'neo4j', name: 'Neo4j', type: 'docker', container: 'neo4j' },
-  { id: 'gremlin', name: 'Gremlin Server', type: 'docker', container: 'gremlin-server' },
+  { id: 'memory-server', name: 'MCP Memory Server', type: 'docker', container: 'mcp-memory-server' },
+  { id: 'opensearch', name: 'OpenSearch', type: 'docker', container: 'mcp-memory-opensearch' },
+  { id: 'dynamodb', name: 'DynamoDB Local', type: 'docker', container: 'mcp-memory-dynamodb' },
+  { id: 'neo4j', name: 'Neo4j', type: 'docker', container: 'mcp-memory-neo4j' },
+  { id: 'gremlin', name: 'Gremlin Server', type: 'docker', container: 'mcp-memory-gremlin' },
 ]
 
 export async function GET(request: NextRequest) {

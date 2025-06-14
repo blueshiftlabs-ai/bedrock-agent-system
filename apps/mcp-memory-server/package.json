@@ -24,7 +24,11 @@
     "memory:local:down": "docker-compose -f docker-compose.memory-local.yml down",
     "memory:local:logs": "docker-compose -f docker-compose.memory-local.yml logs -f",
     "memory:local:status": "docker-compose -f docker-compose.memory-local.yml ps",
-    "setup:dynamodb": "node scripts/setup-dynamodb-tables.js"
+    "setup:dynamodb": "node scripts/setup-dynamodb-tables.js",
+    "docker:prod:build": "docker-compose -f ../../docker-compose.memory-production.yml build",
+    "docker:prod:up": "docker-compose -f ../../docker-compose.memory-production.yml up -d",
+    "docker:prod:down": "docker-compose -f ../../docker-compose.memory-production.yml down",
+    "docker:prod:logs": "docker-compose -f ../../docker-compose.memory-production.yml logs -f"
   },
   "dependencies": {
     "@aws-sdk/client-bedrock-runtime": "^3.825.0",

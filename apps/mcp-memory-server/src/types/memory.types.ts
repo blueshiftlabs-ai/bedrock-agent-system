@@ -61,6 +61,7 @@ export interface MemoryQuery {
   project?: string; // Project context for filtering
   tags?: string[];
   limit?: number;
+  offset?: number; // For pagination
   threshold?: number; // Similarity threshold 0-1
   include_related?: boolean; // Include graph-connected memories
 }
@@ -140,6 +141,7 @@ export interface RetrieveMemoriesRequest {
 export interface RetrieveMemoriesResponse {
   memories: MemorySearchResult[];
   total_count: number;
+  has_more: boolean;
   search_time_ms: number;
 }
 

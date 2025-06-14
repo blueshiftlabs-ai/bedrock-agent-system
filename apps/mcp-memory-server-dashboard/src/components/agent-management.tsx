@@ -451,7 +451,11 @@ export function AgentManagement() {
                         <div className="flex items-center gap-2">
                           <Badge variant="secondary">{type}</Badge>
                         </div>
-                        <span className="text-sm text-muted-foreground">{count}</span>
+                        <span className="text-sm text-muted-foreground">
+                          {typeof count === 'object' && count !== null && 'count' in count 
+                            ? (count as any).count 
+                            : count}
+                        </span>
                       </div>
                     ))}
                   </div>

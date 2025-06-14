@@ -57,6 +57,7 @@ export class MCPToolsService {
       type: z.enum(['episodic', 'semantic', 'procedural', 'working']).optional().describe('Filter by memory type: episodic (events), semantic (facts), procedural (processes), working (temporary)'),
       content_type: z.enum(['text', 'code']).optional().describe('Filter by content type: text or code'),
       limit: z.number().default(10).describe('Maximum number of memories to return (default: 10)'),
+      offset: z.number().default(0).describe('Number of memories to skip for pagination (default: 0)'),
       threshold: z.number().min(0).max(1).optional().describe('Similarity threshold (0-1) for semantic search filtering'),
       include_related: z.boolean().default(false).describe('Include graph-connected related memories from Neo4j'),
     }),
@@ -70,6 +71,7 @@ export class MCPToolsService {
     type?: 'episodic' | 'semantic' | 'procedural' | 'working';
     content_type?: 'text' | 'code';
     limit?: number;
+    offset?: number;
     threshold?: number;
     include_related?: boolean;
   }) {
@@ -85,6 +87,7 @@ export class MCPToolsService {
         type: params.type,
         content_type: params.content_type,
         limit: params.limit || 10,
+        offset: params.offset || 0,
         threshold: params.threshold,
         include_related: params.include_related || false,
       };

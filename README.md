@@ -1,425 +1,208 @@
-# Bedrock Agent System
+# MCP Memory Server
 
-A microservices-based monorepo for AI-powered code transformation and analysis, featuring Model Context Protocol (MCP) support, a modern dashboard, and CLI tools.
+A production-ready Memory Context Protocol (MCP) server with sophisticated memory management, vector search, graph relationships, and real-time monitoring dashboard.
 
-## Architecture Overview
+## 🚀 Overview
 
-The Bedrock Agent System follows a distributed microservices architecture:
+The MCP Memory Server provides a comprehensive memory management system for AI agents and applications, implementing the Model Context Protocol standard with advanced features:
 
-- **MCP Server**: Core NestJS backend with LangGraph workflow orchestration
-- **Dashboard**: Next.js web application for monitoring and management
-- **CLI Tools**: Command-line interface for direct MCP interactions
-- **Microservices**: Separated services for agents, tools, workflows, and API gateway
+- **Multi-layer Storage**: DynamoDB (metadata), OpenSearch (vector search), Neo4j (graph relationships)
+- **Semantic Search**: Vector similarity search with automatic embedding generation
+- **Knowledge Graph**: Connect memories with relationships for enhanced context retrieval
+- **Real-time Dashboard**: Monitor memory operations, browse memories, visualize connections
+- **MCP Compliance**: Full implementation of the Memory Context Protocol standard
 
-## Repository Structure
+## 📦 Core Applications
+
+### MCP Memory Server (`apps/mcp-memory-server`)
+NestJS backend implementing the MCP protocol with:
+- Memory storage with automatic semantic processing
+- Vector similarity search using OpenSearch
+- Graph-based memory relationships via Neo4j
+- RESTful and MCP protocol APIs
+- Health monitoring and observability
+
+### Memory Dashboard (`apps/mcp-memory-server-dashboard`)
+Next.js 15 dashboard with:
+- Real-time memory browsing with infinite scroll
+- Interactive knowledge graph visualization
+- Agent management and activity monitoring
+- Storage health monitoring
+- Memory statistics and analytics
+
+## 🏗️ Architecture
 
 ```
-.
-├── apps/                              # Application packages
-│   ├── mcp-hybrid-server/            # Core MCP server (NestJS + LangGraph)
-│   │   ├── src/
-│   │   │   ├── agents/               # AI agent implementations
-│   │   │   ├── tools/                # MCP tool registry
-│   │   │   ├── workflows/            # LangGraph workflows
-│   │   │   └── integrations/         # External service integrations
-│   │   └── docker/
-│   │       ├── gateway/              # API Gateway service
-│   │       ├── agents/               # Agents microservice
-│   │       ├── tools/                # Tools microservice
-│   │       └── workflows/            # Workflows microservice
-│   └── mcp-dashboard/                # Web dashboard (Next.js)
-│       ├── src/
-│       │   ├── components/           # React components
-│       │   ├── app/                  # Next.js app router
-│       │   └── store/                # State management
-│       └── public/
-├── packages/                          # Shared packages
-│   ├── eslint-config/                # Shared ESLint configurations
-│   ├── typescript-config/            # Shared TypeScript configurations
-│   └── prettier-config/              # Shared Prettier configurations
-├── infrastructure/                    # Infrastructure packages
-│   └── mcp-hybrid-stack/             # AWS CDK infrastructure
-│       ├── lib/
-│       │   ├── microservices-stack.ts # Fargate services definition
-│       │   └── monitoring-stack.ts    # CloudWatch and observability
-│       └── constructs/
-└── deployment/                        # Deployment scripts
-    ├── deploy-microservices.sh       # Microservices deployment
-    └── deploy.sh                     # Legacy deployment
+┌─────────────────────┐     ┌──────────────────────┐
+│   MCP Clients      │     │    Web Dashboard     │
+│  (AI Agents, CLI)  │     │    (Next.js 15)      │
+└──────────┬─────────┘     └───────────┬──────────┘
+           │                           │
+           │ MCP Protocol              │ REST/WebSocket
+           │                           │
+        ┌──┴───────────────────────────┴──┐
+        │       MCP Memory Server         │
+        │         (NestJS)                │
+        └─────────────┬────────────────────┘
+                      │
+        ┌─────────────┼─────────────┐
+        │             │             │
+   ┌────┴────┐  ┌────┴────┐  ┌────┴────┐
+   │DynamoDB │  │OpenSearch│  │ Neo4j   │
+   │(Metadata)│  │(Vectors) │  │(Graph)  │
+   └─────────┘  └──────────┘  └─────────┘
 ```
 
-## Getting Started
+## 🚀 Quick Start
 
 ### Prerequisites
-
 - Node.js 20+
 - pnpm 10+
-- AWS CLI configured
 - Docker & Docker Compose
-- AWS CDK (for infrastructure deployment)
+- AWS credentials (for DynamoDB)
 
 ### Installation
 
 ```bash
-# Install all dependencies
+# Clone the repository
+git clone https://github.com/blueshiftlabs-ai/bedrock-agent-system.git
+cd bedrock-agent-system
+
+# Install dependencies
 pnpm install
 
-# Setup local development environment
-./setup.sh
+# Start infrastructure services (OpenSearch, Neo4j)
+docker-compose up -d
 
-# Setup MCP server specifically
-pnpm --filter @apps/mcp-hybrid-server run setup-local-dev
+# Start the memory server
+pnpm --filter @apps/mcp-memory-server dev
 
-# Setup dashboard
-pnpm --filter @apps/mcp-dashboard run setup
+# In another terminal, start the dashboard
+pnpm --filter @apps/mcp-memory-server-dashboard dev
 ```
 
-### Development
+### Access Points
+- **Memory Server**: http://localhost:4100
+- **Dashboard**: http://localhost:3101
+- **MCP Endpoint**: http://localhost:4100/mcp
 
-#### Running Services Locally
+## 🛠️ Development
 
-```bash
-# Run all services with Docker Compose
-docker-compose -f apps/mcp-hybrid-server/docker/docker-compose.dev.yml up
-
-# Or run individual services:
-
-# MCP Server (Backend)
-pnpm --filter @apps/mcp-hybrid-server dev
-
-# Dashboard (Frontend)
-pnpm --filter @apps/mcp-dashboard dev
-
-# Run all services in development mode
-pnpm dev
-
-# Run all tests
-pnpm test
-
-# Run linting
-pnpm lint
-
-# Build all packages
-pnpm build
+### Project Structure
+```
+.
+├── apps/
+│   ├── mcp-memory-server/          # Backend MCP server
+│   └── mcp-memory-server-dashboard/ # Frontend dashboard
+├── packages/
+│   ├── eslint-config/              # Shared ESLint configuration
+│   ├── prettier-config/            # Shared Prettier configuration
+│   └── typescript-config/          # Shared TypeScript configuration
+└── docker-compose.yml              # Local infrastructure
 ```
 
-#### Microservices Development
-
-```bash
-# Start individual microservices
-docker-compose -f docker-compose.mcp.yml up gateway
-docker-compose -f docker-compose.mcp.yml up agents
-docker-compose -f docker-compose.mcp.yml up tools
-docker-compose -f docker-compose.mcp.yml up workflows
-```
-
-### Infrastructure
-
-```bash
-# Synthesize CloudFormation templates
-pnpm infrastructure:synth
-
-# Deploy infrastructure
-pnpm infrastructure:deploy
-
-# Destroy infrastructure
-pnpm infrastructure:destroy
-```
-
-## Workspace Commands
-
-The monorepo uses pnpm workspaces and Turbo for efficient builds:
-
-- `pnpm build` - Build all packages in dependency order
-- `pnpm dev` - Run all packages in development mode
-- `pnpm test` - Run tests across all packages
-- `pnpm lint` - Lint all packages
-- `pnpm format` - Format all packages
-- `pnpm clean` - Clean build artifacts
-
-## Microservices Architecture
-
-### Service Breakdown
-
-1. **API Gateway Service**
-   - Routes requests to appropriate microservices
-   - Handles authentication and rate limiting
-   - Service discovery and health checks
-
-2. **Agents Microservice**
-   - Code Analyzer Agent
-   - Database Analyzer Agent
-   - Knowledge Builder Agent
-   - Documentation Generator Agent
-
-3. **Tools Microservice**
-   - MCP tool registry and execution
-   - External tool integration
-   - Tool permission management
-
-4. **Workflows Microservice**
-   - LangGraph workflow orchestration
-   - State persistence with DynamoDB
-   - Workflow monitoring and recovery
-
-### Service Communication
-
-```mermaid
-graph LR
-    Client[Client/CLI] --> Gateway[API Gateway]
-    Dashboard[Dashboard] --> Gateway
-    
-    Gateway --> Agents[Agents Service]
-    Gateway --> Tools[Tools Service]
-    Gateway --> Workflows[Workflows Service]
-    
-    Workflows --> Agents
-    Workflows --> Tools
-    
-    Agents --> Bedrock[AWS Bedrock]
-    Tools --> MCP[External MCP Servers]
-    Workflows --> DynamoDB[DynamoDB]
-```
-
-## Package-Specific Commands
-
-### MCP Hybrid Server
+### Available Commands
 
 ```bash
 # Development
-pnpm --filter @apps/mcp-hybrid-server dev
+pnpm dev                    # Run all apps in development mode
+pnpm build                  # Build all apps
+pnpm test                   # Run tests
+pnpm lint                   # Lint all code
 
-# Testing
-pnpm --filter @apps/mcp-hybrid-server test
-pnpm --filter @apps/mcp-hybrid-server test:e2e
-
-# Docker - Build individual services
-pnpm --filter @apps/mcp-hybrid-server docker:build:gateway
-pnpm --filter @apps/mcp-hybrid-server docker:build:agents
-pnpm --filter @apps/mcp-hybrid-server docker:build:tools
-pnpm --filter @apps/mcp-hybrid-server docker:build:workflows
-
-# Deployment
-./deployment/deploy-microservices.sh dev
-./deployment/deploy-microservices.sh prod
+# App-specific commands
+pnpm --filter @apps/mcp-memory-server dev
+pnpm --filter @apps/mcp-memory-server-dashboard dev
 ```
 
-### Dashboard
+## 📚 MCP Protocol Implementation
 
-```bash
-# Development
-pnpm --filter @apps/mcp-dashboard dev
+The server implements the full MCP protocol for memory operations:
 
-# Build
-pnpm --filter @apps/mcp-dashboard build
+### Available Tools
 
-# Start production server
-pnpm --filter @apps/mcp-dashboard start
+- `store-memory` - Store memories with semantic processing
+- `retrieve-memories` - Search memories using vector similarity
+- `add-connection` - Create relationships between memories
+- `create-observation` - Synthesize insights from multiple memories
+- `consolidate-memories` - Merge similar memories
+- `get-memory-statistics` - Analytics and usage metrics
 
-# Testing
-pnpm --filter @apps/mcp-dashboard test
-```
-
-### Infrastructure
-
-```bash
-# CDK commands for microservices
-pnpm --filter @infra/mcp-hybrid-stack synth -- --context stack=microservices
-pnpm --filter @infra/mcp-hybrid-stack deploy -- --context stack=microservices
-pnpm --filter @infra/mcp-hybrid-stack diff -- --context stack=microservices
-
-# Deploy monitoring stack
-pnpm --filter @infra/mcp-hybrid-stack deploy -- --context stack=monitoring
-```
-
-## Configuration
-
-### ESLint
-
-Each package can extend the shared ESLint configuration:
+### Example Usage
 
 ```javascript
-// eslint.config.mjs
-import baseConfig from '@repo/eslint-config/nest';
+// Store a memory
+await mcp.call('store-memory', {
+  content: 'Implementation decision for infinite scroll',
+  type: 'procedural',
+  project: 'my-project',
+  tags: ['frontend', 'performance']
+});
 
-export default [
-  ...baseConfig,
-  // Package-specific overrides
-];
+// Retrieve related memories
+const memories = await mcp.call('retrieve-memories', {
+  query: 'infinite scroll performance',
+  limit: 10,
+  include_related: true
+});
 ```
 
-### TypeScript
+## 🚀 Production Deployment
 
-Each package extends the appropriate TypeScript configuration:
-
-```json
-{
-  "extends": "@packages/typescript-config/nest",
-  "compilerOptions": {
-    // Package-specific options
-  }
-}
-```
-
-### Prettier
-
-Use the shared Prettier configuration in `.prettierrc.js`:
-
-```javascript
-module.exports = {
-  ...require('@repo/prettier-config/prettier-base'),
-};
-```
-
-## Deployment
-
-### AWS Fargate Deployment
-
-The system is deployed as containerized microservices on AWS Fargate:
+### Docker Deployment
 
 ```bash
-# Deploy all microservices
-./deployment/deploy-microservices.sh prod
+# Build production images
+docker build -t mcp-memory-server ./apps/mcp-memory-server
+docker build -t mcp-dashboard ./apps/mcp-memory-server-dashboard
 
-# Deploy individual services
-./deployment/deploy-microservices.sh prod --service gateway
-./deployment/deploy-microservices.sh prod --service agents
-./deployment/deploy-microservices.sh prod --service tools
-./deployment/deploy-microservices.sh prod --service workflows
-./deployment/deploy-microservices.sh prod --service dashboard
+# Run with docker-compose
+docker-compose -f docker-compose.production.yml up
 ```
 
-### Environment Configuration
+### Environment Variables
 
-Each service requires specific environment variables:
-
-```bash
-# API Gateway
-CORS_ORIGINS=https://dashboard.example.com
-SERVICE_DISCOVERY_ENDPOINT=http://localhost:8080
-RATE_LIMIT_MAX=100
-
-# Agents Service
-AWS_REGION=us-east-1
-BEDROCK_MODEL_ID=anthropic.claude-v2
-BEDROCK_ENDPOINT=https://bedrock-runtime.us-east-1.amazonaws.com
-
-# Tools Service
-MCP_SERVER_ENDPOINT=/mcp
-MCP_MAX_CONNECTIONS=100
-TOOL_EXECUTION_TIMEOUT=300000
-
-# Workflows Service
-DYNAMODB_TABLE_NAME=workflow-states
-LANGGRAPH_CHECKPOINT_INTERVAL=60
+#### Memory Server
+```env
+NODE_ENV=production
+PORT=4100
+DYNAMODB_TABLE_NAME=mcp-memories
+OPENSEARCH_ENDPOINT=https://your-opensearch.amazonaws.com
+NEO4J_URI=bolt://localhost:7687
+NEO4J_USER=neo4j
+NEO4J_PASSWORD=your-password
 ```
 
-## Monitoring and Observability
-
-### CloudWatch Integration
-
-All services log to CloudWatch with structured logging:
-
-```typescript
-// Log format
-{
-  timestamp: "2024-01-20T10:30:00Z",
-  level: "info",
-  service: "agents",
-  correlationId: "123e4567-e89b-12d3-a456-426614174000",
-  message: "Agent execution completed",
-  metadata: {
-    agentType: "CodeAnalyzer",
-    executionTime: 1250,
-    success: true
-  }
-}
+#### Dashboard
+```env
+NEXT_PUBLIC_API_URL=https://api.your-domain.com
+NEXT_PUBLIC_WS_URL=wss://api.your-domain.com
 ```
 
-### Health Checks
+## 📊 Monitoring & Observability
 
-Each service exposes health endpoints:
+- **Health Endpoints**: `/health`, `/health/ready`, `/health/live`
+- **Metrics**: Request latency, memory operations, storage health
+- **Logging**: Structured JSON logging with correlation IDs
 
-- `/health` - Basic health check
-- `/health/ready` - Readiness probe
-- `/health/live` - Liveness probe
+## 🤝 Contributing
 
-### Metrics
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'feat: add amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
 
-Key metrics tracked:
+## 📄 License
 
-- Request latency
-- Service availability
-- Tool execution success rate
-- Workflow completion time
-- Error rates by service
+MIT License - see [LICENSE](LICENSE) file for details
 
-## Connecting Services
+## 🔗 Links
 
-### Dashboard to MCP Server
+- [GitHub Project Board](https://github.com/orgs/blueshiftlabs-ai/projects/1)
+- [Documentation](./docs)
+- [Model Context Protocol](https://modelcontextprotocol.com)
 
-The dashboard connects to the MCP server via WebSocket and REST APIs:
+---
 
-```typescript
-// Dashboard configuration
-const MCP_SERVER_URL = process.env.NEXT_PUBLIC_MCP_SERVER_URL || 'http://localhost:3000';
-const WS_URL = process.env.NEXT_PUBLIC_WS_URL || 'ws://localhost:3000';
-```
-
-### CLI to MCP Server
-
-The CLI can connect to both local and remote MCP servers:
-
-```bash
-# Connect to local server
-mcp-cli connect --server http://localhost:3000
-
-# Connect to production server
-mcp-cli connect --server https://api.example.com --api-key YOUR_API_KEY
-
-# Execute tools
-mcp-cli exec code-analysis --file ./src/main.ts
-mcp-cli exec generate-docs --project ./
-```
-
-## Troubleshooting
-
-### Common Issues
-
-1. **Service Discovery Failures**
-   - Check AWS Cloud Map configuration
-   - Verify security group rules
-   - Ensure services are registered correctly
-
-2. **Inter-service Communication**
-   - Verify network policies
-   - Check service mesh configuration
-   - Review API Gateway routing rules
-
-3. **Performance Issues**
-   - Monitor CloudWatch metrics
-   - Check service resource allocation
-   - Review database query performance
-
-### Debug Mode
-
-Enable debug logging for troubleshooting:
-
-```bash
-# Set debug mode for all services
-DEBUG=* docker-compose up
-
-# Set debug mode for specific service
-DEBUG=agents:* pnpm --filter @apps/mcp-hybrid-server dev
-```
-
-## Contributing
-
-1. Create a feature branch
-2. Make your changes
-3. Run tests and linting
-4. Submit a pull request
-
-## License
-
-MIT
+Built with ❤️ for the MCP community

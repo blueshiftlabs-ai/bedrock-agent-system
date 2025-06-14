@@ -88,19 +88,22 @@ export function GraphVisualization() {
 
       if (response.ok) {
         const data = await response.json()
+        console.log('Connections API Response:', data) // Debug logging
         if (data?.result?.content?.[0]?.text) {
           try {
             const result = JSON.parse(data.result.content[0].text)
+            console.log('Parsed connections result:', result) // Debug logging
             processGraphData(result?.connections || [])
           } catch (parseError) {
-            console.error('Failed to parse connections data:', parseError)
+            console.error('Failed to parse connections data:', parseError, data.result.content[0].text)
             processGraphData([])
           }
         } else {
+          console.warn('No connections content in response:', data)
           processGraphData([])
         }
       } else {
-        console.error('Failed to load connections:', response.status)
+        console.error('Failed to load connections:', response.status, response.statusText)
         processGraphData([])
       }
     } catch (error) {
@@ -127,6 +130,7 @@ export function GraphVisualization() {
             arguments: {
               query: '',
               limit: 50
+              // Removed project filter to show all available memories
             }
           }
         })
@@ -136,14 +140,24 @@ export function GraphVisualization() {
         const data = await response.json()
         if (data.result?.content?.[0]?.text) {
           const result = JSON.parse(data.result.content[0].text)
-          setAvailableMemories(result.memories?.map((m: any) => ({
-            id: m.id || m.memory_id,
-            content: (m.content || m.text || 'No content').slice(0, 50) + ((m.content || m.text || '').length > 50 ? '...' : '')
-          })) || [])
+          // Fix data structure parsing for nested memory format
+          setAvailableMemories(result.memories?.map((m: any) => {
+            // Handle both old flat format and new nested format
+            const memoryId = m.memory?.metadata?.memory_id || m.id || m.memory_id
+            const content = m.memory?.content || m.content || m.text || 'No content'
+            return {
+              id: memoryId,
+              content: content.slice(0, 50) + (content.length > 50 ? '...' : '')
+            }
+          }) || [])
         }
+      } else {
+        console.error('Failed to load memories:', response.status, response.statusText)
+        setAvailableMemories([])
       }
     } catch (error) {
       console.error('Failed to load memories:', error)
+      setAvailableMemories([])
     }
   }
 
@@ -222,6 +236,8 @@ export function GraphVisualization() {
       })
 
       if (response.ok) {
+        const data = await response.json()
+        console.log('Add connection response:', data) // Debug logging
         setShowAddConnection(false)
         setNewConnection({
           fromMemoryId: '',
@@ -229,10 +245,16 @@ export function GraphVisualization() {
           relationshipType: 'RELATES_TO',
           bidirectional: false
         })
-        loadConnections() // Refresh the graph
+        // Refresh available memories and connections
+        loadAvailableMemories()
+        loadConnections()
+      } else {
+        console.error('Failed to add connection:', response.status, response.statusText)
+        alert(`Failed to add connection: ${response.status} ${response.statusText}`)
       }
     } catch (error) {
       console.error('Failed to add connection:', error)
+      alert(`Error adding connection: ${error.message}`)
     }
   }
 

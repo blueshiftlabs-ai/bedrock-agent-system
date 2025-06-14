@@ -163,27 +163,43 @@ export class MemoryService {
       },
       {
         predicate: () => true,
-        action: () => this.getAllMemories(request.query || {})
+        action: async () => {
+          const result = await this.getAllMemories(request.query || {});
+          return { memories: result.results, total_available: result.total_available };
+        }
       }
     ];
 
     const executeStrategy = () => {
       const strategy = retrievalStrategies.find(s => s.predicate());
-      return strategy?.action() || Promise.resolve([]);
+      return strategy?.action() || Promise.resolve({ memories: [], total_available: 0 });
     };
 
-    const enhanceWithRelationships = (results: MemorySearchResult[]) => 
-      request.query?.include_related 
-        ? this.enhanceWithGraphRelationships(results)
-        : Promise.resolve(results);
+    const enhanceWithRelationships = (data: any) => {
+      if (data.memories) {
+        return request.query?.include_related 
+          ? this.enhanceWithGraphRelationships(data.memories).then(enhanced => ({ ...data, memories: enhanced }))
+          : Promise.resolve(data);
+      }
+      // For backward compatibility with search results
+      return request.query?.include_related 
+        ? this.enhanceWithGraphRelationships(data).then(enhanced => ({ memories: enhanced, total_available: enhanced.length }))
+        : Promise.resolve({ memories: data, total_available: data.length });
+    };
 
     try {
-      const results = await executeStrategy().then(enhanceWithRelationships);
+      const data = await executeStrategy().then(enhanceWithRelationships);
       const duration = Date.now() - startTime;
       
+      // Calculate has_more for pagination
+      const offset = request.query?.offset || 0;
+      const limit = request.query?.limit || 10;
+      const has_more = (offset + limit) < (data.total_available || data.memories.length);
+      
       return {
-        memories: results,
-        total_count: results.length,
+        memories: data.memories,
+        total_count: data.total_available || data.memories.length,
+        has_more,
         search_time_ms: duration,
       };
 
@@ -307,9 +323,9 @@ export class MemoryService {
   }
 
   /**
-   * Get all memories with optional filtering using functional patterns
+   * Get all memories with optional filtering and pagination using functional patterns
    */
-  async getAllMemories(request: any): Promise<MemorySearchResult[]> {
+  async getAllMemories(request: any): Promise<{ results: MemorySearchResult[], total_available: number }> {
     const safeGetContent = async (metadata: any): Promise<string> => {
       try {
         const content = await this.openSearchService.getMemoryContent(metadata.memory_id, metadata.content_type as any);
@@ -348,14 +364,22 @@ export class MemoryService {
 
     try {
       const allMetadata = await this.dynamoDbService.getAllMemoryMetadata();
-      const filteredMetadata = applyAllFilters(allMetadata).slice(0, request.limit || 10);
+      const filteredMetadata = applyAllFilters(allMetadata);
       
-      const results = await Promise.all(filteredMetadata.map(createMemoryResult));
-      return results.filter(Boolean) as MemorySearchResult[];
+      // Apply pagination
+      const offset = request.offset || 0;
+      const limit = request.limit || 10;
+      const paginatedMetadata = filteredMetadata.slice(offset, offset + limit);
+      
+      const results = await Promise.all(paginatedMetadata.map(createMemoryResult));
+      return {
+        results: results.filter(Boolean) as MemorySearchResult[],
+        total_available: filteredMetadata.length
+      };
       
     } catch (error) {
       this.logger.error(`Failed to get all memories: ${error.message}`);
-      return [];
+      return { results: [], total_available: 0 };
     }
   }
 
