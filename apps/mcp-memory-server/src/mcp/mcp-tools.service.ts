@@ -316,39 +316,27 @@ export class MCPToolsService {
     description: 'Get git repository context information including project name, agent ID, repository URL, and current branch. Used for automatic agent and project attribution.',
     parameters: z.object({
       working_directory: z.string().optional().describe('Working directory to check for git repository (defaults to current working directory)'),
-      include_repository_info: z.boolean().default(true).describe('Include additional repository information like branch and clean status'),
+      refresh_cache: z.boolean().default(false).describe('Force refresh of git context cache'),
     }),
   })
-  async getGitContext(params: { working_directory?: string; include_repository_info?: boolean }) {
+  async getGitContext(params: { working_directory?: string; refresh_cache?: boolean }) {
     try {
-      if (params.include_repository_info) {
-        const repositoryInfo = await this.gitContextService.getRepositoryInfo(params.working_directory);
-        const gitContext = await this.gitContextService.getGitContext(params.working_directory);
-        
-        const result = {
-          ...gitContext,
-          repository_info: repositoryInfo,
-        };
-
-        return {
-          content: [
-            {
-              type: "text",
-              text: JSON.stringify(result, null, 2)
-            }
-          ]
-        };
+      let gitContext;
+      
+      if (params.refresh_cache) {
+        gitContext = await this.gitContextService.refreshContext(params.working_directory);
       } else {
-        const quickContext = await this.gitContextService.getQuickContext(params.working_directory);
-        return {
-          content: [
-            {
-              type: "text",
-              text: JSON.stringify(quickContext, null, 2)
-            }
-          ]
-        };
+        gitContext = await this.gitContextService.getGitContext(params.working_directory);
       }
+
+      return {
+        content: [
+          {
+            type: "text",
+            text: JSON.stringify(gitContext, null, 2)
+          }
+        ]
+      };
     } catch (error) {
       return {
         content: [

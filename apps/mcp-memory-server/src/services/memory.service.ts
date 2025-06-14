@@ -596,7 +596,7 @@ export class MemoryService {
 
     if (!agentId || !project) {
       try {
-        const gitContext = await this.gitContextService.getQuickContext();
+        const gitContext = await this.gitContextService.getGitContext();
         if (!agentId) {
           agentId = gitContext.agentId;
           this.logger.debug(`Auto-detected agent_id from git context: ${agentId}`);
@@ -607,7 +607,7 @@ export class MemoryService {
         }
       } catch (error) {
         this.logger.debug(`Failed to get git context, using defaults: ${error.message}`);
-        agentId = agentId || 'anonymous';
+        agentId = agentId || 'claude-code';
         project = project || 'common';
       }
     }
