@@ -7,6 +7,7 @@ import { LocalStorageService } from '../services/local-storage.service';
 import { OpenSearchStorageService } from '../services/opensearch-storage.service';
 import { NeptuneGraphService } from '../services/neptune-graph.service';
 import { Neo4jGraphService } from '../services/neo4j-graph.service';
+import { GitContextService } from '../services/git-context.service';
 import { MemoryConfigService } from '../config/memory-config.service';
 import { MemoryController } from './memory.controller';
 
@@ -14,6 +15,7 @@ import { MemoryController } from './memory.controller';
   providers: [
     MemoryConfigService,
     EmbeddingService,
+    GitContextService,
     // Conditionally provide DynamoDB or Local storage based on environment
     {
       provide: DynamoDBStorageService,
@@ -34,6 +36,6 @@ import { MemoryController } from './memory.controller';
     MemoryService,
   ],
   controllers: [MemoryController],
-  exports: [MemoryService],
+  exports: [MemoryService, GitContextService],
 })
 export class MemoryModule {}

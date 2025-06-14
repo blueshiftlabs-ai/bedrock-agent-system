@@ -2,13 +2,17 @@ import { Injectable } from '@nestjs/common';
 import { Tool } from '@rekog/mcp-nest';
 import { z } from 'zod';
 import { MemoryService } from '../services/memory.service';
+import { GitContextService } from '../services/git-context.service';
 
 /**
  * MCP Tools Service - provides memory operations via MCP protocol
  */
 @Injectable()
 export class MCPToolsService {
-  constructor(private readonly memoryService: MemoryService) {}
+  constructor(
+    private readonly memoryService: MemoryService,
+    private readonly gitContextService: GitContextService,
+  ) {}
 
   @Tool({
     name: 'store-memory',
@@ -305,5 +309,60 @@ export class MCPToolsService {
         }
       ]
     };
+  }
+
+  @Tool({
+    name: 'get-git-context',
+    description: 'Get git repository context information including project name, agent ID, repository URL, and current branch. Used for automatic agent and project attribution.',
+    parameters: z.object({
+      working_directory: z.string().optional().describe('Working directory to check for git repository (defaults to current working directory)'),
+      include_repository_info: z.boolean().default(true).describe('Include additional repository information like branch and clean status'),
+    }),
+  })
+  async getGitContext(params: { working_directory?: string; include_repository_info?: boolean }) {
+    try {
+      if (params.include_repository_info) {
+        const repositoryInfo = await this.gitContextService.getRepositoryInfo(params.working_directory);
+        const gitContext = await this.gitContextService.getGitContext(params.working_directory);
+        
+        const result = {
+          ...gitContext,
+          repository_info: repositoryInfo,
+        };
+
+        return {
+          content: [
+            {
+              type: "text",
+              text: JSON.stringify(result, null, 2)
+            }
+          ]
+        };
+      } else {
+        const quickContext = await this.gitContextService.getQuickContext(params.working_directory);
+        return {
+          content: [
+            {
+              type: "text",
+              text: JSON.stringify(quickContext, null, 2)
+            }
+          ]
+        };
+      }
+    } catch (error) {
+      return {
+        content: [
+          {
+            type: "text",
+            text: JSON.stringify({ 
+              error: error.message,
+              isGitRepository: false,
+              projectName: 'unknown-project',
+              agentId: 'anonymous'
+            }, null, 2)
+          }
+        ]
+      };
+    }
   }
 }

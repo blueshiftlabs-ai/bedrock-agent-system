@@ -5,6 +5,7 @@ import { EmbeddingService } from './embedding.service';
 import { DynamoDBStorageService } from './dynamodb-storage.service';
 import { OpenSearchStorageService } from './opensearch-storage.service';
 import { Neo4jGraphService } from './neo4j-graph.service';
+import { GitContextService } from './git-context.service';
 import {
   MemoryMetadata,
   StoredMemory,
@@ -39,6 +40,7 @@ export class MemoryService {
     private readonly dynamoDbService: DynamoDBStorageService,
     private readonly openSearchService: OpenSearchStorageService,
     private readonly neo4jService: Neo4jGraphService,
+    private readonly gitContextService: GitContextService,
   ) {
     this.logger.log('Sophisticated Memory Service initialized');
   }
@@ -54,7 +56,7 @@ export class MemoryService {
       this.logger.debug(`Storing memory: ${memoryId}`);
 
       // 1. Create memory metadata
-      const metadata = this.createMemoryMetadata(memoryId, request);
+      const metadata = await this.createMemoryMetadata(memoryId, request);
 
       // 2. Generate embeddings based on content type
       const embeddingResponse = await this.embeddingService.generateEmbedding({
@@ -583,18 +585,40 @@ export class MemoryService {
 
   // Private helper methods
 
-  private createMemoryMetadata(memoryId: string, request: StoreMemoryRequest): MemoryMetadata {
+  private async createMemoryMetadata(memoryId: string, request: StoreMemoryRequest): Promise<MemoryMetadata> {
     const now = new Date();
     const contentType = request.content_type || this.detectContentType(request.content);
     const memoryType = request.type || this.detectMemoryType(request.content, contentType);
+
+    // Use git context to auto-detect agent_id and project if not provided
+    let agentId = request.agent_id;
+    let project = request.project;
+
+    if (!agentId || !project) {
+      try {
+        const gitContext = await this.gitContextService.getQuickContext();
+        if (!agentId) {
+          agentId = gitContext.agentId;
+          this.logger.debug(`Auto-detected agent_id from git context: ${agentId}`);
+        }
+        if (!project) {
+          project = gitContext.projectName;
+          this.logger.debug(`Auto-detected project from git context: ${project}`);
+        }
+      } catch (error) {
+        this.logger.debug(`Failed to get git context, using defaults: ${error.message}`);
+        agentId = agentId || 'anonymous';
+        project = project || 'common';
+      }
+    }
 
     const baseMetadata = {
       memory_id: memoryId,
       type: memoryType,
       content_type: contentType,
-      agent_id: request.agent_id,
+      agent_id: agentId,
       session_id: request.session_id,
-      project: request.project || 'common',
+      project: project,
       created_at: now,
       updated_at: now,
       tags: request.tags || [],
