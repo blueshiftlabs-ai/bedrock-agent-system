@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { Tool } from '@rekog/mcp-nest';
 import { z } from 'zod';
 import { MemoryService } from '../services/memory.service';
-import { GitContextService } from '../services/git-context.service';
+import { getErrorMessage } from '../utils';
 
 /**
  * MCP Tools Service - provides memory operations via MCP protocol
@@ -11,17 +11,16 @@ import { GitContextService } from '../services/git-context.service';
 export class MCPToolsService {
   constructor(
     private readonly memoryService: MemoryService,
-    private readonly gitContextService: GitContextService,
   ) {}
 
   @Tool({
     name: 'store-memory',
-    description: 'Store a memory with semantic understanding and context. Memory types: episodic (events/conversations), semantic (facts/concepts), procedural (how-to/processes), working (temporary/session). Memories are stored across DynamoDB (metadata), OpenSearch (vector search), and Neo4j (relationships).',
+    description: 'Store a memory with semantic understanding and context. Memory types: episodic (events/conversations), semantic (facts/concepts), procedural (how-to/processes), working (temporary/session). Memories are stored across DynamoDB (metadata), OpenSearch (vector search), and Neo4j (relationships). IMPORTANT: agent_id and project are required. If project is unknown, agent should run: `basename $(git remote get-url origin) .git` to detect from current git repository.',
     parameters: z.object({
       content: z.string().describe('Memory content to store'),
-      agent_id: z.string().optional().describe('ID of the agent storing the memory'),
+      agent_id: z.string().optional().describe('ID of the agent storing the memory (REQUIRED - use your agent identifier)'),
       session_id: z.string().optional().describe('Session ID for episodic memories'),
-      project: z.string().optional().describe('Project context for memory isolation (defaults to "common")'),
+      project: z.string().optional().describe('Project context for memory isolation (REQUIRED - use git command if unknown: `basename $(git remote get-url origin) .git`)'),
       type: z.enum(['episodic', 'semantic', 'procedural', 'working']).optional().describe('Memory type: episodic (events/conversations), semantic (facts/concepts), procedural (how-to/processes), working (temporary with TTL)'),
       content_type: z.enum(['text', 'code']).optional().describe('Content type: text (natural language) or code (programming)'),
       tags: z.array(z.string()).optional().describe('Tags for categorization and clustering'),
@@ -312,45 +311,81 @@ export class MCPToolsService {
   }
 
   @Tool({
-    name: 'get-git-context',
-    description: 'Get git repository context information including project name, agent ID, repository URL, and current branch. Used for automatic agent and project attribution.',
+    name: 'update-memory-metadata',
+    description: 'Update metadata for existing memories. Used to fix anonymous memories with proper agent_id and project attribution.',
     parameters: z.object({
-      working_directory: z.string().optional().describe('Working directory to check for git repository (defaults to current working directory)'),
-      refresh_cache: z.boolean().default(false).describe('Force refresh of git context cache'),
+      memory_ids: z.array(z.string()).describe('Array of memory IDs to update'),
+      agent_id: z.string().optional().describe('New agent ID to set'),
+      project: z.string().optional().describe('New project to set'),
+      tags: z.array(z.string()).optional().describe('New tags to set (replaces existing)'),
     }),
   })
-  async getGitContext(params: { working_directory?: string; refresh_cache?: boolean }) {
-    try {
-      let gitContext;
-      
-      if (params.refresh_cache) {
-        gitContext = await this.gitContextService.refreshContext(params.working_directory);
-      } else {
-        gitContext = await this.gitContextService.getGitContext(params.working_directory);
-      }
+  async updateMemoryMetadata(params: {
+    memory_ids: string[];
+    agent_id?: string;
+    project?: string;
+    tags?: string[];
+  }) {
+    const results = [];
+    const errors = [];
 
-      return {
-        content: [
-          {
-            type: "text",
-            text: JSON.stringify(gitContext, null, 2)
-          }
-        ]
-      };
-    } catch (error) {
-      return {
-        content: [
-          {
-            type: "text",
-            text: JSON.stringify({ 
-              error: error.message,
-              isGitRepository: false,
-              projectName: 'unknown-project',
-              agentId: 'anonymous'
-            }, null, 2)
-          }
-        ]
-      };
+    for (const memoryId of params.memory_ids) {
+      try {
+        const updates: any = {};
+        if (params.agent_id) updates.agent_id = params.agent_id;
+        if (params.project) updates.project = params.project;
+        if (params.tags) updates.tags = params.tags;
+
+        await this.memoryService.updateMemoryMetadata(memoryId, updates);
+        results.push({ memory_id: memoryId, status: 'updated', updates });
+      } catch (error) {
+        errors.push({ memory_id: memoryId, error: getErrorMessage(error) });
+      }
     }
+
+    return {
+      content: [
+        {
+          type: "text",
+          text: JSON.stringify({
+            success: results.length,
+            error_count: errors.length,
+            results,
+            errors
+          }, null, 2)
+        }
+      ]
+    };
+  }
+
+  @Tool({
+    name: 'analyze-memory-connections',
+    description: 'Analyze memory connections and provide insights for comprehensive memory network analysis. Part of Issue #5 implementation for enhanced code-to-concept mapping and knowledge graph analytics.',
+    parameters: z.object({
+      memory_id: z.string().optional().describe('Analyze connections for specific memory ID'),
+      agent_id: z.string().optional().describe('Analyze connections for specific agent'),
+      project: z.string().optional().describe('Analyze connections within specific project'),
+      relationship_types: z.array(z.string()).optional().describe('Filter by specific relationship types (e.g., SHARES_CONCEPT, IMPORTS_FROM, IMPLEMENTS_SIMILAR)'),
+      depth: z.number().default(2).describe('Depth of connection traversal (default: 2)'),
+      include_analytics: z.boolean().default(true).describe('Include advanced analytics like centrality scores and clusters'),
+    }),
+  })
+  async analyzeMemoryConnections(params: {
+    memory_id?: string;
+    agent_id?: string;
+    project?: string;
+    relationship_types?: string[];
+    depth?: number;
+    include_analytics?: boolean;
+  }) {
+    const result = await this.memoryService.analyzeMemoryConnections(params);
+    return {
+      content: [
+        {
+          type: "text",
+          text: JSON.stringify(result, null, 2)
+        }
+      ]
+    };
   }
 }

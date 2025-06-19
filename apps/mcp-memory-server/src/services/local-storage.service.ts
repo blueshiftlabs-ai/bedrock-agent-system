@@ -8,6 +8,7 @@ import {
   SessionContext, 
   AgentProfile 
 } from '../types/memory.types';
+import { getErrorMessage } from '../utils';
 
 /**
  * Local file-based storage service for development
@@ -45,7 +46,7 @@ export class LocalStorageService {
         }
       }
     } catch (error) {
-      this.logger.error(`Failed to initialize local storage: ${error.message}`);
+      this.logger.error(`Failed to initialize local storage: ${getErrorMessage(error)}`);
     }
   }
 
@@ -267,7 +268,7 @@ export class LocalStorageService {
       const data = await this.readData(this.memoryFile);
       return Object.values(data).filter((item: any) => item.SK === 'METADATA');
     } catch (error) {
-      this.logger.error(`Failed to get all memories: ${error.message}`);
+      this.logger.error(`Failed to get all memories: ${getErrorMessage(error)}`);
       return [];
     }
   }

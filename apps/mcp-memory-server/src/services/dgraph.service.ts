@@ -8,6 +8,7 @@ import {
   MemoryMetadata,
   StoredMemory 
 } from '../types/memory.types';
+import { getErrorMessage } from '../utils';
 
 /**
  * Dgraph service for knowledge graph operations
@@ -44,7 +45,7 @@ export class DgraphService implements OnModuleDestroy {
       // Initialize graph schema
       await this.initializeGraphSchema();
     } catch (error) {
-      this.logger.error(`Failed to initialize Dgraph connection: ${error.message}`);
+      this.logger.error(`Failed to initialize Dgraph connection: ${getErrorMessage(error)}`);
       // For development, continue without Dgraph
       if (this.configService.isDevelopment) {
         this.logger.warn('Continuing without Dgraph in development mode');
@@ -86,7 +87,7 @@ export class DgraphService implements OnModuleDestroy {
       await this.dgraphClient.alter(op);
       this.logger.log('Dgraph schema initialized');
     } catch (error) {
-      this.logger.error(`Failed to initialize Dgraph schema: ${error.message}`);
+      this.logger.error(`Failed to initialize Dgraph schema: ${getErrorMessage(error)}`);
     }
   }
 
@@ -129,7 +130,7 @@ export class DgraphService implements OnModuleDestroy {
         await txn.discard();
       }
     } catch (error) {
-      this.logger.error(`Failed to create memory node: ${error.message}`);
+      this.logger.error(`Failed to create memory node: ${getErrorMessage(error)}`);
       return null;
     }
   }
@@ -207,7 +208,7 @@ export class DgraphService implements OnModuleDestroy {
         await txn.discard();
       }
     } catch (error) {
-      this.logger.error(`Failed to add connection: ${error.message}`);
+      this.logger.error(`Failed to add connection: ${getErrorMessage(error)}`);
       return false;
     }
   }
@@ -282,7 +283,7 @@ export class DgraphService implements OnModuleDestroy {
 
       return relatedMemories;
     } catch (error) {
-      this.logger.error(`Failed to get related memories: ${error.message}`);
+      this.logger.error(`Failed to get related memories: ${getErrorMessage(error)}`);
       return [];
     }
   }
@@ -297,7 +298,7 @@ export class DgraphService implements OnModuleDestroy {
         this.logger.log('Dgraph connection closed');
       }
     } catch (error) {
-      this.logger.error(`Error closing Dgraph connection: ${error.message}`);
+      this.logger.error(`Error closing Dgraph connection: ${getErrorMessage(error)}`);
     }
   }
 }

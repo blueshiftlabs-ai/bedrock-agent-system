@@ -3,6 +3,7 @@ import { ConfigService } from '@nestjs/config';
 import { BedrockRuntimeClient, InvokeModelCommand } from '@aws-sdk/client-bedrock-runtime';
 import { EmbeddingRequest, EmbeddingResponse, ContentType } from '../types/memory.types';
 import { pipeline, FeatureExtractionPipeline } from '@xenova/transformers';
+import { getErrorMessage } from '../utils';
 
 /**
  * Embedding service that generates context-appropriate embeddings
@@ -55,7 +56,7 @@ export class EmbeddingService {
         );
         this.logger.log('Text embedding pipeline (all-MiniLM-L6-v2) initialized');
       } catch (error) {
-        this.logger.warn(`Text embedding pipeline failed: ${error.message}`);
+        this.logger.warn(`Text embedding pipeline failed: ${getErrorMessage(error)}`);
       }
       
       // Initialize code embedding pipeline (smaller model first)
@@ -67,7 +68,7 @@ export class EmbeddingService {
         );
         this.logger.log('Code embedding pipeline (BERT-base) initialized');
       } catch (error) {
-        this.logger.warn(`Code embedding pipeline failed: ${error.message}`);
+        this.logger.warn(`Code embedding pipeline failed: ${getErrorMessage(error)}`);
       }
       
       // Initialize graph-aware code embedding pipeline (same as code for now)
@@ -78,7 +79,7 @@ export class EmbeddingService {
       
       this.logger.log('Local transformer pipelines initialized successfully');
     } catch (error) {
-      this.logger.warn(`Failed to initialize local transformer pipelines: ${error.message}`);
+      this.logger.warn(`Failed to initialize local transformer pipelines: ${getErrorMessage(error)}`);
       this.logger.warn('Will use basic hash-based embeddings as final fallback');
     }
   }
@@ -106,7 +107,7 @@ export class EmbeddingService {
         token_count: tokenCount,
       };
     } catch (error) {
-      this.logger.error(`Failed to generate embedding: ${error.message}`);
+      this.logger.error(`Failed to generate embedding: ${getErrorMessage(error)}`);
       throw error;
     }
   }
@@ -146,7 +147,7 @@ export class EmbeddingService {
         tokenCount: this.estimateTokenCount(text),
       };
     } catch (error) {
-      this.logger.error(`Failed to generate text embedding: ${error.message}`);
+      this.logger.error(`Failed to generate text embedding: ${getErrorMessage(error)}`);
       
       // Fallback to local embedding if Bedrock fails
       return this.generateLocalTextEmbedding(text);
@@ -193,7 +194,7 @@ export class EmbeddingService {
         tokenCount: this.estimateTokenCount(code),
       };
     } catch (error) {
-      this.logger.error(`Failed to generate code embedding: ${error.message}`);
+      this.logger.error(`Failed to generate code embedding: ${getErrorMessage(error)}`);
       
       // Fallback to local embedding
       return this.generateLocalCodeEmbedding(code, programmingLanguage);
@@ -301,7 +302,7 @@ export class EmbeddingService {
         };
       }
     } catch (error) {
-      this.logger.warn(`Transformer-based text embedding failed: ${error.message}`);
+      this.logger.warn(`Transformer-based text embedding failed: ${getErrorMessage(error)}`);
     }
     
     // Final fallback to hash-based embedding
@@ -355,7 +356,7 @@ export class EmbeddingService {
         };
       }
     } catch (error) {
-      this.logger.warn(`Transformer-based code embedding failed: ${error.message}`);
+      this.logger.warn(`Transformer-based code embedding failed: ${getErrorMessage(error)}`);
     }
     
     // Final fallback to hash-based embedding

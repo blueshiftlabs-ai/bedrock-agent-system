@@ -7,6 +7,7 @@ import {
   MemoryMetadata,
   StoredMemory 
 } from '../types/memory.types';
+import { getErrorMessage } from '../utils';
 
 /**
  * Neo4j graph service for knowledge graph operations
@@ -46,7 +47,7 @@ export class Neo4jGraphService implements OnModuleDestroy {
       // Initialize graph schema
       await this.initializeGraphSchema();
     } catch (error) {
-      this.logger.error(`Failed to initialize Neo4j connection: ${error.message}`);
+      this.logger.error(`Failed to initialize Neo4j connection: ${getErrorMessage(error)}`);
       // For development, continue without Neo4j
       if (this.configService.isDevelopment) {
         this.logger.warn('Continuing without Neo4j in development mode');
@@ -83,15 +84,15 @@ export class Neo4jGraphService implements OnModuleDestroy {
           await session.run(query);
         } catch (error) {
           // Constraint/index might already exist, which is fine
-          if (!error.message.includes('already exists')) {
-            this.logger.warn(`Schema query failed: ${error.message}`);
+          if (!getErrorMessage(error).includes('already exists')) {
+            this.logger.warn(`Schema query failed: ${getErrorMessage(error)}`);
           }
         }
       }
       
       this.logger.log('Neo4j graph schema initialized');
     } catch (error) {
-      this.logger.error(`Failed to initialize Neo4j schema: ${error.message}`);
+      this.logger.error(`Failed to initialize Neo4j schema: ${getErrorMessage(error)}`);
     } finally {
       await session.close();
     }
@@ -150,7 +151,7 @@ export class Neo4jGraphService implements OnModuleDestroy {
       
       return nodeId;
     } catch (error) {
-      this.logger.error(`Failed to create memory node: ${error.message}`);
+      this.logger.error(`Failed to create memory node: ${getErrorMessage(error)}`);
       return null;
     } finally {
       await session.close();
@@ -203,7 +204,7 @@ export class Neo4jGraphService implements OnModuleDestroy {
 
       return false;
     } catch (error) {
-      this.logger.error(`Failed to add connection: ${error.message}`);
+      this.logger.error(`Failed to add connection: ${getErrorMessage(error)}`);
       return false;
     } finally {
       await session.close();
@@ -221,8 +222,10 @@ export class Neo4jGraphService implements OnModuleDestroy {
     const session = this.driver.session();
     
     try {
+      // Ensure depth is an integer for Neo4j
+      const safeDepth = Math.floor(Number(depth));
       const query = `
-        MATCH path = (start:Memory {memory_id: $memory_id})-[r:CONNECTS*1..${depth}]-(related:Memory)
+        MATCH path = (start:Memory {memory_id: $memory_id})-[r:CONNECTS*1..${safeDepth}]-(related:Memory)
         
         WITH related, r, length(path) as distance
         ORDER BY distance, r[0].confidence DESC
@@ -249,7 +252,7 @@ export class Neo4jGraphService implements OnModuleDestroy {
 
       return relatedMemories;
     } catch (error) {
-      this.logger.error(`Failed to get related memories: ${error.message}`);
+      this.logger.error(`Failed to get related memories: ${getErrorMessage(error)}`);
       return [];
     } finally {
       await session.close();
@@ -297,7 +300,7 @@ export class Neo4jGraphService implements OnModuleDestroy {
 
       return concepts;
     } catch (error) {
-      this.logger.error(`Failed to find concept clusters: ${error.message}`);
+      this.logger.error(`Failed to find concept clusters: ${getErrorMessage(error)}`);
       return [];
     } finally {
       await session.close();
@@ -325,7 +328,7 @@ export class Neo4jGraphService implements OnModuleDestroy {
 
       await session.run(query, { memory_id: memoryId });
     } catch (error) {
-      this.logger.error(`Failed to update memory access: ${error.message}`);
+      this.logger.error(`Failed to update memory access: ${getErrorMessage(error)}`);
     } finally {
       await session.close();
     }
@@ -356,7 +359,7 @@ export class Neo4jGraphService implements OnModuleDestroy {
       
       return deletedCount > 0;
     } catch (error) {
-      this.logger.error(`Failed to delete memory: ${error.message}`);
+      this.logger.error(`Failed to delete memory: ${getErrorMessage(error)}`);
       return false;
     } finally {
       await session.close();
@@ -378,7 +381,8 @@ export class Neo4jGraphService implements OnModuleDestroy {
         MATCH (a)-[r]->(b)
         WHERE 1=1
       `;
-      const params: any = { limit };
+      // Ensure limit is an integer for Neo4j
+      const params: any = { limit: Math.floor(Number(limit)) };
 
       if (memoryId) {
         query += ` AND (a.memory_id = $memory_id OR b.memory_id = $memory_id)`;
@@ -410,7 +414,7 @@ export class Neo4jGraphService implements OnModuleDestroy {
         properties: record.get('properties')
       }));
     } catch (error) {
-      this.logger.error(`Failed to get connections: ${error.message}`);
+      this.logger.error(`Failed to get connections: ${getErrorMessage(error)}`);
       return [];
     } finally {
       await session.close();
@@ -429,7 +433,8 @@ export class Neo4jGraphService implements OnModuleDestroy {
     
     try {
       let query = '';
-      const params: any = { entity_id: entityId, limit };
+      // Ensure limit is an integer for Neo4j
+      const params: any = { entity_id: entityId, limit: Math.floor(Number(limit)) };
 
       switch (entityType) {
         case 'memory':
@@ -484,7 +489,7 @@ export class Neo4jGraphService implements OnModuleDestroy {
         connected_type: record.get('connected_type')
       }));
     } catch (error) {
-      this.logger.error(`Failed to get entity connections: ${error.message}`);
+      this.logger.error(`Failed to get entity connections: ${getErrorMessage(error)}`);
       return [];
     } finally {
       await session.close();
@@ -501,7 +506,7 @@ export class Neo4jGraphService implements OnModuleDestroy {
         this.logger.log('Neo4j connection closed');
       }
     } catch (error) {
-      this.logger.error(`Error closing Neo4j connection: ${error.message}`);
+      this.logger.error(`Error closing Neo4j connection: ${getErrorMessage(error)}`);
     }
   }
 }

@@ -2,6 +2,7 @@ import { Injectable, Logger } from '@nestjs/common';
 import { MemoryConfigService } from '../config/memory-config.service';
 import { DynamoDBStorageService } from './dynamodb-storage.service';
 import { LocalStorageService } from './local-storage.service';
+import { getErrorMessage } from '../utils';
 
 /**
  * Storage Strategy Service - Implements fallback storage logic
@@ -51,7 +52,7 @@ export class StorageStrategyService {
             return;
           }
         } catch (error) {
-          this.logger.warn(`Storage strategy ${strategy.name} failed health check: ${error.message}`);
+          this.logger.warn(`Storage strategy ${strategy.name} failed health check: ${getErrorMessage(error)}`);
         }
       }
     }
@@ -136,7 +137,7 @@ export class StorageStrategyService {
       const service = this.getStorageService();
       return await operation(service);
     } catch (error) {
-      this.logger.error(`Operation ${operationName} failed with ${this.currentStrategy}: ${error.message}`);
+      this.logger.error(`Operation ${operationName} failed with ${this.currentStrategy}: ${getErrorMessage(error)}`);
       
       // Try fallback strategy if current operation failed
       if (this.currentStrategy === 'dynamodb') {
@@ -148,7 +149,7 @@ export class StorageStrategyService {
           this.logger.log(`Operation ${operationName} succeeded with local storage fallback`);
           return result;
         } catch (fallbackError) {
-          this.logger.error(`Fallback operation ${operationName} also failed: ${fallbackError.message}`);
+          this.logger.error(`Fallback operation ${operationName} also failed: ${getErrorMessage(fallbackError)}`);
           throw fallbackError;
         }
       } else {

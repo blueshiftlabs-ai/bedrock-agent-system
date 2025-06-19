@@ -8,6 +8,7 @@ import {
   SessionContext, 
   AgentProfile 
 } from '../types/memory.types';
+import { getErrorMessage } from '../utils';
 
 /**
  * DynamoDB storage service for memory metadata, sessions, and agent profiles
@@ -58,6 +59,7 @@ export class DynamoDBStorageService {
       content_type: metadata.content_type,
       agent_id: metadata.agent_id,
       session_id: metadata.session_id,
+      project: metadata.project,
       created_at: metadata.created_at.getTime(),
       updated_at: metadata.updated_at.getTime(),
       ttl: metadata.ttl ? Math.floor(metadata.ttl.getTime() / 1000) : undefined,
@@ -79,7 +81,7 @@ export class DynamoDBStorageService {
       await this.dynamoDbClient.send(command);
       this.logger.debug(`Stored memory metadata: ${metadata.memory_id}`);
     } catch (error) {
-      this.logger.error(`Failed to store memory metadata: ${error.message}`);
+      this.logger.error(`Failed to store memory metadata: ${getErrorMessage(error)}`);
       throw error;
     }
   }
@@ -110,7 +112,7 @@ export class DynamoDBStorageService {
       
       return item;
     } catch (error) {
-      this.logger.error(`Failed to get memory metadata: ${error.message}`);
+      this.logger.error(`Failed to get memory metadata: ${getErrorMessage(error)}`);
       throw error;
     }
   }
@@ -123,6 +125,18 @@ export class DynamoDBStorageService {
       const updateExpression: string[] = [];
       const expressionAttributeNames: Record<string, string> = {};
       const expressionAttributeValues: Record<string, any> = {};
+
+      if (updates.agent_id) {
+        updateExpression.push('#agent_id = :agent_id');
+        expressionAttributeNames['#agent_id'] = 'agent_id';
+        expressionAttributeValues[':agent_id'] = updates.agent_id;
+      }
+
+      if (updates.project) {
+        updateExpression.push('#project = :project');
+        expressionAttributeNames['#project'] = 'project';
+        expressionAttributeValues[':project'] = updates.project;
+      }
 
       if (updates.tags) {
         updateExpression.push('#tags = :tags');
@@ -159,7 +173,7 @@ export class DynamoDBStorageService {
       await this.dynamoDbClient.send(command);
       this.logger.debug(`Updated memory metadata: ${memoryId}`);
     } catch (error) {
-      this.logger.error(`Failed to update memory metadata: ${error.message}`);
+      this.logger.error(`Failed to update memory metadata: ${getErrorMessage(error)}`);
       throw error;
     }
   }
@@ -180,7 +194,7 @@ export class DynamoDBStorageService {
       await this.dynamoDbClient.send(command);
       this.logger.debug(`Deleted memory metadata: ${memoryId}`);
     } catch (error) {
-      this.logger.error(`Failed to delete memory metadata: ${error.message}`);
+      this.logger.error(`Failed to delete memory metadata: ${getErrorMessage(error)}`);
       throw error;
     }
   }
@@ -206,7 +220,7 @@ export class DynamoDBStorageService {
       
       return response.Items?.map(item => unmarshall(item) as DynamoDBMemoryItem) || [];
     } catch (error) {
-      this.logger.error(`Failed to get memories by agent: ${error.message}`);
+      this.logger.error(`Failed to get memories by agent: ${getErrorMessage(error)}`);
       return [];
     }
   }
@@ -231,7 +245,7 @@ export class DynamoDBStorageService {
 
       await this.dynamoDbClient.send(command);
     } catch (error) {
-      this.logger.warn(`Failed to update access tracking: ${error.message}`);
+      this.logger.warn(`Failed to update access tracking: ${getErrorMessage(error)}`);
       // Don't throw - this is non-critical
     }
   }
@@ -261,7 +275,7 @@ export class DynamoDBStorageService {
       await this.dynamoDbClient.send(command);
       this.logger.debug(`Stored session context: ${context.session_id}`);
     } catch (error) {
-      this.logger.error(`Failed to store session context: ${error.message}`);
+      this.logger.error(`Failed to store session context: ${getErrorMessage(error)}`);
       throw error;
     }
   }
@@ -297,7 +311,7 @@ export class DynamoDBStorageService {
         recent_memory_ids: item.recent_memory_ids || [],
       };
     } catch (error) {
-      this.logger.error(`Failed to get session context: ${error.message}`);
+      this.logger.error(`Failed to get session context: ${getErrorMessage(error)}`);
       return null;
     }
   }
@@ -324,7 +338,7 @@ export class DynamoDBStorageService {
 
       await this.dynamoDbClient.send(command);
     } catch (error) {
-      this.logger.warn(`Failed to update session with memory: ${error.message}`);
+      this.logger.warn(`Failed to update session with memory: ${getErrorMessage(error)}`);
       // Non-critical operation
     }
   }
@@ -352,7 +366,7 @@ export class DynamoDBStorageService {
       await this.dynamoDbClient.send(command);
       this.logger.debug(`Stored agent profile: ${profile.agent_id}`);
     } catch (error) {
-      this.logger.error(`Failed to store agent profile: ${error.message}`);
+      this.logger.error(`Failed to store agent profile: ${getErrorMessage(error)}`);
       throw error;
     }
   }
@@ -390,7 +404,7 @@ export class DynamoDBStorageService {
         },
       };
     } catch (error) {
-      this.logger.error(`Failed to get agent profile: ${error.message}`);
+      this.logger.error(`Failed to get agent profile: ${getErrorMessage(error)}`);
       return null;
     }
   }
@@ -420,9 +434,16 @@ export class DynamoDBStorageService {
         };
       }) || [];
     } catch (error) {
-      this.logger.error(`Failed to get all memory metadata: ${error.message}`);
+      this.logger.error(`Failed to get all memory metadata: ${getErrorMessage(error)}`);
       return [];
     }
+  }
+
+  /**
+   * Alias for getAllMemoryMetadata - for compatibility with memory service
+   */
+  async getAllMemories(): Promise<any[]> {
+    return this.getAllMemoryMetadata();
   }
 
   /**
@@ -442,7 +463,7 @@ export class DynamoDBStorageService {
       await this.dynamoDbClient.send(command);
       return true;
     } catch (error) {
-      this.logger.error(`DynamoDB health check failed: ${error.message}`);
+      this.logger.error(`DynamoDB health check failed: ${getErrorMessage(error)}`);
       return false;
     }
   }

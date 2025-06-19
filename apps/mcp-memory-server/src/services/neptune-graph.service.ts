@@ -7,6 +7,7 @@ import {
   MemoryMetadata,
   StoredMemory 
 } from '../types/memory.types';
+import { getErrorMessage } from '../utils';
 
 const driver = gremlin.driver;
 const process = gremlin.process;
@@ -48,7 +49,7 @@ export class NeptuneGraphService implements OnModuleDestroy {
       // Initialize graph schema
       await this.initializeGraphSchema();
     } catch (error) {
-      this.logger.error(`Failed to initialize Neptune connection: ${error.message}`);
+      this.logger.error(`Failed to initialize Neptune connection: ${getErrorMessage(error)}`);
       // For development, continue without Neptune
       if (this.configService.isDevelopment) {
         this.logger.warn('Continuing without Neptune in development mode');
@@ -67,7 +68,7 @@ export class NeptuneGraphService implements OnModuleDestroy {
       // Note: In Neptune, schema is managed differently than in other graph DBs
       this.logger.log('Graph schema initialized');
     } catch (error) {
-      this.logger.warn(`Failed to initialize graph schema: ${error.message}`);
+      this.logger.warn(`Failed to initialize graph schema: ${getErrorMessage(error)}`);
     }
   }
 
@@ -98,7 +99,7 @@ export class NeptuneGraphService implements OnModuleDestroy {
       this.logger.debug(`Created memory node: ${nodeId}`);
       return nodeId;
     } catch (error) {
-      this.logger.error(`Failed to create memory node: ${error.message}`);
+      this.logger.error(`Failed to create memory node: ${getErrorMessage(error)}`);
       throw error;
     }
   }
@@ -126,7 +127,7 @@ export class NeptuneGraphService implements OnModuleDestroy {
       this.logger.debug(`Created concept node: ${nodeId}`);
       return nodeId;
     } catch (error) {
-      this.logger.error(`Failed to create concept node: ${error.message}`);
+      this.logger.error(`Failed to create concept node: ${getErrorMessage(error)}`);
       throw error;
     }
   }
@@ -162,7 +163,7 @@ export class NeptuneGraphService implements OnModuleDestroy {
       this.logger.debug(`Created agent node: ${nodeId}`);
       return nodeId;
     } catch (error) {
-      this.logger.error(`Failed to create agent node: ${error.message}`);
+      this.logger.error(`Failed to create agent node: ${getErrorMessage(error)}`);
       throw error;
     }
   }
@@ -198,7 +199,7 @@ export class NeptuneGraphService implements OnModuleDestroy {
       this.logger.debug(`Created session node: ${nodeId}`);
       return nodeId;
     } catch (error) {
-      this.logger.error(`Failed to create session node: ${error.message}`);
+      this.logger.error(`Failed to create session node: ${getErrorMessage(error)}`);
       throw error;
     }
   }
@@ -258,7 +259,7 @@ export class NeptuneGraphService implements OnModuleDestroy {
       this.logger.debug(`Created connection: ${connection.from_memory_id} -[${connection.relationship_type}]-> ${connection.to_memory_id}`);
       return edgeId;
     } catch (error) {
-      this.logger.error(`Failed to add connection: ${error.message}`);
+      this.logger.error(`Failed to add connection: ${getErrorMessage(error)}`);
       throw error;
     }
   }
@@ -315,7 +316,7 @@ export class NeptuneGraphService implements OnModuleDestroy {
 
       return connections;
     } catch (error) {
-      this.logger.error(`Failed to find connections: ${error.message}`);
+      this.logger.error(`Failed to find connections: ${getErrorMessage(error)}`);
       return [];
     }
   }
@@ -347,7 +348,7 @@ export class NeptuneGraphService implements OnModuleDestroy {
 
       return similarMemories;
     } catch (error) {
-      this.logger.error(`Failed to find similar memories: ${error.message}`);
+      this.logger.error(`Failed to find similar memories: ${getErrorMessage(error)}`);
       return [];
     }
   }
@@ -393,7 +394,7 @@ export class NeptuneGraphService implements OnModuleDestroy {
           });
           connectionsCreated++;
         } catch (error) {
-          this.logger.warn(`Failed to connect observation to memory ${memoryId}: ${error.message}`);
+          this.logger.warn(`Failed to connect observation to memory ${memoryId}: ${getErrorMessage(error)}`);
         }
       }
 
@@ -406,13 +407,13 @@ export class NeptuneGraphService implements OnModuleDestroy {
           confidence: 1.0,
         });
       } catch (error) {
-        this.logger.warn(`Failed to connect observation to agent: ${error.message}`);
+        this.logger.warn(`Failed to connect observation to agent: ${getErrorMessage(error)}`);
       }
 
       this.logger.debug(`Created observation: ${observationId} with ${connectionsCreated} connections`);
       return { observationId, connectionsCreated };
     } catch (error) {
-      this.logger.error(`Failed to create observation: ${error.message}`);
+      this.logger.error(`Failed to create observation: ${getErrorMessage(error)}`);
       throw error;
     }
   }
@@ -462,7 +463,7 @@ export class NeptuneGraphService implements OnModuleDestroy {
 
       return connections;
     } catch (error) {
-      this.logger.error(`Failed to get memory path: ${error.message}`);
+      this.logger.error(`Failed to get memory path: ${getErrorMessage(error)}`);
       return [];
     }
   }
@@ -492,7 +493,7 @@ export class NeptuneGraphService implements OnModuleDestroy {
 
       this.logger.debug(`Deleted memory node and connections: ${memoryId}`);
     } catch (error) {
-      this.logger.error(`Failed to delete memory node: ${error.message}`);
+      this.logger.error(`Failed to delete memory node: ${getErrorMessage(error)}`);
       throw error;
     }
   }
@@ -538,8 +539,8 @@ export class NeptuneGraphService implements OnModuleDestroy {
 
       return stats;
     } catch (error) {
-      this.logger.error(`Failed to get graph statistics: ${error.message}`);
-      return { error: error.message };
+      this.logger.error(`Failed to get graph statistics: ${getErrorMessage(error)}`);
+      return { error: getErrorMessage(error) };
     }
   }
 
@@ -555,7 +556,7 @@ export class NeptuneGraphService implements OnModuleDestroy {
       await this.g.V().limit(1).next();
       return true;
     } catch (error) {
-      this.logger.error(`Neptune health check failed: ${error.message}`);
+      this.logger.error(`Neptune health check failed: ${getErrorMessage(error)}`);
       return false;
     }
   }
@@ -604,7 +605,7 @@ export class NeptuneGraphService implements OnModuleDestroy {
         await this.gremlinConnection.close();
         this.logger.log('Neptune connection closed');
       } catch (error) {
-        this.logger.error(`Error closing Neptune connection: ${error.message}`);
+        this.logger.error(`Error closing Neptune connection: ${getErrorMessage(error)}`);
       }
     }
   }

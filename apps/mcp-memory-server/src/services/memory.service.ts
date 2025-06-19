@@ -5,7 +5,6 @@ import { EmbeddingService } from './embedding.service';
 import { DynamoDBStorageService } from './dynamodb-storage.service';
 import { OpenSearchStorageService } from './opensearch-storage.service';
 import { Neo4jGraphService } from './neo4j-graph.service';
-import { GitContextService } from './git-context.service';
 import {
   MemoryMetadata,
   StoredMemory,
@@ -25,6 +24,7 @@ import {
   ContentType,
   GraphConnection,
 } from '../types/memory.types';
+import { getErrorMessage } from '../utils';
 
 /**
  * Main Memory Service that orchestrates all storage layers
@@ -40,7 +40,6 @@ export class MemoryService {
     private readonly dynamoDbService: DynamoDBStorageService,
     private readonly openSearchService: OpenSearchStorageService,
     private readonly neo4jService: Neo4jGraphService,
-    private readonly gitContextService: GitContextService,
   ) {
     this.logger.log('Sophisticated Memory Service initialized');
   }
@@ -83,7 +82,7 @@ export class MemoryService {
         );
         this.logger.debug('OpenSearch storage successful');
       } catch (error) {
-        this.logger.warn(`OpenSearch storage failed: ${error.message}`);
+        this.logger.warn(`OpenSearch storage failed: ${getErrorMessage(error)}`);
       }
 
       // 5. Create graph node and relationships
@@ -117,7 +116,7 @@ export class MemoryService {
         await this.autoCreateConceptRelationships(memoryId, request.content, metadata.type);
 
       } catch (error) {
-        this.logger.warn(`Failed to create graph relationships: ${error.message}`);
+        this.logger.warn(`Failed to create graph relationships: ${getErrorMessage(error)}`);
       }
 
       // 6. Store metadata in DynamoDB
@@ -128,7 +127,7 @@ export class MemoryService {
         try {
           await this.dynamoDbService.updateSessionWithMemory(request.session_id, memoryId);
         } catch (error) {
-          this.logger.warn(`Failed to update session context: ${error.message}`);
+          this.logger.warn(`Failed to update session context: ${getErrorMessage(error)}`);
         }
       }
 
@@ -143,7 +142,7 @@ export class MemoryService {
       };
 
     } catch (error) {
-      this.logger.error(`Failed to store memory: ${error.message}`);
+      this.logger.error(`Failed to store memory: ${getErrorMessage(error)}`);
       throw error;
     }
   }
@@ -206,7 +205,7 @@ export class MemoryService {
       };
 
     } catch (error) {
-      this.logger.error(`Failed to retrieve memories: ${error.message}`);
+      this.logger.error(`Failed to retrieve memories: ${getErrorMessage(error)}`);
       throw error;
     }
   }
@@ -252,7 +251,7 @@ export class MemoryService {
       return Promise.all(searchResults.map(enhanceWithMetadata));
 
     } catch (error) {
-      this.logger.error(`Failed to search memories: ${error.message}`);
+      this.logger.error(`Failed to search memories: ${getErrorMessage(error)}`);
       return [];
     }
   }
@@ -286,7 +285,25 @@ export class MemoryService {
       return { success: true };
 
     } catch (error) {
-      this.logger.error(`Failed to delete memory: ${error.message}`);
+      this.logger.error(`Failed to delete memory: ${getErrorMessage(error)}`);
+      throw error;
+    }
+  }
+
+  /**
+   * Update memory metadata (agent_id, project, tags, etc.)
+   */
+  async updateMemoryMetadata(memoryId: string, updates: Partial<MemoryMetadata>): Promise<void> {
+    try {
+      this.logger.debug(`Updating memory metadata: ${memoryId}`);
+
+      // Update in DynamoDB
+      await this.dynamoDbService.updateMemoryMetadata(memoryId, updates);
+
+      this.logger.debug(`Memory metadata updated successfully: ${memoryId}`);
+
+    } catch (error) {
+      this.logger.error(`Failed to update memory metadata: ${getErrorMessage(error)}`);
       throw error;
     }
   }
@@ -319,7 +336,7 @@ export class MemoryService {
       };
 
     } catch (error) {
-      this.logger.error(`Failed to add connection: ${error.message}`);
+      this.logger.error(`Failed to add connection: ${getErrorMessage(error)}`);
       throw error;
     }
   }
@@ -333,8 +350,8 @@ export class MemoryService {
         const content = await this.openSearchService.getMemoryContent(metadata.memory_id, metadata.content_type as any);
         return content || '';
       } catch (error) {
-        this.logger.warn(`Failed to get content for ${metadata.memory_id}: ${error.message}`);
-        return `[Content not available - ${error.message}]`;
+        this.logger.warn(`Failed to get content for ${metadata.memory_id}: ${getErrorMessage(error)}`);
+        return `[Content not available - ${getErrorMessage(error)}]`;
       }
     };
 
@@ -348,7 +365,7 @@ export class MemoryService {
           graph_connections: []
         };
       } catch (error) {
-        this.logger.warn(`Failed to process memory ${metadata.memory_id}: ${error.message}`);
+        this.logger.warn(`Failed to process memory ${metadata.memory_id}: ${getErrorMessage(error)}`);
         return null;
       }
     };
@@ -380,7 +397,7 @@ export class MemoryService {
       };
       
     } catch (error) {
-      this.logger.error(`Failed to get all memories: ${error.message}`);
+      this.logger.error(`Failed to get all memories: ${getErrorMessage(error)}`);
       return { results: [], total_available: 0 };
     }
   }
@@ -398,7 +415,7 @@ export class MemoryService {
           { confidence: 0.8 }
         );
       } catch (error) {
-        this.logger.warn(`Failed to create connection to ${relatedMemoryId}: ${error.message}`);
+        this.logger.warn(`Failed to create connection to ${relatedMemoryId}: ${getErrorMessage(error)}`);
         return false;
       }
     };
@@ -422,7 +439,7 @@ export class MemoryService {
             'OBSERVES',
             { confidence: 0.8 }
           ).catch((error) => {
-            this.logger.warn(`Failed to create connection to ${memoryId}: ${error.message}`);
+            this.logger.warn(`Failed to create connection to ${memoryId}: ${getErrorMessage(error)}`);
             return false;
           })
         )
@@ -438,7 +455,7 @@ export class MemoryService {
       };
 
     } catch (error) {
-      this.logger.error(`Failed to create observation: ${error.message}`);
+      this.logger.error(`Failed to create observation: ${getErrorMessage(error)}`);
       throw error;
     }
   }
@@ -452,7 +469,7 @@ export class MemoryService {
         const result = await this.consolidateMemoryPair(candidatePair.memory1, candidatePair.memory2);
         return result.success ? result : { success: false, memoriesMerged: 0, connectionsUpdated: 0 };
       } catch (error) {
-        this.logger.warn(`Failed to consolidate memory pair: ${error.message}`);
+        this.logger.warn(`Failed to consolidate memory pair: ${getErrorMessage(error)}`);
         return { success: false, memoriesMerged: 0, connectionsUpdated: 0 };
       }
     };
@@ -485,7 +502,7 @@ export class MemoryService {
       };
 
     } catch (error) {
-      this.logger.error(`Failed to consolidate memories: ${error.message}`);
+      this.logger.error(`Failed to consolidate memories: ${getErrorMessage(error)}`);
       throw error;
     }
   }
@@ -551,8 +568,8 @@ export class MemoryService {
       };
 
     } catch (error) {
-      this.logger.error(`Failed to get memory statistics: ${error.message}`);
-      return { error: error.message };
+      this.logger.error(`Failed to get memory statistics: ${getErrorMessage(error)}`);
+      return { error: getErrorMessage(error) };
     }
   }
 
@@ -590,28 +607,25 @@ export class MemoryService {
     const contentType = request.content_type || this.detectContentType(request.content);
     const memoryType = request.type || this.detectMemoryType(request.content, contentType);
 
-    // Use enhanced context service with proper priority:
-    // ENV vars > explicit params > git context > defaults
-    let agentId = request.agent_id;
-    let project = request.project;
+    // Priority: ENV vars > explicit params > validation error
+    const agentId = process.env.MEMORY_AGENT_ID || request.agent_id;
+    const project = process.env.MEMORY_PROJECT_NAME || request.project;
 
-    try {
-      const context = await this.gitContextService.getGitContext(
-        undefined, // working directory (use current)
-        project,   // explicit project from request
-        agentId    // explicit agent from request
+    // Validation: agent_id and project are required
+    if (!agentId) {
+      throw new Error(
+        'Agent ID is required. Please provide agent_id parameter or set MEMORY_AGENT_ID environment variable.'
       );
-      
-      // Always use the result from context service (it handles priority internally)
-      agentId = context.agentId;
-      project = context.projectName;
-      
-      this.logger.debug(`Using context: agent=${agentId}, project=${project}`);
-    } catch (error) {
-      this.logger.debug(`Failed to get context, using fallback defaults: ${error.message}`);
-      agentId = agentId || 'claude-code';
-      project = project || 'common';
     }
+
+    if (!project) {
+      throw new Error(
+        'Project name is required. Please provide project parameter or set MEMORY_PROJECT_NAME environment variable. ' +
+        'Agent can detect project from git: `git remote get-url origin | basename $(cat -) .git`'
+      );
+    }
+
+    this.logger.debug(`Using context: agent=${agentId}, project=${project}`);
 
     const baseMetadata = {
       memory_id: memoryId,
@@ -708,7 +722,7 @@ export class MemoryService {
     };
 
     const allMatches = functionPatterns.flatMap(extractMatches);
-    return [...new Set(allMatches)];
+    return Array.from(new Set(allMatches));
   }
 
   private extractImports(content: string): string[] {
@@ -729,7 +743,7 @@ export class MemoryService {
     };
 
     const allMatches = importPatterns.flatMap(extractMatches);
-    return [...new Set(allMatches)];
+    return Array.from(new Set(allMatches));
   }
 
   private extractCodePatterns(content: string): string[] {
@@ -785,7 +799,7 @@ export class MemoryService {
   private extractEntities(content: string): string[] {
     // Simple named entity extraction (capitalize words)
     const entities = content.match(/\b[A-Z][a-z]+(?:\s+[A-Z][a-z]+)*\b/g) || [];
-    return [...new Set(entities)].slice(0, 10);
+    return Array.from(new Set(entities)).slice(0, 10);
   }
 
   private async retrieveMemoriesByIds(memoryIds: string[]): Promise<MemorySearchResult[]> {
@@ -805,7 +819,7 @@ export class MemoryService {
           graph_connections: [],
         } : null;
       } catch (error) {
-        this.logger.warn(`Failed to retrieve memory ${memoryId}: ${error.message}`);
+        this.logger.warn(`Failed to retrieve memory ${memoryId}: ${getErrorMessage(error)}`);
         return null;
       }
     };
@@ -841,7 +855,7 @@ export class MemoryService {
           related_memories: relatedMemoryContents
         };
       } catch (error) {
-        this.logger.warn(`Failed to enhance with graph relationships: ${error.message}`);
+        this.logger.warn(`Failed to enhance with graph relationships: ${getErrorMessage(error)}`);
         return result;
       }
     };
@@ -855,7 +869,7 @@ export class MemoryService {
       // Neo4j will handle it as part of the memory graph
       this.logger.debug(`Agent node management handled by Neo4j: ${agentId}`);
     } catch (error) {
-      this.logger.debug(`Agent node creation skipped: ${error.message}`);
+      this.logger.debug(`Agent node creation skipped: ${getErrorMessage(error)}`);
     }
   }
 
@@ -865,7 +879,7 @@ export class MemoryService {
       // We'll track sessions through memory relationships
       this.logger.debug(`Session node management handled by Neo4j: ${sessionId}`);
     } catch (error) {
-      this.logger.debug(`Session node creation skipped: ${error.message}`);
+      this.logger.debug(`Session node creation skipped: ${getErrorMessage(error)}`);
     }
   }
 
@@ -874,19 +888,40 @@ export class MemoryService {
       // Extract key concepts from content
       const concepts = this.extractConcepts(content);
       
+      // Enhanced concept relationship creation for Issue #5
       for (const concept of concepts) {
-        // In Neo4j, concepts will be represented as tags and relationships
-        // The createMemoryNode already handles tags, so we'll create semantic connections
         try {
-          // For now, we'll skip explicit concept nodes and rely on tag-based clustering
-          // which is handled by the Neo4j service's tag system
-          this.logger.debug(`Concept relationship for "${concept}" handled via tags in Neo4j`);
+          // Find related memories with similar concepts
+          const relatedMemories = await this.findMemoriesByConcept(concept);
+          
+          for (const relatedMemory of relatedMemories) {
+            if (relatedMemory.metadata.memory_id !== memoryId) {
+              // Create semantic relationship based on shared concepts
+              await this.neo4jService.addConnection(
+                memoryId,
+                relatedMemory.metadata.memory_id,
+                'SHARES_CONCEPT',
+                { 
+                  concept: concept,
+                  confidence: this.calculateConceptSimilarity(content, relatedMemory.content || ''),
+                  created_at: new Date().toISOString()
+                }
+              );
+            }
+          }
+          
+          this.logger.debug(`Created concept relationships for "${concept}"`);
         } catch (error) {
-          this.logger.warn(`Failed to create concept relationship for "${concept}": ${error.message}`);
+          this.logger.warn(`Failed to create concept relationship for "${concept}": ${getErrorMessage(error)}`);
         }
       }
+
+      // Code-specific relationship detection for code memories
+      if (memoryType === 'procedural' && content.includes('function') || content.includes('import')) {
+        await this.createCodeSpecificRelationships(memoryId, content);
+      }
     } catch (error) {
-      this.logger.warn(`Failed to create concept relationships: ${error.message}`);
+      this.logger.warn(`Failed to create concept relationships: ${getErrorMessage(error)}`);
     }
   }
 
@@ -902,7 +937,7 @@ export class MemoryService {
     const quotedConcepts = content.match(/"([^"]+)"/g) || [];
     concepts.push(...quotedConcepts.map(q => q.slice(1, -1)));
 
-    return [...new Set(concepts)]
+    return Array.from(new Set(concepts))
       .filter(concept => concept.length > 3 && concept.length < 50)
       .slice(0, 5);
   }
@@ -1014,7 +1049,7 @@ export class MemoryService {
 
       return { agents, total_count: agents.length };
     } catch (error) {
-      this.logger.error(`Failed to list agents: ${error.message}`);
+      this.logger.error(`Failed to list agents: ${getErrorMessage(error)}`);
       return { agents: [], total_count: 0 };
     }
   }
@@ -1163,7 +1198,7 @@ export class MemoryService {
         total_count: projects.length,
       };
     } catch (error) {
-      this.logger.error(`Failed to list projects: ${error.message}`);
+      this.logger.error(`Failed to list projects: ${getErrorMessage(error)}`);
       return { projects: [], total_count: 0 };
     }
   }
@@ -1224,7 +1259,7 @@ export class MemoryService {
 
       return { projects, total_count: projects.length };
     } catch (error) {
-      this.logger.error(`Failed to list projects from local storage: ${error.message}`);
+      this.logger.error(`Failed to list projects from local storage: ${getErrorMessage(error)}`);
       return { projects: [], total_count: 0 };
     }
   }
@@ -1241,7 +1276,7 @@ export class MemoryService {
         total_count: connections.length
       };
     } catch (error) {
-      this.logger.error(`Failed to retrieve connections: ${error.message}`);
+      this.logger.error(`Failed to retrieve connections: ${getErrorMessage(error)}`);
       return { connections: [], total_count: 0 };
     }
   }
@@ -1260,8 +1295,351 @@ export class MemoryService {
         total_count: connections.length
       };
     } catch (error) {
-      this.logger.error(`Failed to get connections by entity: ${error.message}`);
+      this.logger.error(`Failed to get connections by entity: ${getErrorMessage(error)}`);
       return { entity_id: params.entity_id, entity_type: params.entity_type, connections: [], total_count: 0 };
     }
+  }
+
+  // Enhanced memory connection methods for Issue #5
+
+  /**
+   * Find memories that contain similar concepts
+   */
+  private async findMemoriesByConcept(concept: string, limit: number = 10): Promise<StoredMemory[]> {
+    try {
+      // Search for memories containing the concept in content or tags
+      const searchResults = await this.retrieveMemories({
+        query: {
+          query: concept,
+          limit,
+          threshold: 0.7
+        }
+      });
+      
+      return searchResults.memories?.map(result => result.memory) || [];
+    } catch (error) {
+      this.logger.warn(`Failed to find memories by concept "${concept}": ${getErrorMessage(error)}`);
+      return [];
+    }
+  }
+
+  /**
+   * Calculate semantic similarity between two pieces of content
+   */
+  private calculateConceptSimilarity(content1: string, content2: string): number {
+    // Simple similarity calculation based on shared concepts
+    const concepts1 = new Set(this.extractConcepts(content1));
+    const concepts2 = new Set(this.extractConcepts(content2));
+    
+    const intersection = new Set(Array.from(concepts1).filter(x => concepts2.has(x)));
+    const union = new Set([...Array.from(concepts1), ...Array.from(concepts2)]);
+    
+    return union.size > 0 ? intersection.size / union.size : 0;
+  }
+
+  /**
+   * Create code-specific relationships for code memories
+   */
+  private async createCodeSpecificRelationships(memoryId: string, content: string): Promise<void> {
+    try {
+      // Extract code-specific patterns
+      const imports = this.extractImports(content);
+      const functions = this.extractFunctions(content);
+      const patterns = this.extractCodePatterns(content);
+
+      // Find related code memories based on imports
+      for (const importName of imports) {
+        const relatedCodeMemories = await this.findCodeMemoriesByImport(importName);
+        
+        for (const relatedMemory of relatedCodeMemories) {
+          if (relatedMemory.metadata.memory_id !== memoryId) {
+            await this.neo4jService.addConnection(
+              memoryId,
+              relatedMemory.metadata.memory_id,
+              'IMPORTS_FROM',
+              { 
+                import_name: importName,
+                confidence: 0.9,
+                created_at: new Date().toISOString()
+              }
+            );
+          }
+        }
+      }
+
+      // Find related memories based on similar functions
+      for (const functionName of functions) {
+        const relatedCodeMemories = await this.findCodeMemoriesByFunction(functionName);
+        
+        for (const relatedMemory of relatedCodeMemories) {
+          if (relatedMemory.metadata.memory_id !== memoryId) {
+            await this.neo4jService.addConnection(
+              memoryId,
+              relatedMemory.metadata.memory_id,
+              'IMPLEMENTS_SIMILAR',
+              { 
+                function_name: functionName,
+                confidence: 0.8,
+                created_at: new Date().toISOString()
+              }
+            );
+          }
+        }
+      }
+
+      this.logger.debug(`Created code-specific relationships for memory ${memoryId}`);
+    } catch (error) {
+      this.logger.warn(`Failed to create code-specific relationships: ${getErrorMessage(error)}`);
+    }
+  }
+
+  /**
+   * Find code memories that import a specific module/package
+   */
+  private async findCodeMemoriesByImport(importName: string): Promise<StoredMemory[]> {
+    try {
+      const searchResults = await this.retrieveMemories({
+        query: {
+          query: `import ${importName}`,
+          content_type: 'code',
+          limit: 5,
+          threshold: 0.8
+        }
+      });
+      
+      return searchResults.memories?.map(result => result.memory) || [];
+    } catch (error) {
+      this.logger.warn(`Failed to find code memories by import "${importName}": ${getErrorMessage(error)}`);
+      return [];
+    }
+  }
+
+  /**
+   * Find code memories that define or use similar functions
+   */
+  private async findCodeMemoriesByFunction(functionName: string): Promise<StoredMemory[]> {
+    try {
+      const searchResults = await this.retrieveMemories({
+        query: {
+          query: functionName,
+          content_type: 'code',
+          limit: 5,
+          threshold: 0.7
+        }
+      });
+      
+      return searchResults.memories?.map(result => result.memory) || [];
+    } catch (error) {
+      this.logger.warn(`Failed to find code memories by function "${functionName}": ${getErrorMessage(error)}`);
+      return [];
+    }
+  }
+
+  /**
+   * Analyze memory connections and provide comprehensive insights (Issue #5)
+   */
+  async analyzeMemoryConnections(params: {
+    memory_id?: string;
+    agent_id?: string;
+    project?: string;
+    relationship_types?: string[];
+    depth?: number;
+    include_analytics?: boolean;
+  }): Promise<any> {
+    try {
+      const depth = params.depth || 2;
+      const includeAnalytics = params.include_analytics !== false;
+      
+      let baseQuery: any = {};
+      if (params.memory_id) {
+        baseQuery.memory_ids = [params.memory_id];
+      } else {
+        if (params.agent_id) baseQuery.agent_id = params.agent_id;
+        if (params.project) baseQuery.project = params.project;
+        baseQuery.limit = 50; // Get a reasonable set of memories to analyze
+      }
+
+      // Get base memories to analyze
+      const baseMemories = await this.retrieveMemories(baseQuery);
+      const memoryIds = baseMemories.memories?.map(m => m.memory.metadata.memory_id) || [];
+
+      if (memoryIds.length === 0) {
+        return {
+          analysis_type: 'memory_connections',
+          scope: params,
+          memories_analyzed: 0,
+          connection_summary: {},
+          insights: ['No memories found for the specified criteria']
+        };
+      }
+
+      // Get all connections for these memories
+      const connections = [];
+      const relationshipTypeCounts: Record<string, number> = {};
+      const conceptClusters: Record<string, string[]> = {};
+      const codePatterns: Record<string, string[]> = {};
+
+      for (const memoryId of memoryIds) {
+        try {
+          const memoryConnections = await this.retrieveConnections({ memory_id: memoryId, limit: 100 });
+          connections.push(...(memoryConnections.connections || []));
+
+          // Analyze relationship types
+          if (memoryConnections.connections) {
+            for (const conn of memoryConnections.connections) {
+              const relType = conn.relationship_type || 'UNKNOWN';
+              relationshipTypeCounts[relType] = (relationshipTypeCounts[relType] || 0) + 1;
+
+              // Analyze concept clusters
+              if (relType === 'SHARES_CONCEPT' && conn.properties?.concept) {
+                const concept = conn.properties.concept;
+                if (!conceptClusters[concept]) conceptClusters[concept] = [];
+                conceptClusters[concept].push(memoryId);
+                if (conceptClusters[concept].indexOf(conn.to_memory_id) === -1) {
+                  conceptClusters[concept].push(conn.to_memory_id);
+                }
+              }
+
+              // Analyze code patterns
+              if ((relType === 'IMPORTS_FROM' || relType === 'IMPLEMENTS_SIMILAR') && conn.properties) {
+                const pattern = conn.properties.import_name || conn.properties.function_name || 'unknown';
+                if (!codePatterns[pattern]) codePatterns[pattern] = [];
+                codePatterns[pattern].push(memoryId);
+                if (codePatterns[pattern].indexOf(conn.to_memory_id) === -1) {
+                  codePatterns[pattern].push(conn.to_memory_id);
+                }
+              }
+            }
+          }
+        } catch (error) {
+          this.logger.warn(`Failed to get connections for memory ${memoryId}: ${getErrorMessage(error)}`);
+        }
+      }
+
+      const analysis = {
+        analysis_type: 'memory_connections',
+        scope: params,
+        memories_analyzed: memoryIds.length,
+        connections_found: connections.length,
+        connection_summary: {
+          total_connections: connections.length,
+          relationship_type_distribution: relationshipTypeCounts,
+          most_common_relationships: Object.entries(relationshipTypeCounts)
+            .sort(([,a], [,b]) => b - a)
+            .slice(0, 5)
+            .map(([type, count]) => ({ type, count }))
+        },
+        concept_analysis: {
+          total_concepts: Object.keys(conceptClusters).length,
+          largest_concept_clusters: Object.entries(conceptClusters)
+            .sort(([,a], [,b]) => b.length - a.length)
+            .slice(0, 10)
+            .map(([concept, memories]) => ({ 
+              concept, 
+              memory_count: memories.length,
+              memory_ids: memories.slice(0, 5) // Show first 5 for brevity
+            }))
+        },
+        code_analysis: {
+          total_patterns: Object.keys(codePatterns).length,
+          most_connected_patterns: Object.entries(codePatterns)
+            .sort(([,a], [,b]) => b.length - a.length)
+            .slice(0, 10)
+            .map(([pattern, memories]) => ({ 
+              pattern, 
+              memory_count: memories.length,
+              memory_ids: memories.slice(0, 5)
+            }))
+        },
+        insights: this.generateConnectionInsights(relationshipTypeCounts, conceptClusters, codePatterns, memoryIds.length)
+      };
+
+      if (includeAnalytics) {
+        analysis['advanced_analytics'] = {
+          connection_density: connections.length / (memoryIds.length * (memoryIds.length - 1)),
+          average_connections_per_memory: connections.length / memoryIds.length,
+          isolated_memories: memoryIds.length - new Set(connections.flatMap(c => [c.from_memory_id, c.to_memory_id])).size,
+          strongest_connections: connections
+            .filter(c => c.properties?.confidence)
+            .sort((a, b) => (b.properties?.confidence || 0) - (a.properties?.confidence || 0))
+            .slice(0, 5)
+            .map(c => ({
+              from: c.from_memory_id,
+              to: c.to_memory_id,
+              type: c.relationship_type,
+              confidence: c.properties?.confidence
+            }))
+        };
+      }
+
+      return analysis;
+    } catch (error) {
+      this.logger.error(`Failed to analyze memory connections: ${getErrorMessage(error)}`);
+      return {
+        analysis_type: 'memory_connections',
+        scope: params,
+        error: getErrorMessage(error),
+        insights: ['Analysis failed due to an error']
+      };
+    }
+  }
+
+  /**
+   * Generate insights from connection analysis
+   */
+  private generateConnectionInsights(
+    relationshipTypes: Record<string, number>,
+    conceptClusters: Record<string, string[]>,
+    codePatterns: Record<string, string[]>,
+    totalMemories: number
+  ): string[] {
+    const insights: string[] = [];
+
+    // Relationship type insights
+    const totalConnections = Object.values(relationshipTypes).reduce((sum, count) => sum + count, 0);
+    if (totalConnections === 0) {
+      insights.push('No connections found - memories are isolated');
+    } else {
+      insights.push(`Found ${totalConnections} connections across ${Object.keys(relationshipTypes).length} relationship types`);
+      
+      const mostCommon = Object.entries(relationshipTypes).sort(([,a], [,b]) => b - a)[0];
+      if (mostCommon) {
+        insights.push(`Most common relationship type: ${mostCommon[0]} (${mostCommon[1]} connections)`);
+      }
+    }
+
+    // Concept clustering insights
+    const conceptCount = Object.keys(conceptClusters).length;
+    if (conceptCount > 0) {
+      insights.push(`Identified ${conceptCount} shared concepts creating knowledge clusters`);
+      
+      const largestCluster = Object.entries(conceptClusters).sort(([,a], [,b]) => b.length - a.length)[0];
+      if (largestCluster && largestCluster[1].length > 2) {
+        insights.push(`Largest concept cluster: "${largestCluster[0]}" connects ${largestCluster[1].length} memories`);
+      }
+    }
+
+    // Code pattern insights
+    const codePatternCount = Object.keys(codePatterns).length;
+    if (codePatternCount > 0) {
+      insights.push(`Found ${codePatternCount} code patterns with shared implementations or imports`);
+      
+      const mostConnectedPattern = Object.entries(codePatterns).sort(([,a], [,b]) => b.length - a.length)[0];
+      if (mostConnectedPattern && mostConnectedPattern[1].length > 2) {
+        insights.push(`Most connected code pattern: "${mostConnectedPattern[0]}" links ${mostConnectedPattern[1].length} memories`);
+      }
+    }
+
+    // Connection density insights
+    const density = totalConnections / (totalMemories * (totalMemories - 1));
+    if (density > 0.1) {
+      insights.push('High connection density - memories are well-interconnected');
+    } else if (density > 0.05) {
+      insights.push('Moderate connection density - some clustering present');
+    } else {
+      insights.push('Low connection density - opportunities for better linking');
+    }
+
+    return insights;
   }
 }

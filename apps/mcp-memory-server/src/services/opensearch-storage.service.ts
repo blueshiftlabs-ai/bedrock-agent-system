@@ -10,6 +10,7 @@ import {
   ContentType
 } from '../types/memory.types';
 import { v4 as uuidv4 } from 'uuid';
+import { getErrorMessage } from '../utils';
 
 /**
  * OpenSearch storage service for vector similarity search
@@ -59,7 +60,7 @@ export class OpenSearchStorageService {
       
       this.logger.log('OpenSearch indices initialized successfully');
     } catch (error) {
-      this.logger.error(`Failed to initialize indices: ${error.message}`);
+      this.logger.error(`Failed to initialize indices: ${getErrorMessage(error)}`);
     }
   }
 
@@ -80,7 +81,7 @@ export class OpenSearchStorageService {
         this.logger.log(`Created index: ${indexName}`);
       }
     } catch (error) {
-      this.logger.error(`Failed to create index ${indexName}: ${error.message}`);
+      this.logger.error(`Failed to create index ${indexName}: ${getErrorMessage(error)}`);
       throw error;
     }
   }
@@ -258,7 +259,7 @@ export class OpenSearchStorageService {
       this.logger.debug(`Stored memory in OpenSearch: ${memory.metadata.memory_id} -> ${documentId}`);
       return documentId;
     } catch (error) {
-      this.logger.error(`Failed to store memory in OpenSearch: ${error.message}`);
+      this.logger.error(`Failed to store memory in OpenSearch: ${getErrorMessage(error)}`);
       throw error;
     }
   }
@@ -379,7 +380,7 @@ export class OpenSearchStorageService {
       // Limit results
       return results.slice(0, query.limit || 10);
     } catch (error) {
-      this.logger.error(`Failed to search memories: ${error.message}`);
+      this.logger.error(`Failed to search memories: ${getErrorMessage(error)}`);
       return [];
     }
   }
@@ -401,7 +402,7 @@ export class OpenSearchStorageService {
       const document = body._source as OpenSearchDocument;
       return this.documentToStoredMemory(document, documentId);
     } catch (error) {
-      this.logger.error(`Failed to get memory by document ID: ${error.message}`);
+      this.logger.error(`Failed to get memory by document ID: ${getErrorMessage(error)}`);
       return null;
     }
   }
@@ -450,7 +451,7 @@ export class OpenSearchStorageService {
 
       this.logger.debug(`Updated memory in OpenSearch: ${memoryId}`);
     } catch (error) {
-      this.logger.error(`Failed to update memory: ${error.message}`);
+      this.logger.error(`Failed to update memory: ${getErrorMessage(error)}`);
       throw error;
     }
   }
@@ -478,7 +479,7 @@ export class OpenSearchStorageService {
       
       return null;
     } catch (error) {
-      this.logger.error(`Failed to get memory content for ${memoryId}: ${error.message}`);
+      this.logger.error(`Failed to get memory content for ${memoryId}: ${getErrorMessage(error)}`);
       throw error;
     }
   }
@@ -512,7 +513,7 @@ export class OpenSearchStorageService {
         this.logger.debug(`Deleted memory from OpenSearch: ${memoryId}`);
       }
     } catch (error) {
-      this.logger.error(`Failed to delete memory: ${error.message}`);
+      this.logger.error(`Failed to delete memory: ${getErrorMessage(error)}`);
       throw error;
     }
   }
@@ -569,7 +570,7 @@ export class OpenSearchStorageService {
 
       return results.slice(0, limit);
     } catch (error) {
-      this.logger.error(`Failed to find similar memories: ${error.message}`);
+      this.logger.error(`Failed to find similar memories: ${getErrorMessage(error)}`);
       return [];
     }
   }
@@ -587,6 +588,7 @@ export class OpenSearchStorageService {
       content_type: document.content_type,
       agent_id: document.agent_id,
       session_id: document.session_id,
+      project: document.project,
       created_at: new Date(document.created_at),
       updated_at: new Date(document.created_at), // Will be updated from DynamoDB
       tags: document.tags,
@@ -731,12 +733,12 @@ export class OpenSearchStorageService {
 
       return stats;
     } catch (error) {
-      this.logger.error(`Failed to get memory statistics: ${error.message}`);
+      this.logger.error(`Failed to get memory statistics: ${getErrorMessage(error)}`);
       return {
         total_memories: 0,
         text_memories: 0,
         code_memories: 0,
-        error: error.message,
+        error: getErrorMessage(error),
         aggregations: {
           by_type: { buckets: [] },
           by_content_type: { buckets: [] },
@@ -755,7 +757,7 @@ export class OpenSearchStorageService {
       const { body } = await this.opensearchClient.cluster.health();
       return body.status === 'green' || body.status === 'yellow';
     } catch (error) {
-      this.logger.error(`OpenSearch health check failed: ${error.message}`);
+      this.logger.error(`OpenSearch health check failed: ${getErrorMessage(error)}`);
       return false;
     }
   }
