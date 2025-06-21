@@ -2,15 +2,17 @@
 
 import { useRouter } from 'next/navigation'
 import { MemoryDetailModal } from '@/components/memory-detail-modal'
-import { use } from 'react'
 
-export default function MemoryModalPage({ params }: { params: Promise<{ id: string }> }) {
+interface MemoryModalPageProps {
+  params: { id: string }
+}
+
+export default function MemoryModalPage({ params }: MemoryModalPageProps) {
   const router = useRouter()
-  const { id } = use(params)
 
   return (
     <MemoryDetailModal 
-      memoryId={id} 
+      memoryId={params.id} 
       onClose={() => router.back()}
       isModal={true}
     />
