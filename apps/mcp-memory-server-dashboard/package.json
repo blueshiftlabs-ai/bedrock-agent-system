@@ -45,6 +45,7 @@
     "zod": "^3.25.64"
   },
   "devDependencies": {
+    "@packages/typescript-config": "workspace:*",
     "@playwright/test": "^1.53.0",
     "@tailwindcss/postcss": "^4.1.10",
     "@testing-library/jest-dom": "^6.6.3",

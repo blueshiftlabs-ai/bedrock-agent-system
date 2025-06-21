@@ -128,7 +128,7 @@ class BuildEnvManager {
     });
 
     // Fetch each secret
-    for (const secretName of allSecrets) {
+    for (const secretName of Array.from(allSecrets)) {
       try {
         const secretId = `${config.secretPrefix}/${this.environment}/${secretName}`;
         const response = await this.secretsClient.send(

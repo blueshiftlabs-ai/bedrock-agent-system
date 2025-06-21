@@ -512,7 +512,7 @@ export function MemoryDetailModal({ memoryId, onClose, isModal = true }: MemoryD
             {/* Additional Metadata */}
             {(memory.topics?.length || memory.sentiment || memory.language) && (
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-4 border-t">
-                {memory.topics?.length > 0 && (
+                {memory.topics && memory.topics.length > 0 && (
                   <div>
                     <Label className="text-xs text-muted-foreground">Topics</Label>
                     <div className="flex flex-wrap gap-1 mt-1">

@@ -59,14 +59,14 @@ export class EmbeddingService {
         this.logger.warn(`Text embedding pipeline failed: ${getErrorMessage(error)}`);
       }
       
-      // Initialize code embedding pipeline (smaller model first)
+      // Initialize code embedding pipeline (use same model as text for consistency)
       try {
         this.codeEmbeddingPipeline = await pipeline(
           'feature-extraction', 
-          'Xenova/bert-base-uncased', // Start with BERT base as fallback
+          'Xenova/all-MiniLM-L6-v2', // Use same model as text to maintain 384 dimensions
           { quantized: true, revision: 'main' }
         );
-        this.logger.log('Code embedding pipeline (BERT-base) initialized');
+        this.logger.log('Code embedding pipeline (all-MiniLM-L6-v2) initialized');
       } catch (error) {
         this.logger.warn(`Code embedding pipeline failed: ${getErrorMessage(error)}`);
       }

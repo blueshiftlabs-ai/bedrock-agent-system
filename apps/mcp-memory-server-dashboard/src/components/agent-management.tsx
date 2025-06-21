@@ -383,7 +383,7 @@ export function AgentManagement() {
                 </div>
 
                 {/* Tags */}
-                {(editingAgent === selectedAgent.agent_id || selectedAgent.tags?.length > 0) && (
+                {(editingAgent === selectedAgent.agent_id || (selectedAgent.tags && selectedAgent.tags.length > 0)) && (
                   <div>
                     <Label className="text-sm font-medium mb-2">Tags</Label>
                     <div className="flex flex-wrap gap-2">

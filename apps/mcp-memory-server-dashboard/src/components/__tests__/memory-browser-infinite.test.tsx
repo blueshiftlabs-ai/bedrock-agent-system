@@ -6,10 +6,13 @@ import { MemoryBrowserInfinite } from '../memory-browser-infinite'
 
 // Mock next/navigation
 const mockPush = vi.fn()
+const mockSearchParams = new URLSearchParams()
 vi.mock('next/navigation', () => ({
   useRouter: () => ({
     push: mockPush,
+    replace: vi.fn(),
   }),
+  useSearchParams: () => mockSearchParams,
 }))
 
 // Mock intersection observer

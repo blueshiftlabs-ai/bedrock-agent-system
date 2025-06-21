@@ -1,0 +1,496 @@
+{
+  "timestamp": "2025-06-16T15:04:15.711Z",
+  "total_analyzed": 81,
+  "updates": [
+    {
+      "memory_id": "mem_1749914666375_c8f03a50",
+      "agent_id": "claude-code",
+      "project": "bedrock-agent-system",
+      "reason": "Content analysis: Project-specific content"
+    },
+    {
+      "memory_id": "mem_1749857048166_25fa11d7",
+      "agent_id": "claude-code",
+      "project": "bedrock-agent-system",
+      "reason": "Content analysis: Project-specific content"
+    },
+    {
+      "memory_id": "mem_1749872252555_1dbe581b",
+      "agent_id": "claude-code",
+      "project": "bedrock-agent-system",
+      "reason": "Content analysis: Project-specific content"
+    },
+    {
+      "memory_id": "mem_1749854903473_594a2dce",
+      "agent_id": "claude-code",
+      "project": "bedrock-agent-system",
+      "reason": "Content analysis: Project-specific content"
+    },
+    {
+      "memory_id": "mem_1749848162354_7b66a467",
+      "agent_id": "claude-code",
+      "project": "bedrock-agent-system",
+      "reason": "Content analysis: Project-specific content"
+    },
+    {
+      "memory_id": "mem_1749684071034_8ba2a60a",
+      "agent_id": "claude-code",
+      "project": "bedrock-agent-system",
+      "reason": "Content analysis: Project-specific content"
+    },
+    {
+      "memory_id": "mem_1749677347342_288ceab1",
+      "agent_id": "claude-code",
+      "project": "bedrock-agent-system",
+      "reason": "Content analysis: Project-specific content"
+    },
+    {
+      "memory_id": "mem_1749919286637_3a601aff",
+      "agent_id": "claude-code",
+      "project": "bedrock-agent-system",
+      "reason": "Content analysis: Project-specific content"
+    },
+    {
+      "memory_id": "mem_1749439706517_ff1445bf",
+      "agent_id": "claude-code",
+      "project": "bedrock-agent-system",
+      "reason": "Content analysis: Project-specific content"
+    },
+    {
+      "memory_id": "mem_1749872332524_0e376252",
+      "agent_id": "claude-code",
+      "project": "bedrock-agent-system",
+      "reason": "Content analysis: Project-specific content"
+    },
+    {
+      "memory_id": "mem_1749863066477_4e8a6367",
+      "agent_id": "claude-code",
+      "project": "bedrock-agent-system",
+      "reason": "Content analysis: Project-specific content"
+    },
+    {
+      "memory_id": "mem_1749738010082_402a7d83",
+      "agent_id": "claude-code",
+      "project": "bedrock-agent-system",
+      "reason": "Content analysis: Project-specific content"
+    },
+    {
+      "memory_id": "mem_1749857248876_e23bf302",
+      "agent_id": "claude-code",
+      "project": "bedrock-agent-system",
+      "reason": "Content analysis: Project-specific content"
+    },
+    {
+      "memory_id": "mem_1749856118667_d5dc4c13",
+      "agent_id": "claude-code",
+      "project": "bedrock-agent-system",
+      "reason": "Content analysis: Project-specific content"
+    },
+    {
+      "memory_id": "mem_1749668053008_56a96508",
+      "agent_id": "claude-code",
+      "project": "bedrock-agent-system",
+      "reason": "Content analysis: Project-specific content"
+    },
+    {
+      "memory_id": "mem_1749737720644_8abe8d3d",
+      "agent_id": "claude-code",
+      "project": "bedrock-agent-system",
+      "reason": "Content analysis: Project-specific content"
+    },
+    {
+      "memory_id": "mem_1749854995861_0e793d52",
+      "agent_id": "claude-code",
+      "project": "bedrock-agent-system",
+      "reason": "Content analysis: Project-specific content"
+    },
+    {
+      "memory_id": "mem_1749841452168_15b13f33",
+      "agent_id": "claude-code",
+      "project": "bedrock-agent-system",
+      "reason": "Content analysis: Project-specific content"
+    },
+    {
+      "memory_id": "mem_1749828422801_690c7766",
+      "agent_id": "claude-code",
+      "project": "bedrock-agent-system",
+      "reason": "Content analysis: Project-specific content"
+    },
+    {
+      "memory_id": "mem_1749851272127_1cf0a681",
+      "agent_id": "claude-code",
+      "project": "bedrock-agent-system",
+      "reason": "Content analysis: Project-specific content"
+    },
+    {
+      "memory_id": "mem_1749849044236_4f3b33c1",
+      "agent_id": "claude-code",
+      "project": "bedrock-agent-system",
+      "reason": "Content analysis: Project-specific content"
+    },
+    {
+      "memory_id": "mem_1749915113406_9d9467f9",
+      "agent_id": "claude-code",
+      "project": "bedrock-agent-system",
+      "reason": "Content analysis: Project-specific content"
+    },
+    {
+      "memory_id": "mem_1749916614395_6b57667a",
+      "agent_id": "claude-code",
+      "project": "bedrock-agent-system",
+      "reason": "Content analysis: Project-specific content"
+    },
+    {
+      "memory_id": "mem_1749872413937_7a48bb99",
+      "agent_id": "claude-code",
+      "project": "bedrock-agent-system",
+      "reason": "Content analysis: Project-specific content"
+    },
+    {
+      "memory_id": "mem_1749848478787_96b2d4e6",
+      "agent_id": "claude-code",
+      "project": "bedrock-agent-system",
+      "reason": "Content analysis: Project-specific content"
+    },
+    {
+      "memory_id": "mem_1749871975164_d83f3eab",
+      "agent_id": "claude-code",
+      "project": "bedrock-agent-system",
+      "reason": "Content analysis: Project-specific content"
+    },
+    {
+      "memory_id": "mem_1749856765222_d04a0e52",
+      "agent_id": "claude-code",
+      "project": "bedrock-agent-system",
+      "reason": "Content analysis: Project-specific content"
+    },
+    {
+      "memory_id": "mem_1749855251119_4a1b4cef",
+      "agent_id": "claude-code",
+      "project": "bedrock-agent-system",
+      "reason": "Content analysis: Project-specific content"
+    },
+    {
+      "memory_id": "mem_1749850908187_b121537f",
+      "agent_id": "claude-code",
+      "project": "bedrock-agent-system",
+      "reason": "Content analysis: Project-specific content"
+    },
+    {
+      "memory_id": "mem_1749853507313_62f8bc9e",
+      "agent_id": "claude-code",
+      "project": "bedrock-agent-system",
+      "reason": "Content analysis: Project-specific content"
+    },
+    {
+      "memory_id": "mem_1749683205250_bc2d7d25",
+      "agent_id": "claude-code",
+      "project": "bedrock-agent-system",
+      "reason": "Content analysis: Project-specific content"
+    },
+    {
+      "memory_id": "mem_1749849547596_9296929d",
+      "agent_id": "claude-code",
+      "project": "bedrock-agent-system",
+      "reason": "Content analysis: Project-specific content"
+    },
+    {
+      "memory_id": "mem_1749844108429_99ae67d8",
+      "agent_id": "claude-code",
+      "project": "bedrock-agent-system",
+      "reason": "Content analysis: Project-specific content"
+    },
+    {
+      "memory_id": "mem_1749440409606_0173af87",
+      "agent_id": "claude-code",
+      "project": "bedrock-agent-system",
+      "reason": "Content analysis: Project-specific content"
+    },
+    {
+      "memory_id": "mem_1749864295158_10f0215e",
+      "agent_id": "claude-code",
+      "project": "bedrock-agent-system",
+      "reason": "Content analysis: Project-specific content"
+    },
+    {
+      "memory_id": "mem_1749856458347_384f3e8e",
+      "agent_id": "claude-code",
+      "project": "bedrock-agent-system",
+      "reason": "Content analysis: Project-specific content"
+    },
+    {
+      "memory_id": "mem_1749915092222_83bdb7d5",
+      "agent_id": "claude-code",
+      "project": "bedrock-agent-system",
+      "reason": "Content analysis: Project-specific content"
+    },
+    {
+      "memory_id": "mem_1749739668741_54eca69e",
+      "agent_id": "claude-code",
+      "project": "bedrock-agent-system",
+      "reason": "Content analysis: Project-specific content"
+    },
+    {
+      "memory_id": "mem_1749864638207_4024c43d",
+      "agent_id": "claude-code",
+      "project": "bedrock-agent-system",
+      "reason": "Content analysis: Project-specific content"
+    },
+    {
+      "memory_id": "mem_1749681027372_e47b417f",
+      "agent_id": "claude-code",
+      "project": "bedrock-agent-system",
+      "reason": "Content analysis: Project-specific content"
+    },
+    {
+      "memory_id": "mem_1749872618808_0052aae5",
+      "agent_id": "claude-code",
+      "project": "bedrock-agent-system",
+      "reason": "Content analysis: Project-specific content"
+    },
+    {
+      "memory_id": "mem_1749668442454_85e872a0",
+      "agent_id": "claude-code",
+      "project": "bedrock-agent-system",
+      "reason": "Content analysis: Project-specific content"
+    },
+    {
+      "memory_id": "mem_1749668480367_7e06983b",
+      "agent_id": "claude-code",
+      "project": "bedrock-agent-system",
+      "reason": "Content analysis: Project-specific content"
+    },
+    {
+      "memory_id": "mem_1749678194938_98cd9116",
+      "agent_id": "claude-code",
+      "project": "bedrock-agent-system",
+      "reason": "Content analysis: Project-specific content"
+    },
+    {
+      "memory_id": "mem_1749439503019_017a84fb",
+      "agent_id": "claude-code",
+      "project": "bedrock-agent-system",
+      "reason": "Content analysis: Project-specific content"
+    },
+    {
+      "memory_id": "mem_1749678622435_0a251594",
+      "agent_id": "claude-code",
+      "project": "bedrock-agent-system",
+      "reason": "Content analysis: Project-specific content"
+    },
+    {
+      "memory_id": "mem_1749849759704_4aded14d",
+      "agent_id": "claude-code",
+      "project": "bedrock-agent-system",
+      "reason": "Content analysis: Project-specific content"
+    },
+    {
+      "memory_id": "mem_1749914636539_7f1089d8",
+      "agent_id": "claude-code",
+      "project": "bedrock-agent-system",
+      "reason": "Content analysis: Project-specific content"
+    },
+    {
+      "memory_id": "mem_1749872633740_24c9698e",
+      "agent_id": "claude-code",
+      "project": "bedrock-agent-system",
+      "reason": "Content analysis: Project-specific content"
+    },
+    {
+      "memory_id": "mem_1749915012402_9b11d310",
+      "agent_id": "claude-code",
+      "project": "bedrock-agent-system",
+      "reason": "Content analysis: Project-specific content"
+    },
+    {
+      "memory_id": "mem_1749676355344_24ffbf21",
+      "agent_id": "claude-code",
+      "project": "bedrock-agent-system",
+      "reason": "Content analysis: Project-specific content"
+    },
+    {
+      "memory_id": "mem_1749851797972_5237ca43",
+      "agent_id": "claude-code",
+      "project": "bedrock-agent-system",
+      "reason": "Content analysis: Project-specific content"
+    },
+    {
+      "memory_id": "mem_1749676302778_65e69638",
+      "agent_id": "claude-code",
+      "project": "bedrock-agent-system",
+      "reason": "Content analysis: Project-specific content"
+    },
+    {
+      "memory_id": "mem_1749861180338_e889cdb4",
+      "agent_id": "claude-code",
+      "project": "bedrock-agent-system",
+      "reason": "Content analysis: Project-specific content"
+    },
+    {
+      "memory_id": "mem_1749864233367_30883a81",
+      "agent_id": "claude-code",
+      "project": "bedrock-agent-system",
+      "reason": "Content analysis: Project-specific content"
+    },
+    {
+      "memory_id": "mem_1749915278990_f12a55c7",
+      "agent_id": "claude-code",
+      "project": "bedrock-agent-system",
+      "reason": "Content analysis: Project-specific content"
+    },
+    {
+      "memory_id": "mem_1749872650761_c8d2b989",
+      "agent_id": "claude-code",
+      "project": "bedrock-agent-system",
+      "reason": "Content analysis: Project-specific content"
+    },
+    {
+      "memory_id": "mem_1749914397141_b2124669",
+      "agent_id": "claude-code",
+      "project": "bedrock-agent-system",
+      "reason": "Content analysis: Project-specific content"
+    },
+    {
+      "memory_id": "mem_1749855886839_9660a4de",
+      "agent_id": "claude-code",
+      "project": "bedrock-agent-system",
+      "reason": "Content analysis: Project-specific content"
+    },
+    {
+      "memory_id": "mem_1749853020034_ea4f0f66",
+      "agent_id": "claude-code",
+      "project": "bedrock-agent-system",
+      "reason": "Content analysis: Project-specific content"
+    },
+    {
+      "memory_id": "mem_1749681201118_3a4e11c8",
+      "agent_id": "claude-code",
+      "project": "bedrock-agent-system",
+      "reason": "Content analysis: Project-specific content"
+    },
+    {
+      "memory_id": "mem_1749739470721_a8edaf56",
+      "agent_id": "claude-code",
+      "project": "bedrock-agent-system",
+      "reason": "Content analysis: Project-specific content"
+    },
+    {
+      "memory_id": "mem_1749872421206_3b27071f",
+      "agent_id": "claude-code",
+      "project": "bedrock-agent-system",
+      "reason": "Content analysis: Project-specific content"
+    },
+    {
+      "memory_id": "mem_1749914482654_b0e3d45d",
+      "agent_id": "claude-code",
+      "project": "bedrock-agent-system",
+      "reason": "Content analysis: Project-specific content"
+    },
+    {
+      "memory_id": "mem_1749862910205_b4719c90",
+      "agent_id": "claude-code",
+      "project": "bedrock-agent-system",
+      "reason": "Content analysis: Project-specific content"
+    },
+    {
+      "memory_id": "mem_1749856961560_e876ec30",
+      "agent_id": "claude-code",
+      "project": "bedrock-agent-system",
+      "reason": "Content analysis: Project-specific content"
+    },
+    {
+      "memory_id": "mem_1749919228685_268e5801",
+      "agent_id": "claude-code",
+      "project": "bedrock-agent-system",
+      "reason": "Content analysis: Project-specific content"
+    },
+    {
+      "memory_id": "mem_1749676363910_cb9d2067",
+      "agent_id": "claude-code",
+      "project": "bedrock-agent-system",
+      "reason": "Content analysis: Project-specific content"
+    },
+    {
+      "memory_id": "mem_1749439508503_9087f0bb",
+      "agent_id": "claude-code",
+      "project": "bedrock-agent-system",
+      "reason": "Content analysis: Project-specific content"
+    },
+    {
+      "memory_id": "mem_1749677357050_1f2d9655",
+      "agent_id": "claude-code",
+      "project": "bedrock-agent-system",
+      "reason": "Content analysis: Project-specific content"
+    },
+    {
+      "memory_id": "mem_1749872744889_3663e030",
+      "agent_id": "claude-code",
+      "project": "bedrock-agent-system",
+      "reason": "Content analysis: Project-specific content"
+    },
+    {
+      "memory_id": "mem_1749864767700_d0807c21",
+      "agent_id": "claude-code",
+      "project": "bedrock-agent-system",
+      "reason": "Content analysis: Project-specific content"
+    },
+    {
+      "memory_id": "mem_1749676327558_920bf2f1",
+      "agent_id": "claude-code",
+      "project": "bedrock-agent-system",
+      "reason": "Content analysis: Project-specific content"
+    },
+    {
+      "memory_id": "mem_1749872074025_a44a1236",
+      "agent_id": "claude-code",
+      "project": "bedrock-agent-system",
+      "reason": "Content analysis: Project-specific content"
+    },
+    {
+      "memory_id": "mem_1749861386435_9b1948ac",
+      "agent_id": "claude-code",
+      "project": "bedrock-agent-system",
+      "reason": "Content analysis: Project-specific content"
+    },
+    {
+      "memory_id": "mem_1749741143480_d1c986b8",
+      "agent_id": "claude-code",
+      "project": "bedrock-agent-system",
+      "reason": "Content analysis: Project-specific content"
+    },
+    {
+      "memory_id": "mem_1749857232662_fd5bc2d6",
+      "agent_id": "claude-code",
+      "project": "bedrock-agent-system",
+      "reason": "Content analysis: Project-specific content"
+    },
+    {
+      "memory_id": "mem_1749847737539_5d99835c",
+      "agent_id": "claude-code",
+      "project": "bedrock-agent-system",
+      "reason": "Content analysis: Project-specific content"
+    },
+    {
+      "memory_id": "mem_1749914601099_22cc7258",
+      "agent_id": "claude-code",
+      "project": "bedrock-agent-system",
+      "reason": "Content analysis: Project-specific content"
+    },
+    {
+      "memory_id": "mem_1749680804922_48a90568",
+      "agent_id": "claude-code",
+      "project": "bedrock-agent-system",
+      "reason": "Content analysis: Project-specific content"
+    },
+    {
+      "memory_id": "mem_1749914459881_41b47a8c",
+      "agent_id": "claude-code",
+      "project": "bedrock-agent-system",
+      "reason": "Content analysis: Project-specific content"
+    }
+  ],
+  "errors": [],
+  "project_distribution": {
+    "bedrock-agent-system": 81
+  }
+}

@@ -1,219 +1,188 @@
-# MCP Memory Server - Product Requirements Document
+# MCP Memory Server Dashboard - Critical Bug Fixes and Architecture Overhaul
 
 ## Project Overview
 
-**Project Name**: MCP Memory Server  
-**Version**: 1.0  
+**Project Name**: MCP Memory Server Dashboard - Emergency Fixes  
+**Version**: 2.0 - Critical Overhaul  
 **Author**: Claude Code (AI Assistant)  
-**Date**: June 13, 2025  
-**Status**: In Development  
+**Date**: June 20, 2025  
+**Status**: CRITICAL - Production Broken  
 
 ## Executive Summary
 
-The MCP Memory Server is a production-ready Memory Context Protocol (MCP) implementation that provides sophisticated memory management capabilities with vector search, graph relationships, and real-time monitoring. The system enables AI agents and applications to store, retrieve, and connect memories using advanced semantic search and graph-based relationships.
+CRITICAL EMERGENCY: The MCP Memory Server Dashboard is completely non-functional due to compilation hangs, imperative programming anti-patterns, and missing comprehensive testing. This PRD outlines the immediate fixes and architectural overhaul required to restore functionality and implement proper React patterns.
 
-## Problem Statement
+## Critical Problem Statement
 
-Current memory systems for AI applications lack:
-- Standardized protocol for memory operations
-- Sophisticated semantic search capabilities  
-- Graph-based memory relationships
-- Real-time monitoring and administration
-- Production-ready scalability and reliability
+The current system has CRITICAL issues that prevent basic operation:
+- ❌ Dashboard compilation hangs indefinitely (http://localhost:3101 times out)
+- ❌ Imperative programming patterns contrary to React's functional design
+- ❌ Missing E2E tests that would have caught compilation issues
+- ❌ useEffect anti-patterns with nested if statements
+- ❌ Client components using server-side patterns (`use` hook misuse)
+- ❌ Lack of proper RSC (React Server Components) implementation
 
-## Solution Overview
+## Emergency Solution Overview
 
-A comprehensive memory management system consisting of:
+IMMEDIATE CRITICAL FIXES REQUIRED:
 
-1. **MCP Memory Server** (NestJS Backend)
-   - Implements MCP protocol for standardized memory operations
-   - Multi-layer storage: DynamoDB (metadata), OpenSearch (vectors), Neo4j (graphs)
-   - RESTful and MCP protocol APIs
-   - Sophisticated memory processing with embeddings and relationships
+### Phase 1: Emergency Dashboard Fix (CRITICAL - 2 hours)
+1. **Fix Compilation Hang**
+   - Remove `use` hook from client components  
+   - Convert memory-overview to proper RSC pattern
+   - Eliminate blocking network requests during compilation
+   - Restore basic dashboard functionality
 
-2. **Memory Dashboard** (Next.js 15 Frontend)
-   - Real-time memory browsing with infinite scroll
-   - Interactive knowledge graph visualization
-   - Agent management and monitoring
-   - Administrative controls and health monitoring
+2. **Eliminate Imperative Anti-patterns**
+   - Remove all nested if statements in useEffect
+   - Replace imperative patterns with functional approaches
+   - Implement proper error boundaries and suspense
+   - Use optional chaining extensively for safety
 
-## Core Features
+### Phase 2: Architecture Overhaul (CRITICAL - 1 day)
+1. **React Server Components Implementation**
+   - Convert all data fetching to server-side RSC
+   - Implement server actions for mutations
+   - Eliminate client-side data fetching for initial loads
+   - Proper loading states and error boundaries
 
-### Memory Operations
-- Store memories with automatic semantic processing
-- Retrieve memories using vector similarity search
-- Create and manage memory relationships/connections
-- Support for multiple memory types (episodic, semantic, procedural, working)
-- Project-based memory isolation and organization
+2. **Functional Programming Patterns**
+   - Create custom hooks for reusable logic
+   - Implement proper state management with providers  
+   - Replace useEffect with event handlers where possible
+   - Use React Query/SWR for server state management
 
-### Search & Discovery
-- Semantic search with OpenSearch vector similarity
-- Graph-based memory exploration via Neo4j
-- Advanced filtering by type, project, agent, tags
-- Real-time search with pagination and infinite scroll
+### Phase 3: Comprehensive Testing (CRITICAL - 1 day)
+1. **E2E Tests with Playwright**
+   - Tests that verify compilation works (catch future issues)
+   - Core user flow testing (memory browsing, modals)
+   - Real-time update testing with SSE
+   - Error boundary and fallback testing
 
-### Monitoring & Administration
-- Real-time dashboard with memory statistics
-- Health monitoring for all storage layers
-- Agent activity tracking and management
-- Memory lifecycle and access analytics
+2. **Unit Test Coverage**
+   - All components and hooks (90%+ coverage)
+   - Integration tests for API routes
+   - GitHub Actions CI/CD with quality gates
+   - Coverage reporting and enforcement
 
-### Integration & Extensibility
-- MCP protocol compliance for standardized integration
-- RESTful APIs for custom integrations
-- Plugin architecture for custom memory processors
-- Event-driven architecture with real-time updates
+## Critical Requirements
 
-## Technical Architecture
+### Immediate Fixes (Must be completed first)
+1. **Dashboard Must Load** - http://localhost:3101 must respond within 2 seconds
+2. **No Compilation Hangs** - Build process must complete without blocking
+3. **Functional Programming Only** - Zero imperative patterns, zero nested if statements
+4. **RSC Implementation** - Server-side data fetching with proper client/server boundaries
+5. **E2E Tests Pass** - All tests must verify compilation and core functionality
 
-### Backend (MCP Memory Server)
-- **Framework**: NestJS with TypeScript
-- **Protocol**: MCP (Memory Context Protocol) + REST
-- **Storage**: 
-  - DynamoDB (metadata and indexing)
-  - OpenSearch (vector embeddings and search)
-  - Neo4j (graph relationships)
-- **Processing**: Automatic embedding generation, semantic analysis
-- **Deployment**: Docker containers with health checks
+### Architecture Requirements
+1. **React Server Components (RSC)**
+   - All initial data fetching on server-side
+   - Server actions for mutations
+   - Proper client/server component boundaries
+   - No `use` hook in client components
 
-### Frontend (Memory Dashboard)  
-- **Framework**: Next.js 15 with React 19
-- **UI**: shadcn/ui components with Tailwind CSS
-- **State**: React Query for server state management
-- **Features**: Infinite scroll, real-time updates, responsive design
-- **Deployment**: Static build with CDN distribution
+2. **Functional Programming Patterns**
+   - Custom hooks for reusable logic
+   - State management with providers
+   - Event handlers instead of useEffect where possible
+   - Optional chaining for all property access
 
-### Integration Points
-- MCP protocol for AI agent integration
-- RESTful APIs for web applications
-- WebSocket connections for real-time updates
-- OAuth/JWT authentication for security
+3. **Real-time Updates**
+   - Server-Sent Events (SSE) for memory updates
+   - WebSockets for bidirectional communication
+   - NO polling (last resort only)
+   - Proper connection management and reconnection
 
-## User Stories
+4. **Comprehensive Testing**
+   - Playwright E2E tests that verify compilation
+   - 90%+ unit test coverage (Vitest for dashboard, Jest for server)
+   - Integration tests for all API routes
+   - GitHub Actions CI/CD pipeline
 
-### As an AI Developer
-- I want to store memories with automatic semantic processing
-- I want to search memories using natural language queries  
-- I want to create relationships between related memories
-- I want to organize memories by project and agent
+## Critical Success Criteria
 
-### As a System Administrator
-- I want to monitor memory server health and performance
-- I want to manage user access and permissions
-- I want to backup and restore memory data
-- I want to scale the system based on usage patterns
+### Phase 1: Emergency Fix (Must be completed in 2 hours)
+- ✅ Dashboard loads successfully at http://localhost:3101
+- ✅ Compilation completes without hanging
+- ✅ Basic memory browsing functionality restored
+- ✅ No more client-side `use` hook usage
 
-### As a Research Team
-- I want to explore memory relationships through graph visualization
-- I want to analyze memory patterns and trends
-- I want to export memory data for analysis
-- I want to track agent behavior and memory usage
+### Phase 2: Architecture Compliance (Must be completed in 1 day)
+- ✅ All components follow functional programming patterns
+- ✅ RSC implementation for server-side data fetching
+- ✅ SSE real-time updates working
+- ✅ Zero nested if statements in codebase
+- ✅ Comprehensive error boundaries and suspense
 
-## Acceptance Criteria
+### Phase 3: Testing Verification (Must be completed in 1 day)
+- ✅ E2E tests pass and verify compilation works
+- ✅ 90%+ unit test coverage achieved
+- ✅ CI/CD pipeline operational with quality gates
+- ✅ All imperative patterns eliminated
 
-### Core Functionality
-- ✅ Memory storage with automatic embedding generation
-- ✅ Semantic search with relevance scoring
-- ✅ Graph relationships creation and traversal
-- ✅ Multi-project memory isolation
-- ✅ Agent-based memory attribution
+## Implementation Priority
 
-### User Interface
-- ✅ Infinite scroll memory browsing
-- ✅ Interactive graph visualization
-- ✅ Real-time memory statistics
-- ✅ Agent management interface
-- ✅ Responsive design for all devices
+### CRITICAL (Do First)
+1. Fix dashboard compilation hang
+2. Remove `use` hook from client components
+3. Implement basic RSC pattern for overview page
+4. Create E2E test that verifies compilation
 
-### Performance & Reliability
-- [ ] Support for 100,000+ memories per project
-- [ ] Sub-second search response times
-- [ ] 99.9% uptime SLA
-- [ ] Automated backup and recovery
-- [ ] Horizontal scaling capabilities
+### HIGH (Do Next)  
+1. Refactor all imperative patterns to functional
+2. Implement comprehensive custom hooks
+3. Add proper error boundaries everywhere
+4. Create comprehensive test suite
 
-### Security & Compliance
-- [ ] JWT-based authentication
-- [ ] Project-level access controls
-- [ ] Data encryption at rest and in transit
-- [ ] GDPR compliance for memory deletion
-- [ ] Audit logging for all operations
+### MEDIUM (Do After Critical Issues Fixed)
+1. Advanced RSC features
+2. Progressive caching with IndexedDB
+3. Service worker implementation
+4. PWA functionality
 
-## Success Metrics
+## GitHub Project Integration
 
-### Performance Metrics
-- Search latency: < 500ms for 95th percentile
-- Memory storage time: < 200ms average
-- Dashboard load time: < 2 seconds
-- API response time: < 100ms average
+All tasks will be tracked using GitHub Issues and Projects:
+1. Create GitHub issues for each critical bug and feature
+2. Assign proper labels (bug, enhancement, critical, testing)
+3. Use GitHub Projects for kanban-style tracking
+4. Link all taskmaster tasks to GitHub issues
+5. Track progress with automated status updates
 
-### Usage Metrics
-- Number of active projects
-- Memories stored per day
-- Search queries per day
-- Graph connections created
-- User engagement time
+## Quality Assurance Requirements
 
-### Reliability Metrics
-- System uptime: > 99.9%
-- Error rate: < 0.1%
-- Data loss: 0%
-- Recovery time: < 30 minutes
+### Code Quality
+- Zero imperative programming patterns allowed
+- Mandatory functional programming approach
+- Optional chaining required for all property access
+- Custom hooks for all reusable logic
+- Proper error boundaries on all async operations
 
-## Implementation Roadmap
+### Testing Requirements
+- E2E tests MUST verify compilation works
+- All new features require unit tests before merge
+- 90%+ coverage enforcement via CI/CD
+- Integration tests for all API endpoints
+- Performance regression testing
 
-### Phase 1: Core Memory Operations (4 weeks)
-- MCP protocol implementation
-- Basic memory storage and retrieval
-- Embedding generation and vector search
-- Project isolation and basic security
+## Critical Success Definition
 
-### Phase 2: Advanced Features (6 weeks)
-- Graph relationships and visualization
-- Advanced search and filtering
-- Real-time dashboard with infinite scroll
-- Agent management and monitoring
+**The project is only considered successful when:**
+1. ✅ http://localhost:3101 loads within 2 seconds
+2. ✅ All E2E tests pass including compilation verification
+3. ✅ Zero imperative patterns remain in codebase
+4. ✅ RSC pattern properly implemented
+5. ✅ Real-time updates work via SSE
+6. ✅ 90%+ test coverage achieved
+7. ✅ CI/CD pipeline operational
 
-### Phase 3: Production Readiness (4 weeks)
-- Performance optimization and caching
-- Comprehensive testing and quality assurance
-- Security hardening and compliance
-- Documentation and deployment automation
+## Emergency Action Plan
 
-### Phase 4: Advanced Analytics (4 weeks)
-- Memory analytics and insights
-- Advanced graph algorithms
-- Export and integration capabilities
-- Advanced administrative features
+**IMMEDIATE NEXT STEPS:**
+1. Parse this PRD with TaskMaster to create actionable tasks
+2. Create GitHub issues for all critical bugs
+3. Fix dashboard compilation hang (remove `use` hook from client components)
+4. Create E2E test that verifies compilation works
+5. Refactor memory-overview to proper RSC pattern
 
-## Risk Assessment
-
-### Technical Risks
-- **Vector search performance**: Mitigated by OpenSearch optimization
-- **Graph complexity**: Mitigated by Neo4j expertise and indexing
-- **Real-time updates**: Mitigated by WebSocket architecture
-- **Data consistency**: Mitigated by transaction management
-
-### Business Risks
-- **Adoption rate**: Mitigated by MCP protocol compliance
-- **Scalability costs**: Mitigated by cloud-native architecture
-- **Competition**: Mitigated by unique graph-based approach
-- **Data migration**: Mitigated by export/import capabilities
-
-## Dependencies
-
-### External Services
-- OpenSearch for vector search
-- Neo4j for graph database
-- DynamoDB for metadata storage
-- Docker for containerization
-
-### Development Tools
-- NestJS for backend framework
-- Next.js for frontend framework
-- TypeScript for type safety
-- Jest for testing
-
-## Conclusion
-
-The MCP Memory Server represents a comprehensive solution for AI memory management, combining the power of vector search, graph relationships, and real-time monitoring in a production-ready package. With proper implementation of this PRD, the system will provide a robust foundation for AI applications requiring sophisticated memory capabilities.
+**This is a production emergency requiring immediate action. All other work is secondary until basic functionality is restored.**

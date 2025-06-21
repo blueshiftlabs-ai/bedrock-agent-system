@@ -254,7 +254,7 @@ export function GraphVisualization() {
       }
     } catch (error) {
       console.error('Failed to add connection:', error)
-      alert(`Error adding connection: ${error.message}`)
+      alert(`Error adding connection: ${error instanceof Error ? error.message : String(error)}`)
     }
   }
 

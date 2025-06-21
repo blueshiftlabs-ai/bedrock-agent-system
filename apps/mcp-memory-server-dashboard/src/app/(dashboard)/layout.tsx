@@ -6,8 +6,10 @@ import { Database } from 'lucide-react'
 
 export default function DashboardLayout({
   children,
+  modal,
 }: {
   children: React.ReactNode
+  modal: React.ReactNode
 }) {
   const [isConnected, setIsConnected] = useState(false)
 
@@ -52,7 +54,10 @@ export default function DashboardLayout({
             </p>
           </div>
         ) : (
-          children
+          <>
+            {children}
+            {modal}
+          </>
         )}
       </main>
     </div>

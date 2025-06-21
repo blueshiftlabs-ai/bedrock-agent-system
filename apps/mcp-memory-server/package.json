@@ -12,6 +12,10 @@
     "dev": "nest start --watch",
     "dev:local": "cross-env NODE_ENV=development MEMORY_MODE=local nest start --watch",
     "dev:server": "cross-env NODE_ENV=development MEMORY_MODE=server nest start --watch",
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "test:cov": "jest --coverage",
+    "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
     "docker:build": "docker build -t mcp-memory-server .",
     "docker:run": "docker run -p 4100:4100 mcp-memory-server",
     "setup:local": "pnpm run setup:env:local && pnpm run build",
@@ -62,8 +66,13 @@
   "devDependencies": {
     "@aws-sdk/client-dynamodb": "^3.825.0",
     "@nestjs/cli": "11.0.7",
+    "@nestjs/testing": "^11.1.2",
     "@packages/typescript-config": "workspace:*",
+    "@types/jest": "^29.5.13",
     "cross-env": "^7.0.3",
+    "jest": "^29.7.0",
+    "ts-jest": "^29.2.5",
+    "tsconfig-paths": "^4.2.0",
     "typescript": "^5.8.3"
   }
 }

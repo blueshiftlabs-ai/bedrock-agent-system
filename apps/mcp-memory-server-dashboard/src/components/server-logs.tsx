@@ -219,8 +219,8 @@ export function ServerLogs() {
                 <SelectContent>
                   <SelectItem value="all">All Contexts</SelectItem>
                   {getUniqueContexts().map(context => (
-                    <SelectItem key={context} value={context}>
-                      {context}
+                    <SelectItem key={context} value={context || ''}>
+                      {context || 'Unknown'}
                     </SelectItem>
                   ))}
                 </SelectContent>
