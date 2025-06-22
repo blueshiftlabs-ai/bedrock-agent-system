@@ -76,3 +76,15 @@ body {
   background-color: theme(colors.background);
   color: theme(colors.foreground);
 }
+
+/* Animation for memory cards */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

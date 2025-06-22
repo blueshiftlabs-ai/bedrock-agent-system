@@ -71,7 +71,7 @@ export async function GET(request: NextRequest) {
 }
 
 // Function to broadcast memory updates to all connected clients
-export function broadcastMemoryUpdate(update: MemoryUpdate) {
+function broadcastMemoryUpdate(update: MemoryUpdate) {
   const encoder = new TextEncoder()
   const data = encoder.encode(`data: ${JSON.stringify(update)}\n\n`)
   

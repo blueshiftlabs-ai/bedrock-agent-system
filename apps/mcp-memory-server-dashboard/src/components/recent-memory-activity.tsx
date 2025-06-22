@@ -11,24 +11,6 @@ import { TrendingUp, Loader2, ExternalLink, ArrowRight } from 'lucide-react'
 import { format } from 'date-fns'
 import { getMemoryTypeIcon, getMemoryTypeColor } from '@/lib/memory-utils'
 
-// CSS animations for smooth card loading
-const fadeInUpAnimation = `
-  @keyframes fadeInUp {
-    from {
-      opacity: 0;
-      transform: translateY(10px);
-    }
-    to {
-      opacity: 1;
-      transform: translateY(0);
-    }
-  }
-  
-  [data-animate="fadeInUp"] {
-    animation: fadeInUp 0.4s ease-out forwards;
-  }
-`
-
 interface Memory {
   id: string
   content: string
@@ -182,9 +164,7 @@ export function RecentMemoryActivity() {
   }
 
   return (
-    <>
-      <style jsx>{`${fadeInUpAnimation}`}</style>
-      <Card id="recent-activity-section">
+    <Card id="recent-activity-section">
         <CardHeader>
         <div className="flex items-center justify-between">
           <div>
@@ -262,12 +242,11 @@ export function RecentMemoryActivity() {
               {displayedMemories.map((memory, index) => (
                 <div 
                   key={memory.id}
-                  className="group p-4 border rounded-lg hover:shadow-md hover:border-primary/50 transition-all duration-200 cursor-pointer bg-gradient-to-r from-background to-muted/20 hover:scale-[1.01] transform"
+                  className="group p-4 border rounded-lg hover:shadow-md hover:border-primary/50 transition-all duration-200 cursor-pointer bg-gradient-to-r from-background to-muted/20 hover:scale-[1.01] transform opacity-0 animate-[fadeInUp_0.4s_ease-out_forwards]"
                   onClick={() => handleMemoryClick(memory.id)}
                   style={{
                     animationDelay: `${index * 50}ms`,
                   }}
-                  data-animate="fadeInUp"
                 >
                   <div className="flex items-start justify-between">
                     <div className="flex items-start space-x-3 flex-1">
@@ -399,6 +378,5 @@ export function RecentMemoryActivity() {
         </div>
       </CardContent>
     </Card>
-    </>
   )
 }

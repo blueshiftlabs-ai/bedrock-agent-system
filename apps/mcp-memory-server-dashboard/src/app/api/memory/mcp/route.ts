@@ -4,7 +4,23 @@ const MEMORY_SERVER_URL = process.env.MEMORY_SERVER_URL || 'http://localhost:410
 
 export async function POST(request: NextRequest) {
   try {
-    const body = await request.json()
+    let body
+    try {
+      body = await request.json()
+    } catch (parseError) {
+      console.error('Failed to parse request body:', parseError)
+      return NextResponse.json(
+        { error: 'Invalid JSON in request body' },
+        { status: 400 }
+      )
+    }
+    
+    if (!body) {
+      return NextResponse.json(
+        { error: 'Request body is required' },
+        { status: 400 }
+      )
+    }
     
     // Forward the request to the memory server
     const response = await fetch(`${MEMORY_SERVER_URL}/memory/mcp`, {
@@ -17,8 +33,10 @@ export async function POST(request: NextRequest) {
     })
 
     if (!response.ok) {
+      const errorText = await response.text()
+      console.error('Memory server error:', response.status, errorText)
       return NextResponse.json(
-        { error: 'Memory server request failed', status: response.status },
+        { error: 'Memory server request failed', status: response.status, details: errorText },
         { status: response.status }
       )
     }
@@ -28,7 +46,7 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     console.error('API route error:', error)
     return NextResponse.json(
-      { error: 'Internal server error' },
+      { error: 'Internal server error', details: error.message },
       { status: 500 }
     )
   }
