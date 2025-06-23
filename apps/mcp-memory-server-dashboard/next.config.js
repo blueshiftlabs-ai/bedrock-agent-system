@@ -1,5 +1,9 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  // Note: PPR requires Next.js canary
+  // experimental: {
+  //   ppr: 'incremental',
+  // },
   async rewrites() {
     return [
       {
