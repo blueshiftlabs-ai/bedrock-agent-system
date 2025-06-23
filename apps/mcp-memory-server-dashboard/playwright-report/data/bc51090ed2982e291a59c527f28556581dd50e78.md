@@ -1,0 +1,216 @@
+# Page snapshot
+
+```yaml
+- banner:
+  - heading "MCP Memory Server Dashboard" [level=1]
+  - paragraph: Real-time monitoring and management
+  - text: Connected
+  - button "Refresh"
+- navigation:
+  - link "Overview":
+    - /url: /overview
+  - link "Storage":
+    - /url: /storage
+  - link "Memories":
+    - /url: /memories
+  - link "Agents":
+    - /url: /agents
+  - link "Graph":
+    - /url: /graph
+  - link "Logs":
+    - /url: /logs
+  - link "Admin":
+    - /url: /admin
+- main:
+  - heading "Memory Browser" [level=3]
+  - paragraph: Search and browse stored memories with infinite scrolling
+  - textbox "Search memories..."
+  - button "Search"
+  - button "Filters"
+  - button "Add Memory"
+  - button "Reset"
+  - text: Memory Types
+  - checkbox "episodic (7)"
+  - text: episodic (7)
+  - checkbox "procedural (6)"
+  - text: procedural (6)
+  - checkbox "semantic (6)"
+  - text: semantic (6)
+  - checkbox "working (1)"
+  - text: working (1) Agents
+  - checkbox "claude-code (18)"
+  - text: claude-code (18)
+  - checkbox "claude-opus-4-20250514 (2)"
+  - text: claude-opus-4-20250514 (2) Tags
+  - checkbox "all-critical-completed (1)"
+  - text: all-critical-completed (1)
+  - checkbox "animations (1)"
+  - text: animations (1)
+  - checkbox "auto-detection (1)"
+  - text: auto-detection (1)
+  - checkbox "broken (1)"
+  - text: broken (1)
+  - checkbox "bug-fix (2)"
+  - text: bug-fix (2)
+  - checkbox "code-analysis (2)"
+  - text: code-analysis (2)
+  - checkbox "compilation (1)"
+  - text: compilation (1)
+  - checkbox "completed (1)"
+  - text: completed (1)
+  - checkbox "comprehensive-success (1)"
+  - text: comprehensive-success (1)
+  - checkbox "connection (1)"
+  - text: connection (1)
+  - checkbox "critical-feedback (1)"
+  - text: critical-feedback (1)
+  - checkbox "dashboard (2)"
+  - text: dashboard (2)
+  - checkbox "dashboard-production-ready (1)"
+  - text: dashboard-production-ready (1)
+  - checkbox "debugging (3)"
+  - text: debugging (3)
+  - checkbox "explicit-project (1)"
+  - text: explicit-project (1)
+  - checkbox "file-organization (1)"
+  - text: file-organization (1)
+  - checkbox "git-context (2)"
+  - text: git-context (2)
+  - checkbox "github-project (1)"
+  - text: github-project (1)
+  - checkbox "implementation (2)"
+  - text: implementation (2)
+  - checkbox "implementation-complete (1)"
+  - text: implementation-complete (1)
+  - checkbox "implementation-plan (1)"
+  - text: implementation-plan (1)
+  - checkbox "infinite-scroll (3)"
+  - text: infinite-scroll (3)
+  - checkbox "integration-test (1)"
+  - text: integration-test (1)
+  - checkbox "issue-5 (2)"
+  - text: issue-5 (2)
+  - checkbox "knowledge-graph (1)"
+  - text: knowledge-graph (1)
+  - checkbox "line-327 (1)"
+  - text: line-327 (1)
+  - checkbox "loading-states (1)"
+  - text: loading-states (1)
+  - checkbox "major-milestone (1)"
+  - text: major-milestone (1)
+  - checkbox "mcp-memory-dashboard (1)"
+  - text: mcp-memory-dashboard (1)
+  - checkbox "mcp-memory-server (1)"
+  - text: mcp-memory-server (1)
+  - checkbox "mcp-tools (2)"
+  - text: mcp-tools (2)
+  - checkbox "memory-attribution (1)"
+  - text: memory-attribution (1)
+  - checkbox "memory-browser (2)"
+  - text: memory-browser (2)
+  - checkbox "memory-connections (2)"
+  - text: memory-connections (2)
+  - checkbox "memory-management (1)"
+  - text: memory-management (1)
+  - checkbox "memory-service (1)"
+  - text: memory-service (1)
+  - checkbox "migration (1)"
+  - text: migration (1)
+  - checkbox "modal (1)"
+  - text: modal (1)
+  - checkbox "navigation (1)"
+  - text: navigation (1)
+  - checkbox "neo4j (2)"
+  - text: neo4j (2)
+  - checkbox "next.js (3)"
+  - text: next.js (3)
+  - checkbox "playwright (1)"
+  - text: playwright (1)
+  - checkbox "react (2)"
+  - text: react (2)
+  - checkbox "repository-cleanup (1)"
+  - text: repository-cleanup (1)
+  - checkbox "retrieveConnections (1)"
+  - text: retrieveConnections (1)
+  - checkbox "shadcn (1)"
+  - text: shadcn (1)
+  - checkbox "skeleton-ui (1)"
+  - text: skeleton-ui (1)
+  - checkbox "task-management (1)"
+  - text: task-management (1)
+  - checkbox "taskmaster-ai (1)"
+  - text: taskmaster-ai (1)
+  - checkbox "test (3)"
+  - text: test (3)
+  - checkbox "testing (1)"
+  - text: testing (1)
+  - checkbox "testing-needed (1)"
+  - text: testing-needed (1)
+  - checkbox "tracking (1)"
+  - text: tracking (1)
+  - checkbox "tsx (1)"
+  - text: tsx (1)
+  - checkbox "ui-improvement (1)"
+  - text: ui-improvement (1)
+  - checkbox "use-hook (1)"
+  - text: use-hook (1)
+  - checkbox "user-frustration (1)"
+  - text: user-frustration (1)
+  - checkbox "vitest (1)"
+  - text: vitest (1) Sort By
+  - combobox: Date Created
+  - button "Desc"
+  - button "Asc"
+  - text: 20 of 20 memories
+  - button "Clear All" [disabled]
+  - heading "Memories (20)" [level=3]
+  - text: "Page size:"
+  - combobox: "20"
+  - text: episodic bedrock-agent-system by claude-opus-4-20250514
+  - paragraph: "Successfully resolved all TypeScript compilation errors in the dashboard app. The build now completes successfully. Key fixes: 1. Removed styled-jsx syntax that was causing JSX parsing errors 2. Fixed Next.js 15 async params type in modal page 3. Removed exported non-HTTP method from API route 4. Added CSS animations to global styles Build output shows all pages generated successfully with proper routing structure."
+  - text: Jun 22, 2025 14:34 procedural bedrock-agent-system by claude-opus-4-20250514
+  - paragraph: "Fixed TypeScript compilation errors in dashboard app. The main issues were: 1. Removed styled-jsx tag that was causing JSX parsing errors in recent-memory-activity.tsx 2. Added CSS animation to global styles instead 3. Fixed Next.js 15 async params type in modal page component 4. Removed stray memory-overview-working.tsx file"
+  - text: Jun 22, 2025 14:32 procedural bedrock-agent-system by claude-code
+  - paragraph: "CRITICAL COMPILATION BUG FIXED: Dashboard compilation hang completely resolved ## Root Cause The `use()` hook in a client component at `/src/app/@modal/(.)memory/[id]/page.tsx` was causing Next.js compilation to hang indefinitely. ## Solution Applied Fixed by changing: - FROM: `params: Promise<{ id: string }>` with `use(params)` call - TO: `params: { id: string }` with direct `params.id` access ## Verification - Server starts in ~1.5 seconds (was hanging for 5+ minutes) - Dashboard loads properly at http://localhost:3101 - Modal functionality preserved ## Key Learning The `use()` hook should only be used in React Server Components, not client components marked with 'use client'. For client components, params should be synchronously available without the Promise wrapper."
+  - text: bug-fix compilation next.js modal use-hook Jun 21, 2025 16:22 procedural bedrock-agent-system by claude-code
+  - paragraph: No content available
+  - text: loading-states skeleton-ui infinite-scroll memory-browser Jun 19, 2025 15:35 semantic bedrock-agent-system by claude-code
+  - paragraph: Found the main return statement in memory-browser-infinite.tsx component at line 327. The component has CSS animations defined as a string constant (fadeInUpAnimation) but needs a style tag to inject the animations into the DOM. The memory items already have inline animation styles applied at line 607.
+  - text: react tsx animations memory-browser line-327 Jun 19, 2025 15:34 semantic bedrock-agent-system by claude-code
+  - paragraph: Neo4j connection test memory - testing automatic concept relationship creation. This should create connections with other memories containing similar concepts like 'neo4j', 'connection', 'test', 'memory'.
+  - text: neo4j connection test debugging Jun 19, 2025 14:37 semantic bedrock-agent-system by claude-code
+  - paragraph: "Found the retrieveConnections method implementation in the MCP Memory Server. The method flow is: 1. MCP Tools Service (/home/acoose/projects/bedrock-agent-system/apps/mcp-memory-server/src/mcp/mcp-tools.service.ts): - Line 279: async retrieveConnections() method with MCP tool decorator - Calls this.memoryService.retrieveConnections(params) 2. Memory Service (/home/acoose/projects/bedrock-agent-system/apps/mcp-memory-server/src/services/memory.service.ts): - Line 1269: async retrieveConnections() method - Calls this.neo4jService.getConnections(params.memory_id, params.relationship_type, params.limit || 50) 3. Neo4j Graph Service (/home/acoose/projects/bedrock-agent-system/apps/mcp-memory-server/src/services/neo4j-graph.service.ts): - Line 369: async getConnections() method - Implements the actual Neo4j query to retrieve graph connections between memories - Supports optional memory_id, relationship_type, and limit parameters - Returns connections with from_memory_id, to_memory_id, relationship_type, confidence, and properties The method handles the retrieve-connections MCP tool call by querying Neo4j graph relationships between memory nodes."
+  - text: code-analysis mcp-tools memory-service neo4j retrieveConnections Jun 19, 2025 14:36 semantic bedrock-agent-system by claude-code
+  - paragraph: "Issue #5 Implementation - Comprehensive Memory Connections COMPLETED: ✅ Enhanced autoCreateConceptRelationships with semantic similarity detection ✅ Added new relationship types: SHARES_CONCEPT, IMPORTS_FROM, IMPLEMENTS_SIMILAR ✅ Implemented code-specific relationship detection for imports and functions ✅ Created analyzeMemoryConnections method with advanced analytics ✅ Added analyze-memory-connections MCP tool for comprehensive network analysis ✅ Enhanced concept extraction and similarity calculation algorithms ✅ Built connection density analysis and insight generation ✅ Fixed all TypeScript compatibility issues Key Features Implemented: 1. Code-to-Concept Mapping: Automatic detection of shared concepts and semantic relationships 2. Enhanced Relationship Intelligence: Confidence scoring and relationship strength analysis 3. Cross-Project Knowledge: Support for analyzing connections across projects 4. Advanced Analytics: Connection density, centrality analysis, and cluster detection 5. Comprehensive MCP Tool: analyze-memory-connections for deep network insights The system now automatically creates sophisticated relationships when memories are stored and provides powerful tools for analyzing the knowledge graph structure."
+  - text: issue-5 implementation completed memory-connections knowledge-graph Jun 19, 2025 14:30 semantic bedrock-agent-system by claude-code
+  - paragraph: "Issue #5 Analysis - Comprehensive Memory Connections Implementation Plan: Current capabilities: - Basic relationship creation (RELATES_TO, SIMILAR_TO, REFERENCES, FOLLOWS, IMPLEMENTS, CONTRADICTS) - Neo4j graph with bidirectional relationships and confidence scoring - Tag-based concept clustering - MCP tools for connection management (add-connection, retrieve-connections, etc.) Key gaps to address: 1. Advanced semantic analysis for code-specific relationships 2. Cross-project knowledge linking 3. Automated memory generation from git events 4. Enhanced relationship intelligence with temporal tracking 5. Graph analytics and relationship recommendations Implementation approach: - Enhance autoCreateConceptRelationships in memory.service.ts - Add code-specific relationship types in neo4j-graph.service.ts - Create git-event memory generation hooks - Build observation synthesis capabilities - Add cross-project memory retrieval patterns Foundation is solid - ready to build comprehensive memory connections system."
+  - text: issue-5 memory-connections implementation-plan code-analysis Jun 19, 2025 14:24 procedural bedrock-agent-system by claude-code
+  - paragraph: "Starting comprehensive repository cleanup for bedrock-agent-system. The goal is to move all non-essential files from root to either the continuation project or proper subdirectories. Files to move include: - Multiple docker-compose files (distributed-base, distributed-mcp, graph-dgraph, graph-neo4j, etc.) - Migration script (migrate-legacy-apps.sh) - Test JSON files (test-memory.json, test-memory-dynamo.json) - Old documentation (README.old.md, MIGRATION_PLAN.md) - Setup scripts in root The GitHub project manager MCP tool is confirmed to have structural issues - it returns \"invalid_type, expected array, received undefined for content path\" errors."
+  - text: repository-cleanup file-organization migration Jun 19, 2025 13:27 episodic bedrock-agent-system by claude-code
+  - paragraph: Testing explicit project parameter to verify project detection is working properly.
+  - text: integration-test explicit-project Jun 14, 2025 10:41 procedural bedrock-agent-system by claude-code
+  - paragraph: "User asking about taskmanager and GitHub project board updates for the new tasks we added (RSC, PWA, card-level infinite scroll, etc.) Need to: 1. Check if new tasks were added to GitHub project board 2. Add tasks to TaskMaster AI if not already done 3. Ensure consistent tracking across all systems"
+  - text: task-management github-project taskmaster-ai tracking Jun 14, 2025 09:24 working bedrock-agent-system by claude-code
+  - paragraph: "Testing git context auto-detection: This memory should automatically detect the project name as 'bedrock-agent-system' and agent_id as 'bedrock-agent-system' from the git repository context."
+  - text: test git-context auto-detection Jun 13, 2025 21:38 semantic bedrock-agent-system by claude-code
+  - paragraph: "Successfully created GitContextService for the MCP memory server. The service includes: 1. GitContextService class with the following key features: - Detects git repository context from current working directory - Extracts project name from git remote URLs (supports SSH and HTTPS) - Generates appropriate agent IDs based on project name and branch - Caches context for 30 seconds to improve performance - Provides fallback context when not in a git repository 2. Integration with MemoryService: - Auto-detects agent_id and project when not explicitly provided - Uses git context to replace \"Anonymous • unknown\" with meaningful values - Maintains backward compatibility with explicit parameters 3. MCP Tool integration: - Added 'get-git-context' tool for retrieving git repository information - Supports both quick context and detailed repository info - Handles errors gracefully with fallback values 4. Dependencies: - Added simple-git package for git operations - Updated memory and MCP modules to include GitContextService The service automatically detects project name from git remotes and working directory, making memory attribution more meaningful and context-aware."
+  - text: git-context memory-attribution mcp-tools implementation-complete Jun 13, 2025 21:37 episodic bedrock-agent-system by claude-code
+  - paragraph: "🎉 MAJOR MILESTONE ACHIEVED - ALL CRITICAL DASHBOARD ISSUES RESOLVED ## COMPREHENSIVE SUCCESS SUMMARY: ### ✅ CRITICAL TASK 1: Infinite Scroll & Memory Browsing (COMPLETED) - Fixed server-side pagination with proper offset/limit/has_more implementation - Resolved client-side getNextPageParam logic to trust server's has_more flag - Added rate limiting and intersection observer auto-loading - Load more button now functional with proper click handling ### ✅ CRITICAL TASK 2: Graph Page Functionality (COMPLETED) - Fixed \"No content\" dropdown issue through proper data structure parsing - Removed problematic project filtering to show all 44 available memories - Enhanced error handling with comprehensive API response logging - All UI components (buttons, search, dialogs, relationships) now functional - Only remaining issue: Neo4j connection retrieval (backend problem, not frontend) ### ✅ CRITICAL TASK 3: Agents View Restoration (COMPLETED) - Fixed React rendering error: \"Objects are not valid as a React child\" - Implemented proper type checking for memory count display - Restored full agent detail views with statistics and memory browsing - Agent selection, editing, and memory type distribution all working ## DASHBOARD STATUS: PRODUCTION READY ✅ ### VERIFIED FUNCTIONALITY: ✅ Memory browser with infinite scroll and filtering ✅ Graph visualization with connection creation ✅ Agent management with detailed statistics ✅ Storage monitoring and health checks ✅ Overview page with recent memory activity ✅ Real-time server connectivity status ### NEXT PHASE PRIORITIES: 1. 🔧 Neo4j backend connection retrieval investigation 2. 🚀 GitHub project management MCP integration 3. 🧪 Comprehensive test suite with coverage 4. 🔄 IndexedDB caching for progressive web app 5. 📡 Real-time SSE for automatic updates ## ACHIEVEMENT: From \"broken\" state to fully functional dashboard User feedback: \"graph page not useful at all\", \"agents view broken\", \"infinite scroll crashes browsers\" RESULT: All core functionality restored and enhanced with proper error handling."
+  - text: major-milestone all-critical-completed dashboard-production-ready comprehensive-success Jun 13, 2025 17:24 episodic bedrock-agent-system by claude-code
+  - paragraph: "CRITICAL USER FEEDBACK - INFINITE SCROLL STILL BROKEN: ## User's Key Points: 1. /memories page infinite scroll NOT WORKING - claimed fix didn't work 2. Dashboard controls API calls via Next.js routes - can shape pagination ourselves 3. Need to check if using OpenSearch built-in pagination features 4. Should implement streaming HTTP/SSE for real-time memory additions 5. Recent Memory Activity \"show\" selector logic broken - should select next highest number intelligently 6. Missing form libraries (React Hook Form + Zod validation) across application 7. Recent Memory Activity parenthesis count not updating on scroll 8. Tests should verify functionality - Playwright tests should prove if working/broken 9. Not using memory-local tools effectively to track progress, connections, observations 10. Need sophisticated memory connections documenting code relationships, troubleshooting history ## Status: INFINITE SCROLL FUNDAMENTALLY BROKEN - User frustrated with repeated false claims of fixes - Need immediate actual functionality verification - Must use memory tools to document progress and learn from failures - Tests must prove functionality works ## Immediate Actions Needed: 1. Actually test /memories page functionality in browser 2. Implement proper pagination control in Next.js API 3. Fix Recent Memory Activity count updates 4. Create comprehensive memory documentation of all attempts/solutions 5. Write and run Playwright tests that prove functionality works"
+  - text: critical-feedback infinite-scroll broken user-frustration testing-needed Jun 13, 2025 16:48 episodic bedrock-agent-system by claude-code
+  - paragraph: "Fixed test failures in infinite scroll testing. Issues identified: 1) Playwright tests being run by Vitest (need separate configs), 2) TypeScript JSX errors in test files, 3) Tests timing out due to improper mocking, 4) Need to exclude e2e tests from Vitest. Working on fixing each systematically to achieve excellent test coverage."
+  - text: testing debugging vitest playwright infinite-scroll Jun 13, 2025 14:56 episodic bedrock-agent-system by claude-code
+  - paragraph: "Successfully completed MCP Memory Server Dashboard improvements: 1. Implemented Next.js route-based navigation replacing tab-based UI 2. Fixed storage view errors by updating StorageHealth interface to match actual API response 3. Created complete route structure with proper components for /overview, /storage, /memories, /graph, /logs, /admin 4. Fixed \"memories.memories undefined\" error in memory browser with proper null checking 5. Updated storage monitoring to display static MCP configuration values instead of non-existent API fields 6. All navigation routes working with active state highlighting and no redirect loops The dashboard at localhost:3101 now has proper URL-based navigation with working storage monitoring, memory overview, and admin interfaces. Server logs show successful compilation and no runtime errors."
+  - text: dashboard navigation next.js mcp-memory-server bug-fix ui-improvement Jun 11, 2025 17:21 procedural bedrock-agent-system by claude-code
+  - paragraph: "Created comprehensive MCP Memory Server Dashboard with Next.js 15, React 19, and shadcn/ui. Features include: 1. **Real-time Memory Overview**: Statistics, charts for memory types, agent contributions, recent activity feed 2. **Storage Monitoring**: Health status for DynamoDB, OpenSearch, Neo4j with admin interface links 3. **Memory Browser**: Search/filter memories, add new memories, view details, tag management 4. **Graph Visualization**: Interactive knowledge graph with nodes/edges, relationship creation, zoom/pan controls 5. **Server Logs**: Real-time log streaming with filtering, search, download, auto-scroll 6. **Admin Panel**: Links to external database interfaces (DynamoDB Admin, OpenSearch Dashboards, Neo4j Browser) Dashboard runs on port 3101 following our port strategy. All components use functional programming patterns, latest package versions (React 19.1.0, Next.js 15.3.3), and provide real-time updates via API proxy to memory server at localhost:4100."
+  - text: mcp-memory-dashboard next.js react shadcn implementation dashboard memory-management Jun 11, 2025 15:29 episodic bedrock-agent-system by claude-code
+  - paragraph: Testing memory storage via direct HTTP call
+  - text: test debugging Jun 8, 2025 21:28
+  - button "Load More Memories"
+- button "Open Tanstack query devtools":
+  - img
+- alert
+- button "Open Next.js Dev Tools":
+  - img
+```

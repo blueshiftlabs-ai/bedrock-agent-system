@@ -22,15 +22,24 @@ export async function POST(request: NextRequest) {
       )
     }
     
-    // Forward the request to the memory server
-    const response = await fetch(`${MEMORY_SERVER_URL}/memory/mcp`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Accept': 'application/json, text/event-stream',
-      },
-      body: JSON.stringify(body),
-    })
+    // Forward the request to the memory server with timeout
+    const controller = new AbortController()
+    const timeoutId = setTimeout(() => controller.abort(), 5000) // 5 second timeout
+    
+    let response
+    try {
+      response = await fetch(`${MEMORY_SERVER_URL}/memory/mcp`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json, text/event-stream',
+        },
+        body: JSON.stringify(body),
+        signal: controller.signal,
+      })
+    } finally {
+      clearTimeout(timeoutId)
+    }
 
     if (!response.ok) {
       const errorText = await response.text()

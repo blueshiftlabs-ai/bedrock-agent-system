@@ -244,6 +244,7 @@ export function RecentMemoryActivity() {
                   key={memory.id}
                   className="group p-4 border rounded-lg hover:shadow-md hover:border-primary/50 transition-all duration-200 cursor-pointer bg-gradient-to-r from-background to-muted/20 hover:scale-[1.01] transform opacity-0 animate-[fadeInUp_0.4s_ease-out_forwards]"
                   onClick={() => handleMemoryClick(memory.id)}
+                  data-testid="memory-activity-item"
                   style={{
                     animationDelay: `${index * 50}ms`,
                   }}
