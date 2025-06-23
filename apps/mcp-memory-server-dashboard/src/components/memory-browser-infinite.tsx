@@ -541,20 +541,21 @@ export function MemoryBrowserInfinite() {
           </div>
         </CardHeader>
         <CardContent>
-          {isLoading ? (
-            <div className="text-center py-8">
-              <Loader2 className="h-8 w-8 animate-spin mx-auto mb-3" />
-              <p className="text-muted-foreground">Loading memories...</p>
-            </div>
-          ) : filteredAndSortedMemories.length === 0 ? (
-            <div className="text-center py-8 text-muted-foreground">
-              {allMemories.length === 0 
-                ? "No memories found. Try adjusting your search criteria." 
-                : "No memories match your filters. Try adjusting your criteria."}
-            </div>
-          ) : (
-            <>
-              <div className="space-y-4">
+          <div className="h-[600px] overflow-y-auto pr-2">
+            {isLoading ? (
+              <div className="text-center py-8">
+                <Loader2 className="h-8 w-8 animate-spin mx-auto mb-3" />
+                <p className="text-muted-foreground">Loading memories...</p>
+              </div>
+            ) : filteredAndSortedMemories.length === 0 ? (
+              <div className="text-center py-8 text-muted-foreground">
+                {allMemories.length === 0 
+                  ? "No memories found. Try adjusting your search criteria." 
+                  : "No memories match your filters. Try adjusting your criteria."}
+              </div>
+            ) : (
+              <>
+                <div className="space-y-4">
                 {filteredAndSortedMemories.map((memory) => (
                   <div
                     key={memory.id}
@@ -657,6 +658,7 @@ export function MemoryBrowserInfinite() {
               </div>
             </>
           )}
+          </div>
         </CardContent>
       </Card>
       
