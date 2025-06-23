@@ -1,0 +1,93 @@
+# Page snapshot
+
+```yaml
+- banner:
+  - heading "MCP Memory Server Dashboard" [level=1]
+  - paragraph: Real-time monitoring and management
+  - text: Connected
+  - button "Refresh"
+- navigation:
+  - link "Overview":
+    - /url: /overview
+  - link "Storage":
+    - /url: /storage
+  - link "Memories":
+    - /url: /memories
+  - link "Agents":
+    - /url: /agents
+  - link "Graph":
+    - /url: /graph
+  - link "Logs":
+    - /url: /logs
+  - link "Admin":
+    - /url: /admin
+- main:
+  - heading "Total Memories" [level=3]
+  - text: "119"
+  - paragraph: 114 text, 5 code
+  - heading "Graph Concepts" [level=3]
+  - text: "10"
+  - paragraph: Connected memory clusters
+  - heading "Active Agents" [level=3]
+  - text: "6"
+  - paragraph: Unique memory contributors
+  - heading "Recent Activity" [level=3]
+  - text: "10"
+  - paragraph: Last 10 memories
+  - heading "Memory Types Distribution" [level=3]
+  - paragraph: Breakdown by memory type
+  - img: procedural episodic semantic working 0 10 20 30 40
+  - heading "Agent Contributions" [level=3]
+  - paragraph: Memory distribution by agent
+  - img:
+    - img
+    - img
+    - img
+    - img
+    - img
+    - img
+    - text: claude-code 92% claude-opus-4-20250514 3% claude-sonnet-4 3% test-agent-project-fix-v2 1% test-agent-project-fix 1% claude-code-assistant 1%
+  - heading "Recent Memory Activity (10 of 15 (119 total))" [level=3]
+  - paragraph:
+    - text: Latest memory operations with content previews.
+    - button "Visit memories page"
+    - text: for comprehensive memory management with filtering, sorting, and unlimited browsing.
+  - text: "Show:"
+  - combobox: "10"
+  - paragraph: User asking about taskmanager and GitHub project board updates for the new tasks...
+  - paragraph: User asking about taskmanager and GitHub project board updates for the new tasks we added (RSC, PWA, card-level infinite...
+  - text: procedural by claude-code • bedrock-agent-system Jun 14 09:24
+  - paragraph: 🎉 MAJOR MILESTONE ACHIEVED - ALL CRITICAL DASHBOARD ISSUES RESOLVED
+  - paragraph: "🎉 MAJOR MILESTONE ACHIEVED - ALL CRITICAL DASHBOARD ISSUES RESOLVED ## COMPREHENSIVE SUCCESS SUMMARY: ### ✅ CRITICAL ..."
+  - text: episodic by claude-code • bedrock-agent-system Jun 13 17:24
+  - paragraph: Successfully created GitContextService for the MCP memory server. The service in...
+  - paragraph: "Successfully created GitContextService for the MCP memory server. The service includes: 1. GitContextService class with..."
+  - text: semantic by claude-code • bedrock-agent-system Jun 13 21:37
+  - paragraph: Starting comprehensive repository cleanup for bedrock-agent-system. The goal is ...
+  - paragraph: Starting comprehensive repository cleanup for bedrock-agent-system. The goal is to move all non-essential files from roo...
+  - text: procedural by claude-code • bedrock-agent-system Jun 19 13:27
+  - paragraph: "Issue #5 Analysis - Comprehensive Memory Connections Implementation Plan:"
+  - paragraph: "Issue #5 Analysis - Comprehensive Memory Connections Implementation Plan: Current capabilities: - Basic relationship cr..."
+  - text: semantic by claude-code • bedrock-agent-system Jun 19 14:24
+  - paragraph: Neo4j connection test memory - testing automatic concept relationship creation. ...
+  - paragraph: Neo4j connection test memory - testing automatic concept relationship creation. This should create connections with othe...
+  - text: semantic by claude-code • bedrock-agent-system Jun 19 14:37
+  - paragraph: Successfully resolved all TypeScript compilation errors in the dashboard app. Th...
+  - paragraph: Successfully resolved all TypeScript compilation errors in the dashboard app. The build now completes successfully. Key ...
+  - text: episodic by claude-opus-4-20250514 • bedrock-agent-system Jun 22 14:34
+  - paragraph: "CRITICAL USER FEEDBACK - INFINITE SCROLL STILL BROKEN:"
+  - paragraph: "CRITICAL USER FEEDBACK - INFINITE SCROLL STILL BROKEN: ## User's Key Points: 1. /memories page infinite scroll NOT WORK..."
+  - text: episodic by claude-code • bedrock-agent-system Jun 13 16:48
+  - paragraph: "Issue #5 Implementation - Comprehensive Memory Connections COMPLETED:"
+  - paragraph: "Issue #5 Implementation - Comprehensive Memory Connections COMPLETED: ✅ Enhanced autoCreateConceptRelationships with se..."
+  - text: semantic by claude-code • bedrock-agent-system Jun 19 14:30
+  - paragraph: Found the retrieveConnections method implementation in the MCP Memory Server. Th...
+  - paragraph: "Found the retrieveConnections method implementation in the MCP Memory Server. The method flow is: 1. MCP Tools Service ..."
+  - text: semantic by claude-code • bedrock-agent-system Jun 19 14:36
+  - button "Load More"
+- button "Open Tanstack query devtools":
+  - img
+- alert
+- button "Open Next.js Dev Tools":
+  - img
+```

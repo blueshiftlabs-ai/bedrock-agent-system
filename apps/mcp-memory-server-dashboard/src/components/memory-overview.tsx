@@ -50,81 +50,69 @@ export function MemoryOverview() {
   const [loading, setLoading] = useState(true)
 
   const fetchMemoryDetails = async (memoryIds: string[]): Promise<EnhancedMemoryActivity[]> => {
-    console.log('Fetching memory details for IDs:', memoryIds.slice(0, 10))
-    const enhanced: EnhancedMemoryActivity[] = []
+    if (memoryIds.length === 0) return []
     
-    for (const id of memoryIds.slice(0, 10)) { // Limit to 10 for performance
-      try {
-        console.log(`Fetching details for memory: ${id}`)
-        const response = await fetch('/api/memory/mcp', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Accept': 'application/json, text/event-stream'
-          },
-          body: JSON.stringify({
-            jsonrpc: '2.0',
-            id: Date.now(),
-            method: 'tools/call',
-            params: {
-              name: 'retrieve-memories',
-              arguments: {
-                memory_ids: [id],
-                limit: 1
-              }
-            }
-          })
-        })
-
-        if (response.ok) {
-          const data = await response.json()
-          console.log(`Response for ${id}:`, data)
-          if (data.result?.content?.[0]?.text) {
-            const parsedData = JSON.parse(data.result.content[0].text)
-            console.log(`Parsed data for ${id}:`, parsedData)
-            
-            // Handle both direct memory format and wrapped format
-            const memories = parsedData.memories || (parsedData.memory_id ? [parsedData] : null)
-            
-            if (memories && memories.length > 0) {
-              const memoryData = memories[0]
-              const activityItem = stats?.storage.recent_activity.find(a => a.memory_id === id)
-              
-              // Handle the new nested structure: memory.memory.content vs old memory.content
-              const memory = memoryData?.memory || memoryData
-              const metadata = memory?.metadata || memory
-              const memoryContent = memory?.content || memory?.text || 'No content available'
-              
-              console.log(`Memory structure for ${id}:`, { memoryData, memory, metadata, content: memoryContent })
-              
-              const firstLine = String(memoryContent).split('\n')[0] || String(memoryContent)
-              const title = firstLine.slice(0, 60) + (firstLine.length > 60 ? '...' : '')
-              const preview = String(memoryContent).slice(0, 120) + (String(memoryContent).length > 120 ? '...' : '')
-              
-              const enhancedItem = {
-                memory_id: id,
-                type: metadata?.type || activityItem?.type || 'unknown',
-                agent_id: metadata?.agent_id || activityItem?.agent_id,
-                created_at: metadata?.created_at || activityItem?.created_at || '',
-                title,
-                content_preview: preview
-              }
-              console.log(`Enhanced item for ${id}:`, enhancedItem)
-              enhanced.push(enhancedItem)
-            } else {
-              console.log(`No memories found for ${id}`)
+    // Batch fetch all memories in a single request
+    const idsToFetch = memoryIds.slice(0, 10) // Limit to 10 for performance
+    
+    try {
+      const response = await fetch('/api/memory/mcp', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json, text/event-stream'
+        },
+        body: JSON.stringify({
+          jsonrpc: '2.0',
+          id: Date.now(),
+          method: 'tools/call',
+          params: {
+            name: 'retrieve-memories',
+            arguments: {
+              memory_ids: idsToFetch,
+              limit: 10
             }
           }
-        } else {
-          console.error(`Failed to fetch memory ${id}, status:`, response.status)
-        }
-      } catch (error) {
-        console.error(`Failed to fetch memory ${id}:`, error)
+        })
+      })
+
+      if (!response.ok) {
+        console.error('Failed to fetch memories:', response.status)
+        return []
       }
+
+      const data = await response.json()
+      
+      if (!data.result?.content?.[0]?.text) {
+        return []
+      }
+
+      const parsedData = JSON.parse(data.result.content[0].text)
+      const memories = parsedData.memories || []
+      
+      return memories.map((memoryData: any) => {
+        const memory = memoryData?.memory || memoryData
+        const metadata = memory?.metadata || memory
+        const memoryContent = memory?.content || memory?.text || 'No content available'
+        const activityItem = stats?.storage.recent_activity.find(a => a.memory_id === metadata?.memory_id)
+        
+        const firstLine = String(memoryContent).split('\n')[0] || String(memoryContent)
+        const title = firstLine.slice(0, 60) + (firstLine.length > 60 ? '...' : '')
+        const preview = String(memoryContent).slice(0, 120) + (String(memoryContent).length > 120 ? '...' : '')
+        
+        return {
+          memory_id: metadata?.memory_id || '',
+          type: metadata?.type || activityItem?.type || 'unknown',
+          agent_id: metadata?.agent_id || activityItem?.agent_id,
+          created_at: metadata?.created_at || activityItem?.created_at || '',
+          title,
+          content_preview: preview
+        }
+      })
+    } catch (error) {
+      console.error('Failed to batch fetch memories:', error)
+      return []
     }
-    
-    console.log('Final enhanced activities:', enhanced)
-    return enhanced
   }
 
   useEffect(() => {
