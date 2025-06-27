@@ -378,11 +378,11 @@ export class Neo4jGraphService implements OnModuleDestroy {
     
     try {
       let query = `
-        MATCH (a)-[r]->(b)
+        MATCH (a:Memory)-[r]->(b:Memory)
         WHERE 1=1
       `;
       // Ensure limit is an integer for Neo4j
-      const params: any = { limit: Math.floor(Number(limit)) };
+      const params: any = { limit: parseInt(String(limit), 10) || 50 };
 
       if (memoryId) {
         query += ` AND (a.memory_id = $memory_id OR b.memory_id = $memory_id)`;
@@ -390,7 +390,7 @@ export class Neo4jGraphService implements OnModuleDestroy {
       }
 
       if (relationshipType) {
-        query += ` AND type(r) = $relationship_type`;
+        query += ` AND r.type = $relationship_type`;
         params.relationship_type = relationshipType;
       }
 
@@ -398,20 +398,44 @@ export class Neo4jGraphService implements OnModuleDestroy {
         RETURN 
           a.memory_id as from_memory_id,
           b.memory_id as to_memory_id,
-          type(r) as relationship_type,
+          r.type as relationship_type,
           r.confidence as confidence,
-          properties(r) as properties
-        LIMIT $limit
+          r.properties as properties,
+          a.content as from_content,
+          b.content as to_content,
+          a.type as from_type,
+          b.type as to_type,
+          a.agent_id as from_agent_id,
+          b.agent_id as to_agent_id,
+          a.created_at as from_created_at,
+          b.created_at as to_created_at
+        ORDER BY r.created_at DESC
+        LIMIT toInteger($limit)
       `;
 
       const result = await session.run(query, params);
       
       return result.records.map(record => ({
+        from_id: record.get('from_memory_id'),
+        to_id: record.get('to_memory_id'),
         from_memory_id: record.get('from_memory_id'),
         to_memory_id: record.get('to_memory_id'),
         relationship_type: record.get('relationship_type'),
         confidence: record.get('confidence'),
-        properties: record.get('properties')
+        properties: record.get('properties'),
+        // Enhanced data for graph visualization
+        from_label: record.get('from_content')?.slice(0, 50) + '...' || record.get('from_memory_id').slice(0, 8),
+        to_label: record.get('to_content')?.slice(0, 50) + '...' || record.get('to_memory_id').slice(0, 8),
+        from_type: record.get('from_type') || 'memory',
+        to_type: record.get('to_type') || 'memory',
+        from_properties: {
+          agent_id: record.get('from_agent_id'),
+          created_at: record.get('from_created_at')
+        },
+        to_properties: {
+          agent_id: record.get('to_agent_id'),
+          created_at: record.get('to_created_at')
+        }
       }));
     } catch (error) {
       this.logger.error(`Failed to get connections: ${getErrorMessage(error)}`);
@@ -447,7 +471,7 @@ export class Neo4jGraphService implements OnModuleDestroy {
               r.confidence as confidence,
               properties(r) as properties,
               labels(connected)[0] as connected_type
-            LIMIT $limit
+            LIMIT toInteger($limit)
           `;
           break;
         case 'agent':
@@ -460,7 +484,7 @@ export class Neo4jGraphService implements OnModuleDestroy {
               r.confidence as confidence,
               properties(r) as properties,
               labels(connected)[0] as connected_type
-            LIMIT $limit
+            LIMIT toInteger($limit)
           `;
           break;
         case 'session':
@@ -473,7 +497,7 @@ export class Neo4jGraphService implements OnModuleDestroy {
               r.confidence as confidence,
               properties(r) as properties,
               labels(connected)[0] as connected_type
-            LIMIT $limit
+            LIMIT toInteger($limit)
           `;
           break;
       }

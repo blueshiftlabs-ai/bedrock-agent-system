@@ -278,7 +278,12 @@ export class MCPToolsService {
     }),
   })
   async retrieveConnections(params: { memory_id?: string; relationship_type?: string; limit?: number }) {
-    const result = await this.memoryService.retrieveConnections(params);
+    // Ensure limit is an integer to avoid Neo4j float errors
+    const cleanParams = {
+      ...params,
+      limit: params.limit ? parseInt(String(params.limit), 10) : 50
+    };
+    const result = await this.memoryService.retrieveConnections(cleanParams);
     return {
       content: [
         {
