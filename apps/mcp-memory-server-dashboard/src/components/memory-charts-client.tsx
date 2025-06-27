@@ -3,6 +3,7 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { BarChart as BarChartIcon, PieChart as PieChartIcon } from 'lucide-react'
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts'
+import { getMemoryTypeHexColor } from '@/lib/memory-utils'
 
 // Colors for charts
 const COLORS = ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#06b6d4']
@@ -33,6 +34,7 @@ export function MemoryChartsClient({ initialData }: MemoryChartsClientProps) {
   const memoryTypeData = initialData.storage?.by_type ? 
     Object.entries(initialData.storage.by_type).map(([type, countObj]) => ({
       name: type.charAt(0).toUpperCase() + type.slice(1),
+      originalType: type, // Keep original type for color mapping
       count: (countObj as any)?.count || 0
     })) : []
 
@@ -59,7 +61,7 @@ export function MemoryChartsClient({ initialData }: MemoryChartsClientProps) {
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-      <Card>
+      <Card id="memory-types-bar-chart">
         <CardHeader>
           <CardTitle className="flex items-center space-x-2">
             <BarChartIcon className="h-5 w-5" />
@@ -75,14 +77,21 @@ export function MemoryChartsClient({ initialData }: MemoryChartsClientProps) {
                 <XAxis dataKey="name" />
                 <YAxis />
                 <Tooltip />
-                <Bar dataKey="count" fill="#3b82f6" />
+                <Bar dataKey="count">
+                  {memoryTypeData.map((entry, index) => (
+                    <Cell 
+                      key={`cell-${index}`} 
+                      fill={getMemoryTypeHexColor(entry.originalType)} 
+                    />
+                  ))}
+                </Bar>
               </BarChart>
             </ResponsiveContainer>
           </div>
         </CardContent>
       </Card>
 
-      <Card>
+      <Card id="agent-activity-pie-chart">
         <CardHeader>
           <CardTitle className="flex items-center space-x-2">
             <PieChartIcon className="h-5 w-5" />

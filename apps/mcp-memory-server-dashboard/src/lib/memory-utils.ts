@@ -15,6 +15,14 @@ export function getMemoryTypeIcon(type: string) {
   }
 }
 
+// Unified color system matching graph visualization
+export const MEMORY_TYPE_COLORS = {
+  episodic: '#3b82f6',   // Blue - events and experiences
+  semantic: '#10b981',   // Green - facts and concepts  
+  procedural: '#8b5cf6', // Purple - processes and how-to
+  working: '#f59e0b'     // Amber - temporary/session data
+} as const
+
 export function getMemoryTypeColor(type: string) {
   switch (type) {
     case 'episodic':
@@ -22,12 +30,16 @@ export function getMemoryTypeColor(type: string) {
     case 'semantic':
       return 'bg-green-500'
     case 'procedural':
-      return 'bg-yellow-500'
-    case 'working':
       return 'bg-purple-500'
+    case 'working':
+      return 'bg-amber-500'
     default:
       return 'bg-gray-500'
   }
+}
+
+export function getMemoryTypeHexColor(type: string): string {
+  return MEMORY_TYPE_COLORS[type as keyof typeof MEMORY_TYPE_COLORS] || '#6b7280'
 }
 
 export function getMemoryTypeColorClass(type: string, variant: 'background' | 'text' | 'border' = 'background') {

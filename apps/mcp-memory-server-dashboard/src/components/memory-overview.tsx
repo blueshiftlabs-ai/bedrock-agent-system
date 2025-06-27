@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts'
 import { Brain, Database, Network, TrendingUp, FileText, Code, MessageSquare, Cog } from 'lucide-react'
-import { getMemoryTypeIcon, getMemoryTypeColor } from '@/lib/memory-utils'
+import { getMemoryTypeIcon, getMemoryTypeColor, getMemoryTypeHexColor } from '@/lib/memory-utils'
 import { RecentMemoryActivity } from './recent-memory-activity'
 
 interface MemoryStats {
@@ -188,10 +188,15 @@ export function MemoryOverview() {
     )
   }
 
-  const typeData = Object.entries(stats.storage.by_type).map(([type, data]) => ({
-    name: type,
-    count: data.count
-  }))
+  const typeData = Object.entries(stats.storage.by_type).map(([type, data]) => {
+    const color = getMemoryTypeHexColor(type)
+    console.log(`Type data: type="${type}", count=${data.count}, color=${color}`)
+    return {
+      name: type,
+      count: data.count,
+      fill: color  // Add fill back to data
+    }
+  })
 
   const agentData = Object.entries(stats.storage.by_agent).map(([agent, data]) => ({
     name: agent === 'unknown' ? 'Anonymous' : agent,
@@ -295,7 +300,54 @@ export function MemoryOverview() {
                 <XAxis dataKey="name" />
                 <YAxis />
                 <Tooltip />
-                <Bar dataKey="count" fill="#0088FE" />
+                <Bar dataKey="count" />
+              </BarChart>
+            </ResponsiveContainer>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>Memory Types Distribution (Alternative)</CardTitle>
+            <CardDescription>Testing individual bars</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <ResponsiveContainer width="100%" height={300}>
+              <BarChart data={typeData}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="name" />
+                <YAxis />
+                <Tooltip />
+                {typeData.map((entry, index) => (
+                  <Bar 
+                    key={`bar-${index}`}
+                    dataKey="count" 
+                    fill={getMemoryTypeHexColor(entry.name)}
+                    data={[entry]}
+                  />
+                ))}
+              </BarChart>
+            </ResponsiveContainer>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>Memory Types Distribution (Cell Method)</CardTitle>
+            <CardDescription>Using Cell components</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <ResponsiveContainer width="100%" height={300}>
+              <BarChart data={typeData}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="name" />
+                <YAxis />
+                <Tooltip />
+                <Bar dataKey="count">
+                  {typeData.map((entry, index) => (
+                    <Cell key={`cell-${index}`} fill={getMemoryTypeHexColor(entry.name)} />
+                  ))}
+                </Bar>
               </BarChart>
             </ResponsiveContainer>
           </CardContent>
